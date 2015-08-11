@@ -1,0 +1,148 @@
+#+TITLE: Evil Multiple Cursors
+
+* Spec
+** Text selection
+- should work-test with regex
+- should work-test with selected text
+- should work-test with the word at point
+- should be able to add matches
+- should be able to skip matches
+- should be able to remove matches
+- should be able to add all matches
+- want a combination of visualstar and word/symbol only
+** Movement
+- normal cursor movements (up/down/left/right)
+- evil motions
+- should be able to cycle cursors
+- gg should go to the first cursor
+- G should go to the last cursor
+- should be able to align all cursors at 
+  - start of line
+  - end of line
+  - current column
+  - original word
+- going back to a previous line should return the cursor to it's old location
+** Editing
+- should work with any operator
+- should work in insert mode
+- should work with other plugins such as exchange, surround, smartchr, etc
+- add hooks for commands, so that for every command/keys pair users can specify a lambda 
+to be run for each fake cursor when the real cursor executes the above command
+  - same as a key map but for commands
+** Status
+- the number of matches
+- the number of current cursors
+- it should be visibly clear when the multiple cursor mode is engaged
+* Implementation
+** Re-implement the current multiple-cursors in terms of evil's abstractions
+- mOtions
+- oPerators
+** Steps
+*** for search support only selected pattern (a la visualstar) to start
+*** create fake cursors based on the current selection or regex
+- the visual selection should be on for each fake cursor
+- if nothing is selected add each new cursor on the same column (below or above)
+- how do we accomplish this with evil abstractions
+  - the search can be done as in evil-visualstar
+*** in motion after hooks simulate the current motion for all fake cursors
+*** in operator after hook run the last operator command for all fake cursors
+*** in the exit insert mode hook, repeat the last command (same as dot) for all the fake cursors
+**** see ~evil-repeat~ 
+** Store the number of cursors in a variable, see ~mc/num-cursors~
+** Need a place to store state for each cursor
+** Abstractions
+*** cursor list
+- align
+- execute command
+- remove (all)
+- count
+*** cursor
+- has a unique id
+- contains state
+- can move itself
+- can re size itself
+- cursor (fake or real)
+- a cursors should have state 
+  - determine the vars that need to be tracked per cursor, see ~mc/cursor-specific-vars~
+- make-cursor
+- make-active-region
+- cursor-execute command/motion
+- mark-next-match
+  - direction: forward, backward
+  - match type: word, symbol, everything
+  - skip?
+* Preparation
+** TODO Understand the implementation of emacs multiple-cursors
+** TODO Get familiar with the abstractions of evil mode
+* Related
+- https://github.com/magnars/multiple-cursors.el/issues/17
+- https://github.com/magnars/multiple-cursors.el
+- https://github.com/terryma/vim-multiple-cursors
+- http://www.sublimetext.com/docs/3/multiple_selection_with_the_keyboard.html
+* Questions
+** How do we draw each cursor
+- should respect the color and shape of the original cursor (based on evil state)
+** How do we get the visual selection in evil
+** Where do we store all cursors
+- store the cursors in a list (similar to evil's ~evil-ex-active-highlights-alist~)
+- define some abstractions over the cursors list
+- a lot of state can be stored into the cursor overlays
+- overlays can be removed and re-added to the buffer 
+** How do we find all places that need to have a fake cursor
+- see evil-visualstar
+** How does the emacs multiple cursors work
+- it creates a set of fake cursors (and regions) based on the current selection
+  - see ~mc/cursor-face~ and ~mc/region-face~
+- how does it create a fake cursor (and active region)
+** How do we deal with copy/paste
+** How do we deal with new lines
+** How do I set up the environment for developing the plugin
+- unit tests
+- messages/debug
+- install
+- reload on changes
+** What happens to the cursors that are off screen
+* Development
+** TODO Implement only prev and next based on the visual selection
+- draw the cursors
+- draw the visual selection for each cursor
+- first escape should clear the visual selection (if any)
+- second escape should clear the cursors (if visual selection)
+- second escape should remove all fake cursors
+- should be able to add a cursor for next match or show a warning message
+- should be able to add a cursor for prev match or show a warning message
+- should be able to add a cursor for all matches or show a warning message
+- add tests
+*** Behavior
+**** pressing (create-next-cursor/create-prev-cursor) the first time
+- output error if there is no visual selection
+- output error if the visual selection is not of a supported type (inline)
+- store the selected pattern
+- create fake cursor at point (end of visual selection)
+- store state for the current fake cursor
+- remove the visual selection
+- move cursor to the pattern match (end of it)
+**** pressing (create-next-cursor/create-prev-cursor) subsequent times
+- output error if there are no more matches or if the next match is a fake cursor
+- create the next fake cursor at point
+- store state for the current fake cursor
+- move cursor to the next pattern match (wrap)
+** TODO Implement motions for the fake and real cursors
+- all evil motions should work for all cursors
+- other motions that are built using evil abstractions should work such as %, etc
+- after exiting insert the cursor moves to the left one char: need to do the same for all fake cursors
+- add tests
+** Implement operators
+- abuilt in operators should work
+- or operators implemented using evil abstractions should work
+- atests
+** Keep the visual selection and ensure that making a visual selection works for all cursors
+- atests
+** Implement prev and next based on the word/WORD/symbol at cursor as well
+- atest
+** Implement skip when adding cursors
+** Add ability to wrap around when doing next or prev
+** Add ability to create cursors for all matches
+** Handle the insert mode
+- all operations performed in insert state should happen for all cursors
+** Ensure undo/redo works properly for all changes and all cursors
