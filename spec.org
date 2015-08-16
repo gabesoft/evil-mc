@@ -26,9 +26,9 @@
 - should work with any operator
 - should work in insert mode
 - should work with other plugins such as exchange, surround, smartchr, etc
-- add hooks for commands, so that for every command/keys pair users can specify a lambda 
-to be run for each fake cursor when the real cursor executes the above command
+- add hooks for commands, so that for every command/keys pair users can specify a lambda to be run for each fake cursor when the real cursor executes the above command
   - same as a key map but for commands
+- maybe we should have a ring of commands, similar to evil-repeat-ring to allow for executing prior commands
 ** Status
 - the number of matches
 - the number of current cursors
@@ -51,6 +51,8 @@ to be run for each fake cursor when the real cursor executes the above command
 ** Store the number of cursors in a variable, see ~mc/num-cursors~
 ** Need a place to store state for each cursor
 ** Abstractions
+
+
 *** cursor list
 - align
 - execute command
@@ -71,6 +73,13 @@ to be run for each fake cursor when the real cursor executes the above command
   - direction: forward, backward
   - match type: word, symbol, everything
   - skip?
+** Conflicts and workarounds
+- evil-escape causes evil-find-char to stop working and self-insert-command with "f" to result in an infinite loop
+  - this is due to remapping "fd" to escape from insert
+- there is some interference with yasnippet
+  - see yas--on-field-overlay-modification
+    - wrong type argument: overlayp, nil
+** Operator commands need to be done using evil-operator-range to get the beginning and end positions
 * Preparation
 ** TODO Understand the implementation of emacs multiple-cursors
 ** TODO Get familiar with the abstractions of evil mode
@@ -146,3 +155,4 @@ to be run for each fake cursor when the real cursor executes the above command
 ** Handle the insert mode
 - all operations performed in insert state should happen for all cursors
 ** Ensure undo/redo works properly for all changes and all cursors
+- after undo position the cursors in the proper places
