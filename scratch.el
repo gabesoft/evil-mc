@@ -499,6 +499,7 @@ If the buffer is change, the command is cancelled.")
   "Begin saving the current command if it is a supported command in `emc-command-info'."
   ;; TODO also check that the emc-multiple-cursors-mode is enabled
   ;;      and no there aro no blacklisted modes enabled
+  ;;      - evil-emacs-state-p
   (when (not emc-running-command)
     (emc-print-this-command "PRE")
     (let ((cmd (or (command-remapping this-original-command) this-original-command)))
