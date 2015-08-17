@@ -10,6 +10,8 @@
 - should be able to remove matches
 - should be able to add all matches
 - want a combination of visualstar and word/symbol only
+- should be able to create/remove a cursor to/from anywhere
+  - would need a cursor creation mode to avoid moving all fake cursors as the real one is moving
 ** Movement
 - normal cursor movements (up/down/left/right)
 - evil motions
@@ -29,6 +31,9 @@
 - add hooks for commands, so that for every command/keys pair users can specify a lambda to be run for each fake cursor when the real cursor executes the above command
   - same as a key map but for commands
 - maybe we should have a ring of commands, similar to evil-repeat-ring to allow for executing prior commands
+- make it work with the following plugins
+  - evil-surround
+  - evil-snipe
 ** Status
 - the number of matches
 - the number of current cursors
@@ -79,6 +84,8 @@
 - there is some interference with yasnippet
   - see yas--on-field-overlay-modification
     - wrong type argument: overlayp, nil
+- disabling or never enabling evil-snipe breaks motion commands
+  - this-command-keys don't contain "t" in commands such as "dtk" or "ctk"
 ** Operator commands need to be done using evil-operator-range to get the beginning and end positions
 * Preparation
 ** TODO Understand the implementation of emacs multiple-cursors
@@ -93,7 +100,7 @@
 - should respect the color and shape of the original cursor (based on evil state)
 ** How do we get the visual selection in evil
 ** Where do we store all cursors
-- store the cursors in a list (similar to evil's ~evil-ex-active-highlights-alist~)
+- store the cursors in a list (similar to evil"s ~evil-ex-active-highlights-alist~)
 - define some abstractions over the cursors list
 - a lot of state can be stored into the cursor overlays
 - overlays can be removed and re-added to the buffer 

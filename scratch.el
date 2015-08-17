@@ -70,7 +70,7 @@
 (defface emc-region-face
   '((t :inherit region))
   "The face used for fake regions"
-  :group 'multiple-cursors)
+  :group 'evil-multiple-cursors)
 
 (evil-define-local-var emc-cursor-list nil
   "The list of current cursors")
@@ -209,6 +209,7 @@
 
 (defun emc-setup-key-maps ()
   "Sets up all key bindings for working with multiple cursors."
+  (interactive)
   (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-next-cursor)
   (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor)
   (define-key evil-normal-state-local-map (kbd "C-,") 'emc-remove-all-cursors))
@@ -469,6 +470,20 @@ If the buffer is change, the command is cancelled.")
         ((atom keys) (cons keys nil))
         (t keys)))
 
+(defun emc-append-unique (keys raw last)
+  "Return a list of keys with only the unique values from KEYS, RAW, and LAST."
+  (let ((normalized-keys (emc-normalize-keys keys))
+        (normalized-raw (emc-normalize-keys raw))
+        (normalized-last (emc-normalize-keys last)))
+    (remove-duplicates (append normalized-keys normalized-raw normalized-last) :from-end t)))
+
+(defun emc-set-this-comand-keys (new-keys)
+  "Adds NEW-KEYS to the current comand."
+  (let* ((this (emc-get-this-command))
+         (last (emc-get-last-command))
+         (keys (emc-normalize-keys new-keys)))
+    (emc-set-command-info this last keys)))
+
 (defun emc-append-this-comand-keys (new-keys)
   "Adds NEW-KEYS to the current comand."
   (let* ((this (emc-get-this-command))
@@ -491,11 +506,28 @@ If the buffer is change, the command is cancelled.")
         (emc-set-last-command last-command)
         (emc-append-this-comand-keys (this-command-keys-vector))))))
 
+;; TODO: use the advice below in the absence of evil-snipe-mode but not if it is enabled
+(defun emc-record-key-sequence (prompt &optional continue-echo dont-downcase-last
+                                       can-return-switch-frame cmd-loop)
+  "Record `this-command-keys' before it is reset."
+  (when (not emc-running-command)
+    (let* ((orig (emc-get-this-command-keys))
+           (new (emc-normalize-keys (this-command-keys-vector)))
+           (all (append orig new)))
+      (emc-set-this-comand-keys (remove-duplicates all :from-end t)))
+    (message "KEYS SEQUENCE %s %s %s"
+             (this-command-keys)
+             (this-command-keys-vector)
+             (emc-get-this-command-keys))))
+
 (defun emc-finish-save-command ()
   "Finish saving the current command. This should be called from `post-command-hook'."
   (when (not emc-running-command)
     (emc-print-this-command "POST")
-    (emc-append-this-comand-keys (this-command-keys-vector))))
+    (emc-append-this-comand-keys (emc-append-unique
+                                  (this-command-keys-vector)
+                                  (this-single-command-raw-keys)
+                                  last-input-event))))
 
 (defun emc-position-cursors-after-insert ()
   "Re-position the cursors when exiting insert state."
@@ -546,6 +578,7 @@ If the buffer is change, the command is cancelled.")
       (eq cmd 'backward-delete-char-untabify)
       (eq cmd 'delete-backward-char)
       (eq cmd 'newline-and-indent)
+      (eq cmd 'yank)
       (eq cmd 'evil-delete-backward-char-and-join)
       (eq cmd 'evil-delete-backward-word)
       (eq cmd 'evil-delete)
@@ -554,24 +587,35 @@ If the buffer is change, the command is cancelled.")
       (eq cmd 'evil-change-line)
       (eq cmd 'evil-delete-char)
       (eq cmd 'evil-append)
+      (eq cmd 'evil-paste-before)
+      (eq cmd 'evil-paste-after)
       (eq cmd 'evil-replace)
       (eq cmd 'evil-open-above)
       (eq cmd 'evil-open-below)
       (eq cmd 'self-insert-command)))
 
-(evil-define-operator emc-evil-change (beg end type register yank-handler delete-func)
-  "TODO: doc"
-  (interactive "<R><x><y>")
-  (list beg end type register))
+(defun emc-change-operator-sequence (keys)
+  "Return the sequence of keys to run an `evil-change' keyboard macro for fake cursors based on KEYS."
+  (let* ((seq (apply 'concat keys))
+         (keys-with-count (evil-extract-count seq))
+         (cnt (nth 0 keys-with-count))
+         (fst (nth 2 keys-with-count))
+         (snd (nth 3 keys-with-count))
+         (res (apply 'concat (list "d" (cond ((string-equal snd "w") "e")  ;; TODO use a map
+                                             ((string-equal snd "W") "E")
+                                             (t snd))))))
+    (cond ((string-equal seq "cc") "^C")
+          (t (concat "l" (if (null cnt)
+                             res
+                           (concat (number-to-string cnt) res)))))))
 
-;; (point)(call-interactively 'emc-evil-change nil [119])
 
 (defun emc-run-last-command ()
   "Run the last stored command."
   (when (emc-command-info-p)
     (let* ((cmd (emc-get-this-command))
            (keys-vector (emc-get-this-command-keys))
-           (keys (mapcar 'char-to-string keys-vector)))
+           (keys (mapcar 'char-to-string (remove-if-not 'characterp keys-vector))))
       (when emc-debug (message "CMD %s keys-vector %s keys %s" cmd keys-vector keys))
       (cond ((or (eq cmd 'evil-snipe-f)
                  (eq cmd 'evil-snipe-t)) (evil-snipe-repeat))
@@ -585,105 +629,32 @@ If the buffer is change, the command is cancelled.")
             ((eq cmd 'delete-backward-char) (delete-char -1))
             ((eq cmd 'evil-delete) (execute-kbd-macro (apply 'concat keys)))
             ((eq cmd 'evil-replace) (evil-repeat 1))
+            ((eq cmd 'evil-paste-before) (evil-paste-before 1))
+            ((eq cmd 'evil-paste-after) (evil-paste-after 1))
             ((eq cmd 'evil-open-below) (evil-insert-newline-below))
             ((eq cmd 'evil-open-above) (evil-insert-newline-above))
             ((eq cmd 'evil-change-line) (evil-delete-line (point) (1+ (point))))
 
             ((eq cmd 'evil-change)
              (evil-with-state normal
-               ;; TODO until we find a better way just map the keys
-               ;; cw -> lde
-               ;; dtv -> ldv
-               ;; c2ti -> ld2ti
-               (execute-kbd-macro "ld2ti")))
+               (message "keys %s change %s" keys (emc-change-operator-sequence keys))
+               (execute-kbd-macro (emc-change-operator-sequence keys))))
 
-            ;; ((eq cmd 'evil-change)
-            ;;  (evil-with-state normal
-            ;;    (let* ((motion (emc-evil-read-motion (cdr keys-vector)))
-            ;;           (range (evil-motion-range (car motion))))
-            ;;      (message "range %s point %s motion %s" range (point) motion)
-            ;;      (evil-delete (car range) (car (cdr range))))))
+            ;; TODO make this work
+            ;; ((eq cmd 'evil-repeat) (evil-repeat 1))
+            ;; evil-surround integration cs'" etc
 
-            ;; TODO fix
-            ;; ((eq cmd 'evil-change)
-            ;;  (call-interactively 'evil-change nil (vconcat (cdr keys))))
-
-            ;; ((eq cmd 'evil-change)
-            ;;  (let ((range (evil-motion-range 'evil-forward-word-end)))
-            ;;    (evil-delete (car range) (car (cdr range)))))
-
-            ;; ((eq cmd 'evil-repeat) (evil-repeat 1)) ;; TODO make this work
             (t (funcall cmd))))))
-
-(defun emc-evil-read-motion (keys &optional motion count type modifier)
-  "Read a MOTION, motion COUNT and motion TYPE from the keyboard.
-The type may be overridden with MODIFIER, which may be a type
-or a Visual selection as defined by `evil-define-visual-selection'.
-Return a list (MOTION COUNT [TYPE])."
-  (let ((modifiers '((evil-visual-char . char)
-                     (evil-visual-line . line)
-                     (evil-visual-block . block)))
-        command prefix)
-    (unless motion
-      (dolist (key keys)
-        (setq command (evil-keypress-parser (list key))
-              motion (pop command)
-              prefix (pop command))
-        (when prefix
-          (if count
-              (setq count (string-to-number
-                           (concat (number-to-string count)
-                                   (number-to-string prefix))))
-            (setq count prefix)))
-        ;; if the command is a type modifier, read more
-        (when (rassq motion evil-visual-alist)
-          (setq modifier
-                (or modifier
-                    (car (rassq motion evil-visual-alist)))))))
-    (when modifier
-      (setq type (or type (evil-type motion 'exclusive)))
-      (cond
-       ((eq modifier 'char)
-        ;; TODO: this behavior could be less hard-coded
-        (if (eq type 'exclusive)
-            (setq type 'inclusive)
-          (setq type 'exclusive)))
-       (t
-        (setq type modifier))))
-    (list motion count type)))
-
-;; (call-interactively 'evil-change nil [99 119 99])
-
-;; (defun emc-get-motion (keys state)
-;;   "Returns the motion associated with KEYS for STATE."
-;;   (let ((motion (or evil-operator-range-motion
-;;                     (when (evil-ex-p) 'evil-line)))
-;;         (type evil-operator-range-type)
-;;         (range (evil-range (point) (point)))
-;;         command count modifier)
-;;     (evil-save-state
-;;       (unless motion
-;;         (evil-change-state state)
-;;         (let ((keys (nth 2 (evil-extract-count (this-command-keys)))))
-;;           (setq keys (listify-key-sequence keys))
-;;           (dotimes (var (length keys))
-;;             (define-key evil-operator-shortcut-map
-;;               (vconcat (nthcdr var keys)) 'evil-line)))
-;;         (setq command (evil-keypress-parser keys)
-;;               motion (nth 0 command)
-;;               count (nth 1 command)
-;;               type (or type (nth 2 command)))))
-;;     motion))
-
-;; (emc-get-motion "w" 'normal)
-;; (evil-save-state (evil-change-state 'motion) (evil-keypress-parser "b"))
 
 (defun emc-execute-last-command ()
   "Executes the command stored in `emc-command-info'."
   (when (and emc-command-info (not emc-cursor-command))
     (when emc-debug
       (message "Executing %s command (running %s)" emc-command-info emc-running-command))
-    (condition-case error (emc-run-last-command)
+    (condition-case error
+        (unwind-protect
+            (catch 'abort
+              (emc-run-last-command)))
       (error (message "Command %s failed with error %s"
                       emc-command-info (error-message-string error))))))
 
@@ -719,7 +690,9 @@ Return a list (MOTION COUNT [TYPE])."
 
   ;; Add this as the first hook, to run before evil-repeat post hook which clears the command keys
   (add-hook 'post-command-hook 'emc-finish-save-command nil t)
-  (add-hook 'post-command-hook 'emc-run-motion-for-all-cursors t t))
+  (add-hook 'post-command-hook 'emc-run-motion-for-all-cursors t t)
+
+  (advice-add 'read-key-sequence :before #'emc-record-key-sequence))
 
 ;; (execute-kbd-macro "bbbbdw")
 
@@ -729,7 +702,8 @@ Return a list (MOTION COUNT [TYPE])."
   (remove-hook 'evil-insert-state-exit-hook 'emc-position-cursors-after-insert)
   (remove-hook 'pre-command-hook 'emc-begin-save-command t)
   (remove-hook 'post-command-hook 'emc-finish-save-command t)
-  (remove-hook 'post-command-hook 'emc-run-motion-for-all-cursors t))
+  (remove-hook 'post-command-hook 'emc-run-motion-for-all-cursors t)
+  (advice-remove 'read-key-sequence #'emc-record-key-sequence))
 
 (defun emc-print-command-vars ()
   "Prints command variables."
