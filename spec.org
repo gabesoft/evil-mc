@@ -40,8 +40,8 @@
 - it should be visibly clear when the multiple cursor mode is engaged
 * Implementation
 ** Re-implement the current multiple-cursors in terms of evil's abstractions
-- mOtions
-- oPerators
+- motions
+- operators
 ** Steps
 *** for search support only selected pattern (a la visualstar) to start
 *** create fake cursors based on the current selection or regex
@@ -86,6 +86,7 @@
     - wrong type argument: overlayp, nil
 - disabling or never enabling evil-snipe breaks motion commands
   - this-command-keys don't contain "t" in commands such as "dtk" or "ctk"
+- insert does not seem to work in org mode (org-self-insert-command)
 ** Operator commands need to be done using evil-operator-range to get the beginning and end positions
 * Preparation
 ** TODO Understand the implementation of emacs multiple-cursors
@@ -151,11 +152,11 @@
 ** Implement operators
 - abuilt in operators should work
 - or operators implemented using evil abstractions should work
-- atests
+- add tests
 ** Keep the visual selection and ensure that making a visual selection works for all cursors
-- atests
+- add tests
 ** Implement prev and next based on the word/WORD/symbol at cursor as well
-- atest
+- add tests
 ** Implement skip when adding cursors
 ** Add ability to wrap around when doing next or prev
 ** Add ability to create cursors for all matches

@@ -497,10 +497,14 @@ If the buffer is change, the command is cancelled.")
 ;; command, last-command, (keys: vector-pre vector-post)
 (defun emc-begin-save-command ()
   "Begin saving the current command if it is a supported command in `emc-command-info'."
+  ;; TODO also check that the emc-multiple-cursors-mode is enabled
+  ;;      and no there aro no blacklisted modes enabled
   (when (not emc-running-command)
     (emc-print-this-command "PRE")
     (let ((cmd (or (command-remapping this-original-command) this-original-command)))
       (when (emc-supported-command-p cmd)
+        ;; TODO set the emc-command-recording flag
+        ;;      all subsequent hooks & advices need to observe the above flag
         (emc-clear-this-command)
         (emc-set-this-command cmd)
         (emc-set-last-command last-command)
@@ -592,7 +596,10 @@ If the buffer is change, the command is cancelled.")
       (eq cmd 'evil-replace)
       (eq cmd 'evil-open-above)
       (eq cmd 'evil-open-below)
-      (eq cmd 'self-insert-command)))
+      (eq cmd 'self-insert-command)
+      (eq cmd 'org-self-insert-command)
+      ))
+
 
 (defun emc-change-operator-sequence (keys)
   "Return the sequence of keys to run an `evil-change' keyboard macro for fake cursors based on KEYS."
@@ -622,6 +629,7 @@ If the buffer is change, the command is cancelled.")
             ((eq cmd 'evil-find-char) (evil-repeat-find-char))
             ((eq cmd 'newline-and-indent) (newline-and-indent))
             ((eq cmd 'self-insert-command) (self-insert-command 1))
+            ((eq cmd 'org-self-insert-command) (self-insert-command 1))
             ((eq cmd 'evil-append) (evil-forward-char))
             ((eq cmd 'evil-delete-backward-char-and-join) (evil-delete-backward-char-and-join 1))
             ((eq cmd 'evil-delete-char) (evil-delete-char (point) (1+ (point))))
