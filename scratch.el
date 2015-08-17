@@ -477,15 +477,15 @@ If the buffer is change, the command is cancelled.")
         (normalized-last (emc-normalize-keys last)))
     (remove-duplicates (append normalized-keys normalized-raw normalized-last) :from-end t)))
 
-(defun emc-set-this-comand-keys (new-keys)
-  "Adds NEW-KEYS to the current comand."
+(defun emc-set-this-command-keys (new-keys)
+  "Adds NEW-KEYS to the current command."
   (let* ((this (emc-get-this-command))
          (last (emc-get-last-command))
          (keys (emc-normalize-keys new-keys)))
     (emc-set-command-info this last keys)))
 
-(defun emc-append-this-comand-keys (new-keys)
-  "Adds NEW-KEYS to the current comand."
+(defun emc-append-this-command-keys (new-keys)
+  "Adds NEW-KEYS to the current command."
   (let* ((this (emc-get-this-command))
          (last (emc-get-last-command))
          (keys (emc-get-this-command-keys))
@@ -509,7 +509,7 @@ If the buffer is change, the command is cancelled.")
         (emc-clear-this-command)
         (emc-set-this-command cmd)
         (emc-set-last-command last-command)
-        (emc-append-this-comand-keys (this-command-keys-vector))))))
+        (emc-append-this-command-keys (this-command-keys-vector))))))
 
 ;; TODO: use the advice below in the absence of evil-snipe-mode but not if it is enabled
 (defun emc-record-key-sequence (prompt &optional continue-echo dont-downcase-last
@@ -519,7 +519,7 @@ If the buffer is change, the command is cancelled.")
     (let* ((orig (emc-get-this-command-keys))
            (new (emc-normalize-keys (this-command-keys-vector)))
            (all (append orig new)))
-      (emc-set-this-comand-keys (remove-duplicates all :from-end t)))
+      (emc-set-this-command-keys (remove-duplicates all :from-end t)))
     (message "KEYS SEQUENCE %s %s %s"
              (this-command-keys)
              (this-command-keys-vector)
@@ -529,7 +529,7 @@ If the buffer is change, the command is cancelled.")
   "Finish saving the current command. This should be called from `post-command-hook'."
   (when (not emc-running-command)
     (emc-print-this-command "POST")
-    (emc-append-this-comand-keys (emc-append-unique
+    (emc-append-this-command-keys (emc-append-unique
                                   (this-command-keys-vector)
                                   (this-single-command-raw-keys)
                                   last-input-event))))
@@ -548,7 +548,7 @@ If the buffer is change, the command is cancelled.")
   (eq emc-running-command t))
 
 ;; TODO: find motions interfere with the cursors commands (especially insert f)
-;; TODO: abort comand hooks functinality if (evil-emacs-state-p)
+;; TODO: abort command hooks functinality if (evil-emacs-state-p)
 
 ;; TODO: make delete char work
 ;; (evil-delete-char (1- (point)) (point))
