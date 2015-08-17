@@ -94,6 +94,13 @@
     (overlay-put overlay 'priority 100)
     overlay))
 
+(defun emc-print-cursor-list ()
+  "Return the cursor list."
+  (interactive)
+  (if emc-cursor-list
+      (message "Cursors %s: %s" (length emc-cursor-list) emc-cursor-list)
+    (message "No cursors found")))
+
 (defun emc-make-cursor-at-point ()
   "Create a cursor overlay at point"
   (interactive)
@@ -104,6 +111,9 @@
 (defun emc-remove-overlay-at-point ()
   "Remove the overlay at point."
   (interactive)
+  (when emc-cursor-list
+    (setq emc-cursor-list (remove-if (lambda (overlay) (eq (overlay-start overlay) (point)))
+                                     emc-cursor-list)))
   (remove-overlays (point) (1+ (point))))
 
 (defun emc-remove-cursor-at-point ()
@@ -111,7 +121,7 @@
   (emc-remove-overlay-at-point))
 
 (defun emc-goto-next-match (pattern &optional direction)
-  "Go to the next match of PATTERN optionally in DIRECTION or 'forward."
+  "Go to the next match of PATTERN optionally in DIRECTION or 'forward. The search does not wrap."
   (let ((pat (evil-ex-make-search-pattern pattern))
         (dir (or direction 'forward)))
     (setq evil-ex-search-pattern pat)
@@ -176,9 +186,17 @@
   "Go to next pattern given by `emc-get-pattern'."
   (interactive)
   (when (emc-get-pattern)
-    (emc-go-to-next-match (emc-get-pattern))))
+    (emc-goto-next-match (emc-get-pattern))))
 
-(defun emc-maybe-goto-next-match ()
+(defun emc-goto-prev ()
+  "Go to prev pattern given by `emc-get-pattern'."
+  (interactive)
+  (when (emc-get-pattern)
+    (emc-goto-next-match (emc-get-pattern) 'backward)
+    (emc-goto-next-match (emc-get-pattern) 'backward)
+    (emc-goto-next-match (emc-get-pattern) 'forward)))
+
+(defun emc-make-cursor-and-goto-next-match ()
   "Create a cursor at point and go to next match if any."
   (let ((cursor (emc-make-cursor-at-point)))
     (evil-exit-visual-state)
@@ -187,16 +205,58 @@
       (delete-overlay cursor)
       (error "No more matches found"))))
 
+(defun emc-goto-prev-match-and-undo-cursor ()
+  "Move point to a previous match and undo the cursor there if any."
+  (if (and (emc-goto-next-match (emc-get-pattern) 'backward)
+           (emc-goto-next-match (emc-get-pattern) 'backward))
+      (progn
+        (emc-goto-next-match (emc-get-pattern) 'forward)
+        (emc-remove-overlay-at-point))
+    (error "No more matches found")))
+
+(defun emc-skip-cursor-and-goto-next-match ()
+  "Skip making a cursor at point and go to next match if any."
+  (evil-exit-visual-state)
+  (unless (emc-goto-next-match (emc-get-pattern) 'forward)
+    (error "No more matches found")))
+
 (evil-define-command emc-make-next-cursor ()
   "Make the next cursor."
   :repeat ignore
   (interactive)
-  (let ((emc-cursor-command t)) ;; TODO: this is no longer needed, but need to ensure that no commands are recorded during cursors creatio
+  (let ((emc-cursor-command t)) ;; TODO: this is no longer needed, but need to ensure that no commands are recorded during cursors creation
     (setq emc-command-info nil)
     (cond ((evil-visual-state-p)
            (emc-set-pattern-from-visual-selection)
-           (emc-maybe-goto-next-match))
-          ((emc-get-pattern) (emc-maybe-goto-next-match))
+           (emc-make-cursor-and-goto-next-match))
+          ((emc-get-pattern) (emc-make-cursor-and-goto-next-match))
+          (t (error "No more matches or no visual selection found")))))
+
+(evil-define-command emc-skip-next-cursor ()
+  "Skip the next cursor."
+  :repeat ignore
+  (interactive)
+  (let ((emc-cursor-command t))
+    (setq emc-command-info nil)
+    (cond ((evil-visual-state-p)
+           (emc-set-pattern-from-visual-selection)
+           (emc-skip-cursor-and-goto-next-match))
+          ((emc-get-pattern) (emc-skip-cursor-and-goto-next-match))
+          (t (error "No more matches or no visual selection found")))))
+
+;; TODO should allow moving to the prev match or to the prev cursor
+;; maybe C-p : emc-goto-prev-match
+;; maybe C-P : emc-undo-prev-cursor
+(evil-define-command emc-undo-prev-cursor ()
+  "Move point to the prev match and remove the cursor if any."
+  :repeat ignore
+  (interactive)
+  (let ((emc-cursor-command t))
+    (setq emc-command-info nil)
+    (cond ((evil-visual-state-p)
+           (emc-set-pattern-from-visual-selection)
+           (emc-goto-prev-match-and-undo-cursor))
+          ((emc-get-pattern) (emc-goto-prev-match-and-undo-cursor))
           (t (error "No more matches or no visual selection found")))))
 
 (evil-define-command emc-remove-all-cursors ()
@@ -210,8 +270,16 @@
 (defun emc-setup-key-maps ()
   "Sets up all key bindings for working with multiple cursors."
   (interactive)
+
   (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-next-cursor)
   (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor)
+
+  (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
+  (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
+
+  (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
+  (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
+
   (define-key evil-normal-state-local-map (kbd "C-,") 'emc-remove-all-cursors))
 
 (emc-setup-key-maps)
