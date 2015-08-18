@@ -3,7 +3,7 @@
 ;; Author: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Version: 0.0.1
 ;; Keywords: evil editing cursors vim evil-multiple-cursors emc
-;; Package-Requires ((emacs "24") (evil "1.1.3"))
+;; Package-Requires ((emacs "24") (evil "1.2.1"))
 ;; Homepage: https://github.com/gabesoft/evil-multiple-cursors
 ;;
 ;; This file is not part of GNU Emacs.
@@ -32,8 +32,16 @@
     ;; - gch     - cursor here (would need to have a cursor create mode to avoid moving existing cursors)
     (evil-define-key 'visual map (kbd "C-n") 'emc-make-next-cursor)
     (evil-define-key 'normal map (kbd "C-n") 'emc-make-next-cursor)
-    (evil-define-key 'normal map (kbd "C-k") 'emc-skip-next-cursor)
-    (evil-define-key 'normal map (kbd "C-j") 'emc-undo-last-cursor)
+
+    (evil-define-key 'visual map (kbd "C-t") 'emc-skip-next-cursor)
+    (evil-define-key 'normal map (kbd "C-t") 'emc-skip-next-cursor)
+
+    (evil-define-key 'visual map (kbd "C-p") 'emc-undo-prev-cursor)
+    (evil-define-key 'normal map (kbd "C-p") 'emc-undo-prev-cursor)
+
+    (evil-define-key 'visual map (kbd "C-P") 'emc-make-prev-cursor)
+    (evil-define-key 'normal map (kbd "C-P") 'emc-make-prev-cursor)
+
     (evil-define-key 'normal map (kbd "C-,") 'emc-remove-all-cursors)
     map))
 

@@ -34,6 +34,7 @@
 - make it work with the following plugins
   - evil-surround
   - evil-snipe
+  - evil-exchange
 ** Status
 - the number of matches
 - the number of current cursors
@@ -122,9 +123,6 @@
 * Development
 ** TODO Implement only prev and next based on the visual selection
 - draw the cursors
-- draw the visual selection for each cursor
-- first escape should clear the visual selection (if any)
-- second escape should clear the cursors (if visual selection)
 - second escape should remove all fake cursors
 - should be able to add a cursor for next match or show a warning message
 - should be able to add a cursor for prev match or show a warning message
@@ -150,10 +148,13 @@
 - after exiting insert the cursor moves to the left one char: need to do the same for all fake cursors
 - add tests
 ** Implement operators
-- abuilt in operators should work
-- or operators implemented using evil abstractions should work
+- all built in operators should work
+- all operators implemented using evil abstractions should work
 - add tests
 ** Keep the visual selection and ensure that making a visual selection works for all cursors
+- second escape should clear the cursors (if visual selection)
+- first escape should clear the visual selection (if any)
+- draw the visual selection for each cursor
 - add tests
 ** Implement prev and next based on the word/WORD/symbol at cursor as well
 - add tests
