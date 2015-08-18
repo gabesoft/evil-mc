@@ -111,11 +111,11 @@
 
 (defun emc-get-region-mark (region)
   "Return the REGION's mark."
-  (overlay-get region 'mark))
+  (when region (overlay-get region 'mark)))
 
 (defun emc-get-region-point (region)
   "Return the REGION's point."
-  (overlay-get region 'point))
+  (when region (overlay-get region 'point)))
 
 (defun emc-get-region-direction (region)
   "Return the direction of a visual region."
@@ -716,6 +716,8 @@ If the buffer is change, the command is cancelled.")
                   (and (eq dir -1) (eq start pos)))
           (throw 'emc-region-found region))))))
 
+;; TODO need to replace the old region with new in emc-region-list
+;;      same for emc-exchange-point-and-mark
 (defun emc-refresh-region (orig)
   "Refresh the visual region when point moved from ORIG to current location."
   (let ((region (emc-find-region orig)))
@@ -725,6 +727,19 @@ If the buffer is change, the command is cancelled.")
             ((and (< (point) mark)) (emc-make-region-overlay mark (point)))
             (t (emc-make-region-overlay (point) (1+ (point))))))))
 
+;; TODO left here
+(defun emc-exchange-point-and-mark ()
+  "Exchange point and mark for a fake region."
+  (let* ((region (emc-find-region (point)))
+         (mark (emc-get-region-mark region))
+         (point (emc-get-region-point region)))
+    (when region
+      (delete-overlay region)
+      (emc-make-region-overlay (point) mark)
+      ;; delete-cursor-at-point and remove from emc-cursor-list
+      (goto-char mark)
+      (emc-make-cursor-at-point))))
+
 (defun emc-run-last-command-visual ()
   "Run the last stored command in visual mode."
   (when (emc-command-info-p)
@@ -732,9 +747,12 @@ If the buffer is change, the command is cancelled.")
            (keys-vector (emc-get-this-command-keys))
            (keys (mapcar 'char-to-string (remove-if-not 'characterp keys-vector)))
            (repeat-type (evil-get-command-property cmd :repeat)))
-      (when emc-debug (message "CMD-VISUAL %s keys-vector %s keys %s repeat-type %s" cmd keys-vector keys repeat-type))
+      (when emc-debug (message "CMD-VISUAL %s keys-vector %s keys %s repeat-type %s"
+                               cmd keys-vector keys repeat-type))
       ;; TODO: implement evil-exchange-point-and-mark
-      (cond ((eq repeat-type 'motion)
+      (cond ((eq cmd 'exchange-point-and-mark) (emc-exchange-point-and-mark))
+            ((eq cmd 'evil-exchange-point-and-mark) (emc-exchange-point-and-mark))
+            ((eq repeat-type 'motion)
              (let ((orig (point)))
                (evil-with-state normal
                  (funcall cmd)
@@ -742,6 +760,8 @@ If the buffer is change, the command is cancelled.")
                    (when overlay (emc-add-region overlay))))))
             ((eq cmd 'evil-visual-char) (emc-delete-all-regions))
             (t (message "not implemented"))))))
+
+;; (remove-overlays)
 
 (defun emc-run-last-command ()
   "Run the last stored command."
