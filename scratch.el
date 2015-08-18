@@ -733,6 +733,7 @@ If the buffer is change, the command is cancelled.")
            (keys (mapcar 'char-to-string (remove-if-not 'characterp keys-vector)))
            (repeat-type (evil-get-command-property cmd :repeat)))
       (when emc-debug (message "CMD-VISUAL %s keys-vector %s keys %s repeat-type %s" cmd keys-vector keys repeat-type))
+      ;; TODO: implement evil-exchange-point-and-mark
       (cond ((eq repeat-type 'motion)
              (let ((orig (point)))
                (evil-with-state normal
