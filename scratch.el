@@ -728,6 +728,9 @@ If the buffer is change, the command is cancelled.")
             (t (emc-make-region-overlay (point) (1+ (point))))))))
 
 ;; TODO left here
+;; TODO when looping through cursors set the current cursor & region overlay into
+;; emc-current-cursor & emc-current-region to avoid searching for it every time
+;; the new cursor & region after the command executed should be set there as well and updated on command end
 (defun emc-exchange-point-and-mark ()
   "Exchange point and mark for a fake region."
   (let* ((region (emc-find-region (point)))
