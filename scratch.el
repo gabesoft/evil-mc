@@ -849,8 +849,7 @@ If the buffer is change, the command is cancelled.")
       (message "Executing %s command (running %s)" emc-command-info emc-running-command))
     (ignore-errors
       (condition-case error
-          (let* ((run (emc-get-run-command)))
-            (funcall run cursor region))
+          (funcall (emc-get-run-command) cursor region)
         (error (message "Command %s failed with error %s"
                         emc-command-info (error-message-string error))
                nil)))))
@@ -905,6 +904,11 @@ If the buffer is change, the command is cancelled.")
   (advice-add 'read-key-sequence :before #'emc-record-key-sequence))
 
 ;; (execute-kbd-macro "bbbbdw")
+
+(defun emc-print-mark-and-point ()
+  "Print mark and point."
+  (interactive)
+  (message "Mark %s Point %s" (mark) (point)))
 
 (defun emc-remove-hooks ()
   "Removes all emc related hooks."
