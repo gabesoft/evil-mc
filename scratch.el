@@ -847,15 +847,13 @@ If the buffer is change, the command is cancelled.")
   (when (and emc-command-info (not emc-cursor-command))
     (when emc-debug
       (message "Executing %s command (running %s)" emc-command-info emc-running-command))
-    (condition-case error
-        (unwind-protect
-            (catch 'abort
-              (catch 'quit
-                (let* ((run (emc-get-run-command)))
-                  (funcall run cursor region)))))
-      (error (message "Command %s failed with error %s"
-                      emc-command-info (error-message-string error))
-             nil))))
+    (ignore-errors
+      (condition-case error
+          (let* ((run (emc-get-run-command)))
+            (funcall run cursor region))
+        (error (message "Command %s failed with error %s"
+                        emc-command-info (error-message-string error))
+               nil)))))
 
 ;; (emc-execute-last-command nil nil)
 ;; (setq emc-cursor-list (cons cursor emc-cursor-list)))
@@ -892,6 +890,7 @@ If the buffer is change, the command is cancelled.")
             (setq emc-region-list region-list))
           (setq emc-command-info nil))))))
 
+;; TODO hooks should not throw errors
 (defun emc-add-hooks ()
   "Adds all emc related hooks."
   (interactive)
