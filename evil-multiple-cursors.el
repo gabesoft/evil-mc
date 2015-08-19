@@ -42,6 +42,7 @@
     (evil-define-key 'visual map (kbd "C-P") 'emc-make-prev-cursor)
     (evil-define-key 'normal map (kbd "C-P") 'emc-make-prev-cursor)
 
+    ;; this should be bound to ESC
     (evil-define-key 'normal map (kbd "C-,") 'emc-remove-all-cursors)
     map))
 

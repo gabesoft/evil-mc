@@ -735,21 +735,17 @@ If the buffer is change, the command is cancelled.")
           ((and (< (point) mark)) (emc-make-region-overlay mark (point)))
           (t (emc-make-region-overlay (point) (1+ (point)))))))
 
-;; TODO left here
-;; TODO when looping through cursors set the current cursor & region overlay into
-;; emc-current-cursor & emc-current-region to avoid searching for it every time
-;; the new cursor & region after the command executed should be set there as well and updated on command end
-(defun emc-exchange-point-and-mark ()
-  "Exchange point and mark for a fake region."
+(defun emc-exchange-point-and-mark (region)
+  "Exchange point and mark for a fake REGION."
   (let* ((region (emc-find-region (point)))
          (mark (emc-get-region-mark region))
          (point (emc-get-region-point region)))
     (when region
-      (delete-overlay region)
-      (emc-make-region-overlay (point) mark)
-      ;; delete-cursor-at-point and remove from emc-cursor-list
-      (goto-char mark)
-      (emc-make-cursor-at-point))))
+      (let (new-region new-cursor)
+        (setq new-region (emc-make-region-overlay point mark))
+        (goto-char (if (< mark point) mark (1- mark)))
+        (setq new-cursor (emc-make-cursor-at-point))
+        (list new-cursor new-region)))))
 
 (defun emc-run-last-command-visual (cursor region)
   "Run the last stored command in visual mode given CURSOR and REGION."
@@ -760,19 +756,25 @@ If the buffer is change, the command is cancelled.")
            (repeat-type (evil-get-command-property cmd :repeat)))
       (when emc-debug (message "CMD-VISUAL %s keys-vector %s keys %s repeat-type %s"
                                cmd keys-vector keys repeat-type))
-      (cond ((eq cmd 'exchange-point-and-mark) (emc-exchange-point-and-mark))
-            ((eq cmd 'evil-exchange-point-and-mark) (emc-exchange-point-and-mark))
+      (cond ((or (eq cmd 'exchange-point-and-mark)
+                 (eq cmd 'evil-exchange-point-and-mark))
+             (emc-exchange-point-and-mark region))
+            ((or (eq cmd 'evil-inner-paren)
+                 (eq cmd 'evil-a-paren))
+             ;; TODO try this using evil-with-active-region
+             (evil-with-state normal
+               (let* ((limits (funcall cmd))
+                      (start (nth 0 limits))
+                      (end (1- (nth 1 limits))))
+                 (goto-char end)
+                 (list nil (emc-refresh-region region start)))))
             ((eq repeat-type 'motion)
              (let ((orig (point)))
                (evil-with-state normal
                  (funcall cmd)
-                 ;; TODO need a function to prepare the command results
-                 ;;      then we can remove emc-process-last-command-result
                  (list nil (emc-refresh-region region orig)))))
             ((eq cmd 'evil-visual-char) (emc-delete-all-regions))
             (t (message "not implemented"))))))
-
-;; (remove-overlays)
 
 (defun emc-run-last-command (cursor region)
   "Run the last stored command given CURSOR and REGION."
@@ -792,22 +794,32 @@ If the buffer is change, the command is cancelled.")
             ((eq cmd 'evil-delete-char) (evil-delete-char (point) (1+ (point))))
             ((eq cmd 'backward-delete-char-untabify) (delete-backward-char 1))
             ((eq cmd 'delete-backward-char) (delete-char -1))
-            ((eq cmd 'evil-delete) (execute-kbd-macro (apply 'concat keys)))
             ((eq cmd 'evil-replace) (evil-repeat 1))
             ((eq cmd 'evil-paste-before) (evil-paste-before 1))
             ((eq cmd 'evil-paste-after) (evil-paste-after 1))
             ((eq cmd 'evil-open-below) (evil-insert-newline-below))
             ((eq cmd 'evil-open-above) (evil-insert-newline-above))
             ((eq cmd 'evil-change-line) (evil-delete-line (point) (1+ (point))))
-            ((eq cmd 'evil-invert-char) (execute-kbd-macro (apply 'concat keys))) ;; TODO fix ~~
+            ((eq cmd 'evil-invert-char) (evil-invert-char (point) (1+ (point))) (evil-forward-char))
             ((eq cmd 'evil-upcase) (execute-kbd-macro (apply 'concat keys)))
             ((eq cmd 'evil-downcase) (execute-kbd-macro (apply 'concat keys)))
             ((eq cmd 'keyboard-quit) (emc-delete-all-regions))
 
+            ((eq cmd 'evil-delete)
+             (if region
+                 (let ((start (overlay-start region))
+                       (end (overlay-end region)))
+                   (evil-delete start end))
+               (execute-kbd-macro (apply 'concat keys))))
+
             ((eq cmd 'evil-change)
-             (evil-with-state normal
-               (message "keys %s change %s" keys (emc-change-operator-sequence keys))
-               (execute-kbd-macro (emc-change-operator-sequence keys))))
+             (if region
+                 (evil-with-state normal
+                   (let ((start (overlay-start region))
+                         (end (overlay-end region)))
+                     (evil-delete start end)))
+               (evil-with-state normal
+                 (execute-kbd-macro (emc-change-operator-sequence keys)))))
 
             ;; TODO make this work
             ;; ((eq cmd 'evil-repeat) (evil-repeat 1))
@@ -826,7 +838,7 @@ If the buffer is change, the command is cancelled.")
   (let* ((result (if (or (null input) (listp input)) input (list input)))
          (cursor (nth 0 result))
          (region (nth 1 result)))
-    (message "PROCESS %s" result)
+    ;; (message "PROCESS %s" result)
     (list (if (overlayp cursor) cursor (emc-make-cursor-at-point))
           (if (overlayp region) region nil))))
 
@@ -860,17 +872,17 @@ If the buffer is change, the command is cancelled.")
                 (region-list nil))
             (dotimes (index (length emc-cursor-list))
               ;; TODO optimize this loop
-              (message "INDEX %s CURSORS %s" index emc-cursor-list)
+              ;; (message "INDEX %s CURSORS %s" index emc-cursor-list)
               (let* ((cursor (nth index emc-cursor-list))
                      (region (nth index emc-region-list))
                      (start (overlay-start cursor)))
-                (message "START %s" start)
+                ;; (message "START %s" start)
                 (goto-char start)
                 (let* ((output (emc-execute-last-command cursor region))
                        (result (emc-process-last-command-result output))
                        (new-cursor (nth 0 result))
                        (new-region (nth 1 result)))
-                  (message "NEW CURSOR %s NEW REGION %s RESULT %s" new-cursor new-region result)
+                  ;; (message "NEW CURSOR %s NEW REGION %s RESULT %s" new-cursor new-region result)
                   (when cursor (delete-overlay cursor))
                   (when region (delete-overlay region))
                   (setq cursor-list (cons new-cursor cursor-list))
