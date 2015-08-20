@@ -810,6 +810,15 @@ If the buffer is change, the command is cancelled.")
             ;; TODO for paste first check if there's text to be pasted from cursor
             ;; use evil-set-register to set the text before pasting
             ;; when overwriting a register, save and restore it's contents when done
+
+            ;; to implement defadvice around current-kill and
+            ;; check whether the emc-current-kill-ring is not nil
+            ;; if so use the that kill ring instead of the real kill-ring
+            ;; in the defadvice make sure to update all fake kill rings
+            ;; with interprogram pastes (see current-kill in multiple-cursors-core.el)
+            ;; call evil-paste-before like so
+            ;; (let ((kill-ring (cursor-kill-ring)))
+            ;;   (evil-paste-before 1))
             ((eq cmd 'evil-paste-before) (evil-paste-before 1))
             ((eq cmd 'evil-paste-after) (evil-paste-after 1))
 
@@ -828,6 +837,9 @@ If the buffer is change, the command is cancelled.")
                         (end (overlay-end region))
                         (text (filter-buffer-substring start end)))
                    (goto-char start)
+                   ;; TODO use kill-new to set text into the current cursor-kill-ring
+                   ;; (let ((kill-ring nil)) (kill-new "abcd") (current-kill 0))
+                   ;; use evil-yank instead of kill-new
                    (message "yank %s" text))))
 
             ((eq cmd 'evil-delete)

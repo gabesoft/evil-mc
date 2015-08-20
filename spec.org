@@ -89,7 +89,9 @@
 - main overlay
 - region overlay
 - yanked text (stored in a kill-ring per cursor)
+- the current kill ring pointer (kill-ring-yank-pointer)
 - what is the best data structure for a cursor
+- may be easiest to save all this in the overlay
 ** Conflicts and workarounds
 - evil-escape causes evil-find-char to stop working and self-insert-command with "f" to result in an infinite loop
   - this is due to remapping "fd" to escape from insert
