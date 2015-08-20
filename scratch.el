@@ -664,6 +664,7 @@ If the buffer is change, the command is cancelled.")
         (eq cmd 'newline-and-indent)
         (eq cmd 'keyboard-quit)
         (eq cmd 'yank)
+        (eq cmd 'evil-yank)
         (eq cmd 'evil-delete-backward-char-and-join)
         (eq cmd 'evil-delete-backward-word)
         (eq cmd 'evil-delete)
@@ -756,6 +757,7 @@ If the buffer is change, the command is cancelled.")
       (cond ((or (eq cmd 'exchange-point-and-mark)
                  (eq cmd 'evil-exchange-point-and-mark))
              (emc-exchange-point-and-mark region))
+
             ((or (eq cmd 'evil-snipe-f)
                  (eq cmd 'evil-snipe-F)
                  (eq cmd 'evil-snipe-t)
@@ -763,6 +765,7 @@ If the buffer is change, the command is cancelled.")
              (let ((orig (point)))
                (evil-snipe-repeat)
                (list nil (emc-refresh-region region orig))))
+
             ((or (eq cmd 'evil-inner-paren)
                  (eq cmd 'evil-a-paren))
              (let* ((limits (funcall cmd))
@@ -770,13 +773,16 @@ If the buffer is change, the command is cancelled.")
                     (end (1- (nth 1 limits))))
                (goto-char end)
                (list nil (emc-refresh-region nil start))))
+
             ((eq repeat-type 'motion)
              (let ((orig (point)))
                (funcall cmd)
                (list nil (emc-refresh-region region orig))))
+
             ((eq cmd 'evil-visual-char)
              (unless region
                (list nil (emc-refresh-region region (point)))))
+
             (t (message "not implemented"))))))
 
 (defun emc-run-last-command (cursor region)
@@ -800,8 +806,13 @@ If the buffer is change, the command is cancelled.")
             ((eq cmd 'backward-delete-char-untabify) (delete-backward-char 1))
             ((eq cmd 'delete-backward-char) (delete-char -1))
             ((eq cmd 'evil-replace) (evil-repeat 1))
+
+            ;; TODO for paste first check if there's text to be pasted from cursor
+            ;; use evil-set-register to set the text before pasting
+            ;; when overwriting a register, save and restore it's contents when done
             ((eq cmd 'evil-paste-before) (evil-paste-before 1))
             ((eq cmd 'evil-paste-after) (evil-paste-after 1))
+
             ((eq cmd 'evil-open-below) (evil-insert-newline-below))
             ((eq cmd 'evil-open-above) (evil-insert-newline-above))
             ((eq cmd 'evil-change-line) (evil-delete-line (point) (1+ (point))))
@@ -810,6 +821,14 @@ If the buffer is change, the command is cancelled.")
             ((eq cmd 'evil-downcase) (execute-kbd-macro (apply 'concat keys)))
             ((eq cmd 'keyboard-quit) nil)
             ((eq cmd 'evil-visual-char) (evil-force-normal-state))
+
+            ((eq cmd 'evil-yank)
+             (if region
+                 (let* ((start (overlay-start region))
+                        (end (overlay-end region))
+                        (text (filter-buffer-substring start end)))
+                   (goto-char start)
+                   (message "yank %s" text))))
 
             ((eq cmd 'evil-delete)
              (if region
@@ -848,14 +867,14 @@ If the buffer is change, the command is cancelled.")
   (when (and emc-command-info (not emc-cursor-command))
     (when emc-debug
       (message "Executing %s command (running %s)" emc-command-info emc-running-command))
-    ;; (ignore-errors)
-    (condition-case error
-        (if visualp
-            (emc-run-last-command-visual cursor region)
-          (emc-run-last-command cursor region))
-      (error (message "Command %s failed with error %s"
-                      emc-command-info (error-message-string error))
-             nil))))
+    (ignore-errors
+      (condition-case error
+          (if visualp
+              (emc-run-last-command-visual cursor region)
+            (emc-run-last-command cursor region))
+        (error (message "Command %s failed with error %s"
+                        emc-command-info (error-message-string error))
+               nil)))))
 
 ;; (emc-execute-last-command nil nil)
 ;; (setq emc-cursor-list (cons cursor emc-cursor-list)))

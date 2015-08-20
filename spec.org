@@ -12,6 +12,7 @@
 - want a combination of visualstar and word/symbol only
 - should be able to create/remove a cursor to/from anywhere
   - would need a cursor creation mode to avoid moving all fake cursors as the real one is moving
+- should be able to select just a letter 
 ** Visual
 - allow extended visual motions such as vib, vab, etc
 ** Movement
@@ -38,6 +39,7 @@
   - evil-surround
   - evil-snipe
   - evil-exchange
+- copy/paste should work properly including with text objects and evil plugins
 ** Status
 - the number of matches
 - the number of current cursors
@@ -59,9 +61,10 @@
 **** see ~evil-repeat~ 
 ** Store the number of cursors in a variable, see ~mc/num-cursors~
 ** Need a place to store state for each cursor
+** Debugging
+- need to be able to log the current command running for each cursor including input, output, errors, etc
+- should be able to set the level in configuration as well as interactively
 ** Abstractions
-
-
 *** cursor list
 - align
 - execute command
@@ -82,6 +85,11 @@
   - direction: forward, backward
   - match type: word, symbol, everything
   - skip?
+*** cursor data
+- main overlay
+- region overlay
+- yanked text (stored in a kill-ring per cursor)
+- what is the best data structure for a cursor
 ** Conflicts and workarounds
 - evil-escape causes evil-find-char to stop working and self-insert-command with "f" to result in an infinite loop
   - this is due to remapping "fd" to escape from insert
