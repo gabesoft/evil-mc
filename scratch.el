@@ -727,18 +727,27 @@ If the buffer is change, the command is cancelled.")
                   (and (eq dir -1) (eq start pos)))
           (throw 'emc-region-found region))))))
 
+;; (eq cmd 'abc)
+;; (eq cmd 'abc)
+;; (eq cmd 'abc)
+;; (eq cmd 'abc)
+;; (eq cmd 'abc)
+;; (eq cmd 'abc)
+
 (defun emc-refresh-region (region orig)
   "Refresh the visual REGION when point moved from ORIG to current location."
-  (let ((mark (or (and region (emc-get-region-mark region)) orig)))
-    (when region (delete-overlay region))
-    (cond ((and (< mark (point))) (emc-make-region-overlay mark (1+ (point))))
-          ((and (< (point) mark)) (emc-make-region-overlay mark (point)))
+  (let ((mark (emc-get-region-mark region)))
+    (message "mark %s orig %s point %s" mark orig (point))
+    (unless mark (setq mark orig))
+    (cond ((and (eq orig mark) (< (point) mark)) (setq mark (1+ mark)))
+          ((and (< orig mark) (<= mark (point))) (setq mark (1- mark))))
+    (cond ((< mark (point)) (emc-make-region-overlay mark (1+ (point))))
+          ((< (point) mark) (emc-make-region-overlay mark (point)))
           (t (emc-make-region-overlay (point) (1+ (point)))))))
 
 (defun emc-exchange-point-and-mark (region)
   "Exchange point and mark for a fake REGION."
-  (let* ((region (emc-find-region (point)))
-         (mark (emc-get-region-mark region))
+  (let* ((mark (emc-get-region-mark region))
          (point (emc-get-region-point region)))
     (when region
       (let (new-region new-cursor)
@@ -762,18 +771,19 @@ If the buffer is change, the command is cancelled.")
             ((or (eq cmd 'evil-inner-paren)
                  (eq cmd 'evil-a-paren))
              ;; TODO try this using evil-with-active-region
-             (evil-with-state normal
-               (let* ((limits (funcall cmd))
-                      (start (nth 0 limits))
-                      (end (1- (nth 1 limits))))
-                 (goto-char end)
-                 (list nil (emc-refresh-region region start)))))
+             ;; (evil-with-state normal)
+             (let* ((limits (funcall cmd))
+                    (start (nth 0 limits))
+                    (end (1- (nth 1 limits))))
+               (goto-char end)
+               (list nil (emc-refresh-region region start))))
             ((eq repeat-type 'motion)
              (let ((orig (point)))
-               (evil-with-state normal
-                 (funcall cmd)
-                 (list nil (emc-refresh-region region orig)))))
-            ((eq cmd 'evil-visual-char) (emc-delete-all-regions))
+               (funcall cmd)
+               (list nil (emc-refresh-region region orig))))
+            ((eq cmd 'evil-visual-char)
+             (unless region
+               (list nil (emc-refresh-region region (point)))))
             (t (message "not implemented"))))))
 
 (defun emc-run-last-command (cursor region)
@@ -803,7 +813,8 @@ If the buffer is change, the command is cancelled.")
             ((eq cmd 'evil-invert-char) (evil-invert-char (point) (1+ (point))) (evil-forward-char))
             ((eq cmd 'evil-upcase) (execute-kbd-macro (apply 'concat keys)))
             ((eq cmd 'evil-downcase) (execute-kbd-macro (apply 'concat keys)))
-            ((eq cmd 'keyboard-quit) (emc-delete-all-regions))
+            ((eq cmd 'keyboard-quit) nil)
+            ((eq cmd 'evil-visual-char) (evil-force-normal-state))
 
             ((eq cmd 'evil-delete)
              (if region
@@ -827,12 +838,6 @@ If the buffer is change, the command is cancelled.")
 
             (t (funcall cmd))))))
 
-(defun emc-get-run-command ()
-  "Get the runner for the last command."
-  (if (evil-visual-state-p)
-      'emc-run-last-command-visual
-    'emc-run-last-command))
-
 (defun emc-process-last-command-result (input)
   "Convert the INPUT of the last command into the expected format."
   (let* ((result (if (or (null input) (listp input)) input (list input)))
@@ -842,17 +847,19 @@ If the buffer is change, the command is cancelled.")
     (list (if (overlayp cursor) cursor (emc-make-cursor-at-point))
           (if (overlayp region) region nil))))
 
-(defun emc-execute-last-command (cursor region)
+(defun emc-execute-last-command (cursor region visualp)
   "Executes the command stored in `emc-command-info' for CURSOR and REGION."
   (when (and emc-command-info (not emc-cursor-command))
     (when emc-debug
       (message "Executing %s command (running %s)" emc-command-info emc-running-command))
-    (ignore-errors
-      (condition-case error
-          (funcall (emc-get-run-command) cursor region)
-        (error (message "Command %s failed with error %s"
-                        emc-command-info (error-message-string error))
-               nil)))))
+    ;; (ignore-errors)
+    (condition-case error
+        (if visualp
+            (emc-run-last-command-visual cursor region)
+          (emc-run-last-command cursor region))
+      (error (message "Command %s failed with error %s"
+                      emc-command-info (error-message-string error))
+             nil))))
 
 ;; (emc-execute-last-command nil nil)
 ;; (setq emc-cursor-list (cons cursor emc-cursor-list)))
@@ -864,9 +871,12 @@ If the buffer is change, the command is cancelled.")
   (unless (or emc-running-command (not emc-command-info))
     (let ((emc-running-command t))
       (evil-with-single-undo
+        ;; (evil-with-transient-mark-mode)
+        ;; (message "BEFORE-VISUAL %s" (evil-visual-state-p))
         (save-excursion
           (let ((cursor-list nil)
-                (region-list nil))
+                (region-list nil)
+                (visualp (evil-visual-state-p)))
             (dotimes (index (length emc-cursor-list))
               ;; TODO optimize this loop
               ;; (message "INDEX %s CURSORS %s" index emc-cursor-list)
@@ -875,11 +885,14 @@ If the buffer is change, the command is cancelled.")
                      (start (overlay-start cursor)))
                 ;; (message "START %s" start)
                 (goto-char start)
-                (let* ((output (emc-execute-last-command cursor region))
+                (let* ((output (emc-execute-last-command cursor region visualp))
                        (result (emc-process-last-command-result output))
                        (new-cursor (nth 0 result))
                        (new-region (nth 1 result)))
                   ;; (message "NEW CURSOR %s NEW REGION %s RESULT %s" new-cursor new-region result)
+                  ;; (message "cmd %s" emc-command-info)
+                  ;; (message "cursor %s -> %s" cursor new-cursor)
+                  ;; (message "region %s -> %s" region new-region)
                   (when cursor (delete-overlay cursor))
                   (when region (delete-overlay region))
                   (setq cursor-list (cons new-cursor cursor-list))
@@ -887,7 +900,9 @@ If the buffer is change, the command is cancelled.")
 
             (setq emc-cursor-list cursor-list)
             (setq emc-region-list region-list))
-          (setq emc-command-info nil))))))
+          (setq emc-command-info nil)
+          ;; (message "AFTER-VISUAL %s" (evil-visual-state-p))
+          )))))
 
 ;; TODO hooks should not throw errors
 (defun emc-add-hooks ()
