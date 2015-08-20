@@ -1,19 +1,4 @@
-;; (defvar def '(a b c d))
-;; (mc/dump-list 'def(setq def
-;;                         '(
-;;                           a
-;;                           b
-;;                           c
-;;                           d
-;;                           )))
-
-;; (:inverse-video)
-;; (make-symbol "def")
-
-;; (defface emc-cursor-face
-;;   '((t (:inverse-video t)))
-;;   "The face used for fake cursors"
-;;   :group 'multiple-cursors)
+;;; Code:
 
 (defface emc-cursor-face
   '((((class color) (min-colors 88) (background dark))
@@ -727,19 +712,22 @@ If the buffer is change, the command is cancelled.")
                   (and (eq dir -1) (eq start pos)))
           (throw 'emc-region-found region))))))
 
-;; (eq cmd 'abc)
-;; (eq cmd 'abc)
-;; (eq cmd 'abc)
-;; (eq cmd 'abc)
-;; (eq cmd 'abc)
-;; (eq cmd 'abc)
+;; (defun emc-refresh-region (region orig)
+;;   "Refresh the visual REGION when point moved from ORIG to current location."
+;;   (let ((mark (or (and region (emc-get-region-mark region)) orig)))
+;;     (when region (delete-overlay region))
+;;     (cond ((and (< mark (point))) (emc-make-region-overlay mark (1+ (point))))
+;;           ((and (< (point) mark)) (emc-make-region-overlay mark (point)))
+;;           (t (emc-make-region-overlay (point) (1+ (point)))))))
+
+;; ((and (eq mark orig) (< (point) mark)) (setq mark (1+ mark)))
 
 (defun emc-refresh-region (region orig)
   "Refresh the visual REGION when point moved from ORIG to current location."
   (let ((mark (emc-get-region-mark region)))
-    (message "mark %s orig %s point %s" mark orig (point))
+    ;; (message "mark %s orig %s point %s" mark orig (point))
     (unless mark (setq mark orig))
-    (cond ((and (eq orig mark) (< (point) mark)) (setq mark (1+ mark)))
+    (cond ((and (<= mark orig) (< (point) mark)) (setq mark (1+ mark)))
           ((and (< orig mark) (<= mark (point))) (setq mark (1- mark))))
     (cond ((< mark (point)) (emc-make-region-overlay mark (1+ (point))))
           ((< (point) mark) (emc-make-region-overlay mark (point)))
@@ -768,15 +756,20 @@ If the buffer is change, the command is cancelled.")
       (cond ((or (eq cmd 'exchange-point-and-mark)
                  (eq cmd 'evil-exchange-point-and-mark))
              (emc-exchange-point-and-mark region))
+            ((or (eq cmd 'evil-snipe-f)
+                 (eq cmd 'evil-snipe-F)
+                 (eq cmd 'evil-snipe-t)
+                 (eq cmd 'evil-snipe-T))
+             (let ((orig (point)))
+               (evil-snipe-repeat)
+               (list nil (emc-refresh-region region orig))))
             ((or (eq cmd 'evil-inner-paren)
                  (eq cmd 'evil-a-paren))
-             ;; TODO try this using evil-with-active-region
-             ;; (evil-with-state normal)
              (let* ((limits (funcall cmd))
                     (start (nth 0 limits))
                     (end (1- (nth 1 limits))))
                (goto-char end)
-               (list nil (emc-refresh-region region start))))
+               (list nil (emc-refresh-region nil start))))
             ((eq repeat-type 'motion)
              (let ((orig (point)))
                (funcall cmd)
@@ -794,7 +787,9 @@ If the buffer is change, the command is cancelled.")
            (keys (mapcar 'char-to-string (remove-if-not 'characterp keys-vector))))
       (when emc-debug (message "CMD %s keys-vector %s keys %s" cmd keys-vector keys))
       (cond ((or (eq cmd 'evil-snipe-f)
-                 (eq cmd 'evil-snipe-t)) (evil-snipe-repeat))
+                 (eq cmd 'evil-snipe-F)
+                 (eq cmd 'evil-snipe-t)
+                 (eq cmd 'evil-snipe-T)) (evil-snipe-repeat))
             ((eq cmd 'evil-find-char) (evil-repeat-find-char))
             ((eq cmd 'newline-and-indent) (newline-and-indent))
             ((eq cmd 'self-insert-command) (self-insert-command 1))
@@ -828,6 +823,7 @@ If the buffer is change, the command is cancelled.")
                  (evil-with-state normal
                    (let ((start (overlay-start region))
                          (end (overlay-end region)))
+                     (evil-forward-char)
                      (evil-delete start end)))
                (evil-with-state normal
                  (execute-kbd-macro (emc-change-operator-sequence keys)))))
