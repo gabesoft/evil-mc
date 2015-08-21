@@ -767,6 +767,10 @@ If the buffer is change, the command is cancelled.")
   "Get the kill-ring for CURSOR."
   (emc-get-cursor-property cursor :kill-ring))
 
+(defun emc-get-cursor-kill-ring-pointer (cursor)
+  "Get the kill-ring-pointer for CURSOR."
+  (emc-get-cursor-property cursor :kill-ring-pointer))
+
 (defun emc-put-cursor-overlay (cursor val)
   "Set the overlay for CURSOR to VAL."
   (emc-put-cursor-property cursor :overlay val))
@@ -778,6 +782,10 @@ If the buffer is change, the command is cancelled.")
 (defun emc-put-cursor-kill-ring (cursor val)
   "Set the kill-ring for CURSOR to VAL."
   (emc-put-cursor-property cursor :kill-ring val))
+
+(defun emc-put-cursor-kill-ring-pointer (cursor val)
+  "Set the kill-ring-pointer for CURSOR to VAL."
+  (emc-put-cursor-property cursor :kill-ring-pointer val))
 
 (defun emc-refresh-region (region orig)
   "Refresh the visual REGION when point moved from ORIG to current location."
