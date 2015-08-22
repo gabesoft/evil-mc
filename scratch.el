@@ -311,23 +311,6 @@
     (setq emc-cursor-list nil)
     (setq emc-pattern nil)))
 
-(defun emc-setup-key-maps ()
-  "Sets up all key bindings for working with multiple cursors."
-  (interactive)
-
-  (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-next-cursor)
-  (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor)
-
-  (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
-  (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
-
-  (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
-  (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
-
-  (define-key evil-normal-state-local-map (kbd "C-,") 'emc-destroy-all-cursors))
-
-(emc-setup-key-maps)
-
 ;; (remove-overlays)
 ;; (setq emc-pattern nil)
 
@@ -534,6 +517,14 @@ If the buffer is change, the command is cancelled.")
     (let ((rest (cdr emc-command-info)))
       (when rest (car (cdr rest))))))
 
+(defun emc-this-command-p ()
+  "True if there is a command stored in `emc-command-info'."
+  (not (null (emc-get-this-command))))
+
+;; (defun emc-command-info-p ()
+;;   "True if there is a command stored in `emc-command-info'."
+;;   (emc-get-this-command))
+
 (defun emc-set-command-info (this last keys)
   "Sets the command info to THIS command LAST command and KEYS."
   (setq emc-command-info (cons this (cons last (cons keys nil)))))
@@ -596,7 +587,10 @@ If the buffer is change, the command is cancelled.")
         (emc-clear-this-command)
         (emc-set-this-command cmd)
         (emc-set-last-command last-command)
-        (emc-append-this-command-keys (this-command-keys-vector))))))
+
+        ;; This introduces duplicates
+        ;; (emc-append-this-command-keys (this-command-keys-vector))
+        ))))
 
 ;; TODO: use the advice below in the absence of evil-snipe-mode but not if it is enabled
 (defun emc-record-key-sequence (prompt &optional continue-echo dont-downcase-last
@@ -621,12 +615,12 @@ If the buffer is change, the command is cancelled.")
                                    (this-single-command-raw-keys)
                                    last-input-event))))
 
-(defun emc-position-cursors-after-insert ()
-  "Re-position the cursors when exiting insert state."
-  (when (not emc-running-command)
-    (emc-clear-this-command)
-    (emc-set-this-command 'evil-backward-char)
-    (emc-run-command-for-all-cursors)))
+;; (defun emc-position-cursors-after-insert ()
+;;   "Re-position the cursors when exiting insert state."
+;;   (when (not emc-running-command)
+;;     (emc-clear-this-command)
+;;     (emc-set-this-command 'evil-backward-char)
+;;     (emc-run-command-for-all-cursors)))
 
 ;; (evil-get-register ?-)
 
@@ -654,10 +648,6 @@ If the buffer is change, the command is cancelled.")
 
 ;; keys this-command-keys this-single-command-raw-keys last-in
 
-(defun emc-command-info-p ()
-  "True if there is a command stored in `emc-command-info'."
-  (emc-get-this-command))
-
 (defun emc-key-to-string (key)
   "Converts a key to a string."
   (cond ((characterp key) (char-to-string key))
@@ -668,31 +658,42 @@ If the buffer is change, the command is cancelled.")
   "Return true if CMD is supported for multiple cursors."
   (let ((repeat-type (evil-get-command-property cmd :repeat)))
     (or (eq repeat-type 'motion)
+
         (eq cmd 'backward-delete-char-untabify)
+        (eq cmd 'copy-to-the-end-of-line)
         (eq cmd 'delete-backward-char)
-        (eq cmd 'newline-and-indent)
-        (eq cmd 'keyboard-quit)
-        (eq cmd 'yank)
-        (eq cmd 'evil-yank)
-        (eq cmd 'evil-delete-backward-char-and-join)
-        (eq cmd 'evil-delete-backward-word)
-        (eq cmd 'evil-delete)
-        (eq cmd 'evil-repeat)
+        (eq cmd 'evil-append)
+        (eq cmd 'evil-append-line)
         (eq cmd 'evil-change)
         (eq cmd 'evil-change-line)
+        (eq cmd 'evil-delete)
+        (eq cmd 'evil-delete-backward-char-and-join)
+        (eq cmd 'evil-delete-backward-word)
         (eq cmd 'evil-delete-char)
-        (eq cmd 'evil-append)
-        (eq cmd 'evil-paste-before)
-        (eq cmd 'evil-paste-after)
-        (eq cmd 'evil-replace)
+        (eq cmd 'evil-delete-line)
+        (eq cmd 'evil-downcase)
+        (eq cmd 'evil-insert-line)
+        (eq cmd 'evil-invert-char)
+        (eq cmd 'evil-join)
+        (eq cmd 'evil-normal-state)
         (eq cmd 'evil-open-above)
         (eq cmd 'evil-open-below)
-        (eq cmd 'evil-visual-char)
-        (eq cmd 'evil-invert-char)
+        (eq cmd 'evil-paste-after)
+        (eq cmd 'evil-paste-before)
+        (eq cmd 'evil-repeat)
+        (eq cmd 'evil-replace)
         (eq cmd 'evil-upcase)
-        (eq cmd 'evil-downcase)
+        (eq cmd 'evil-visual-char)
+        (eq cmd 'evil-yank)
+        (eq cmd 'keyboard-quit)
+        (eq cmd 'move-text-down)
+        (eq cmd 'move-text-up)
+        (eq cmd 'newline-and-indent)
+        (eq cmd 'org-self-insert-command)
         (eq cmd 'self-insert-command)
-        (eq cmd 'org-self-insert-command))))
+        (eq cmd 'yank)
+
+        )))
 
 (defun emc-change-operator-sequence (keys)
   "Return the sequence of keys to run an `evil-change' keyboard macro for fake cursors based on KEYS."
@@ -767,9 +768,9 @@ If the buffer is change, the command is cancelled.")
   "Get the kill-ring for CURSOR."
   (emc-get-cursor-property cursor :kill-ring))
 
-(defun emc-get-cursor-kill-ring-pointer (cursor)
-  "Get the kill-ring-pointer for CURSOR."
-  (emc-get-cursor-property cursor :kill-ring-pointer))
+(defun emc-get-cursor-kill-ring-yank-pointer (cursor)
+  "Get the kill-ring-yank-pointer for CURSOR."
+  (emc-get-cursor-property cursor :kill-ring-yank-pointer))
 
 (defun emc-put-cursor-overlay (cursor val)
   "Set the overlay for CURSOR to VAL."
@@ -783,9 +784,9 @@ If the buffer is change, the command is cancelled.")
   "Set the kill-ring for CURSOR to VAL."
   (emc-put-cursor-property cursor :kill-ring val))
 
-(defun emc-put-cursor-kill-ring-pointer (cursor val)
-  "Set the kill-ring-pointer for CURSOR to VAL."
-  (emc-put-cursor-property cursor :kill-ring-pointer val))
+(defun emc-put-cursor-kill-ring-yank-pointer (cursor val)
+  "Set the kill-ring-yank-pointer for CURSOR to VAL."
+  (emc-put-cursor-property cursor :kill-ring-yank-pointer val))
 
 (defun emc-refresh-region (region orig)
   "Refresh the visual REGION when point moved from ORIG to current location."
@@ -834,11 +835,13 @@ If the buffer is change, the command is cancelled.")
                (eq cmd 'evil-inner-word)
                (eq cmd 'evil-inner-WORD)
                (eq cmd 'evil-inner-paragraph)
+               (eq cmd 'evil-inner-bracket)
                (eq cmd 'evil-inner-sentence)
                (eq cmd 'evil-a-paren)
                (eq cmd 'evil-a-word)
                (eq cmd 'evil-a-WORD)
                (eq cmd 'evil-a-paragraph)
+               (eq cmd 'evil-a-bracket)
                (eq cmd 'evil-a-sentence))
            (let* ((limits (funcall cmd))
                   (start (nth 0 limits))
@@ -864,45 +867,61 @@ If the buffer is change, the command is cancelled.")
   (let* ((cmd (emc-get-this-command))
          (region (emc-get-cursor-region cursor))
          (kill-ring (emc-get-cursor-kill-ring cursor))
+         (kill-ring-yank-pointer (emc-get-cursor-kill-ring-yank-pointer cursor))
          (keys-vector (emc-get-this-command-keys))
-         (keys (mapcar 'char-to-string (remove-if-not 'characterp keys-vector))))
+         (keys (mapcar 'char-to-string (remove-if-not 'characterp keys-vector)))
+         (keys-string (apply 'concat keys)))
     (when emc-debug (message "CMD %s keys-vector %s keys %s" cmd keys-vector keys))
     (cond ((or (eq cmd 'evil-snipe-f)
                (eq cmd 'evil-snipe-F)
                (eq cmd 'evil-snipe-t)
                (eq cmd 'evil-snipe-T)) (evil-snipe-repeat))
+
           ((eq cmd 'evil-find-char) (evil-repeat-find-char))
           ((eq cmd 'newline-and-indent) (newline-and-indent))
           ((eq cmd 'self-insert-command) (self-insert-command 1))
           ((eq cmd 'org-self-insert-command) (self-insert-command 1))
-          ((eq cmd 'evil-append) (evil-forward-char))
+          ((eq cmd 'evil-append) (evil-append 1))
+
           ((eq cmd 'evil-delete-backward-char-and-join) (evil-delete-backward-char-and-join 1))
-          ((eq cmd 'evil-delete-char) (evil-delete-char (point) (1+ (point))))
+          ((eq cmd 'evil-delete-char) (execute-kbd-macro keys-string))
+          ((eq cmd 'evil-delete-line) (execute-kbd-macro keys-string))
+          ((eq cmd 'evil-join) (execute-kbd-macro keys-string))
+
+          ((eq cmd 'evil-insert-line) (evil-insert-line 1))
+          ((eq cmd 'evil-append-line) (evil-append-line 1))
+
           ((eq cmd 'backward-delete-char-untabify) (delete-backward-char 1))
           ((eq cmd 'delete-backward-char) (delete-char -1))
           ((eq cmd 'evil-replace) (evil-repeat 1))
-
-          ;; TODO for paste first check if there's text to be pasted from cursor
-          ;; use evil-set-register to set the text before pasting
-          ;; when overwriting a register, save and restore it's contents when done
-
-          ;; to implement defadvice around current-kill and
-          ;; check whether the emc-current-kill-ring is not nil
-          ;; if so use the that kill ring instead of the real kill-ring
-          ;; in the defadvice make sure to update all fake kill rings
-          ;; with interprogram pastes (see current-kill in multiple-cursors-core.el)
-          ;; call evil-paste-before like so
-          ;; (let ((kill-ring (cursor-kill-ring)))
-          ;;   (evil-paste-before 1))
           ((eq cmd 'evil-paste-before) (evil-paste-before 1))
           ((eq cmd 'evil-paste-after) (evil-paste-after 1))
+
+          ;; TODO this depends on the cursor order
+          ;;      moving up or down have to be done in order of cursor positions
+          ;;      but the real cursor always happens first which may break the others
+          ;;      determine if this is worth supporting
+          ((eq cmd 'move-text-down) (move-text-down 1))
+          ((eq cmd 'move-text-up) (move-text-up 1))
+
+          ;; (execute-kbd-macro "J")
+          ;; (execute-kbd-macro "ft")
+          ;; (execute-kbd-macro "f-")
+          ;; (eq cmd 'evil-invert-char)
+          ;; (eq cmd 'evil-upcase)
+          ;; (eq cmd 'evil-change-line)
+          ;; (eq cmd 'evil-open-above)
+
+          ((eq cmd 'evil-normal-state)
+           (evil-insert 1)
+           (evil-normal-state))
 
           ((eq cmd 'evil-open-below) (evil-insert-newline-below))
           ((eq cmd 'evil-open-above) (evil-insert-newline-above))
           ((eq cmd 'evil-change-line) (evil-delete-line (point) (1+ (point))))
-          ((eq cmd 'evil-invert-char) (evil-invert-char (point) (1+ (point))) (evil-forward-char))
-          ((eq cmd 'evil-upcase) (execute-kbd-macro (apply 'concat keys)))
-          ((eq cmd 'evil-downcase) (execute-kbd-macro (apply 'concat keys)))
+          ((eq cmd 'evil-invert-char) (execute-kbd-macro keys-string))
+          ((eq cmd 'evil-upcase) (execute-kbd-macro keys-string))
+          ((eq cmd 'evil-downcase) (execute-kbd-macro keys-string))
           ((eq cmd 'keyboard-quit) nil)
           ((eq cmd 'evil-visual-char) (evil-force-normal-state))
 
@@ -912,17 +931,15 @@ If the buffer is change, the command is cancelled.")
                       (end (overlay-end region))
                       (text (filter-buffer-substring start end)))
                  (goto-char start)
-                 ;; TODO use kill-new to set text into the current cursor-kill-ring
-                 ;; (let ((kill-ring nil)) (kill-new "abcd") (current-kill 0))
-                 ;; use evil-yank instead of kill-new
-                 (message "yank %s" text))))
+                 (evil-yank start end nil nil nil))
+             (execute-kbd-macro keys-string)))
 
           ((eq cmd 'evil-delete)
            (if region
                (let ((start (overlay-start region))
                      (end (overlay-end region)))
                  (evil-delete start end))
-             (execute-kbd-macro (apply 'concat keys))))
+             (execute-kbd-macro keys-string)))
 
           ((eq cmd 'evil-change)
            (if region
@@ -939,9 +956,11 @@ If the buffer is change, the command is cancelled.")
           ;; evil-surround integration cs'" etc
 
           (t (funcall cmd)))
+    ;; (message "kill %s %s" kill-ring kill-ring-yank-pointer)
     (emc-put-cursor-property cursor
-                             :region nil
-                             :kill-ring kill-ring)))
+                             :kill-ring kill-ring
+                             :kill-ring-yank-pointer kill-ring-yank-pointer
+                             :region nil)))
 
 ;; (defun emc-process-last-command-result (input)
 ;;   "Convert the INPUT of the last command into the expected format."
@@ -955,7 +974,7 @@ If the buffer is change, the command is cancelled.")
 (defun emc-execute-last-command (cursor visual-state-p)
   "Executes the command stored in `emc-command-info' for
 CURSOR assuming VISUAL-STATE-P."
-  (when (and (emc-command-info-p) (not emc-cursor-command))
+  (when (and (emc-this-command-p) (not emc-cursor-command))
     (when emc-debug
       (message "Executing %s command (running %s)"
                emc-command-info emc-running-command))
@@ -975,7 +994,7 @@ CURSOR assuming VISUAL-STATE-P."
 
 (defun emc-run-command-for-all-cursors ()
   "Runs the current command for all cursors."
-  (unless (or emc-running-command (not emc-command-info))
+  (unless (or emc-running-command (not (emc-this-command-p)))
     (let ((emc-running-command t))
       (evil-with-single-undo
         ;; (evil-with-transient-mark-mode)
@@ -1013,12 +1032,25 @@ CURSOR assuming VISUAL-STATE-P."
           ;; (message "AFTER-VISUAL %s" (evil-visual-state-p))
           )))))
 
-;; TODO hooks should not throw errors
+(defun emc-setup-key-maps ()
+  "Sets up all key bindings for working with multiple cursors."
+  (interactive)
+  (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-next-cursor)
+  (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor)
+  (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
+  (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
+  (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
+  (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
+  (define-key evil-normal-state-local-map (kbd "C-,") 'emc-destroy-all-cursors))
+
+;; (emc-setup-key-maps)
+
+;; TODO the hooks should not throw errors
 (defun emc-add-hooks ()
   "Adds all emc related hooks."
   (interactive)
   (setq emc-command-info nil)
-  (add-hook 'evil-insert-state-exit-hook 'emc-position-cursors-after-insert)
+  ;; (add-hook 'evil-insert-state-exit-hook 'emc-position-cursors-after-insert)
   (add-hook 'pre-command-hook 'emc-begin-save-command t t)
 
   ;; Add this as the first hook, to run before evil-repeat post hook which clears the command keys
@@ -1029,6 +1061,13 @@ CURSOR assuming VISUAL-STATE-P."
 
 ;; (execute-kbd-macro "bbbbdw")
 
+(defun emc-init-mode ()
+  "Initialize the evil-multiple-cursors mode."
+  (interactive)
+  (emc-setup-key-maps)
+  (emc-add-hooks))
+
+
 (defun emc-print-mark-and-point ()
   "Print mark and point."
   (interactive)
@@ -1037,7 +1076,7 @@ CURSOR assuming VISUAL-STATE-P."
 (defun emc-remove-hooks ()
   "Removes all emc related hooks."
   (interactive)
-  (remove-hook 'evil-insert-state-exit-hook 'emc-position-cursors-after-insert)
+  ;; (remove-hook 'evil-insert-state-exit-hook 'emc-position-cursors-after-insert)
   (remove-hook 'pre-command-hook 'emc-begin-save-command t)
   (remove-hook 'post-command-hook 'emc-finish-save-command t)
   (remove-hook 'post-command-hook 'emc-run-command-for-all-cursors t)

@@ -102,6 +102,9 @@
   - this-command-keys don't contain "t" in commands such as "dtk" or "ctk"
 - insert does not seem to work in org mode (org-self-insert-command)
 ** Operator commands need to be done using evil-operator-range to get the beginning and end positions
+* Issues
+** make yank/paste work with the spacemacs micro paste mode
+** undo after paste does not work properly (requires an additional undo for the real cursor)
 * Preparation
 ** TODO Understand the implementation of emacs multiple-cursors
 ** TODO Get familiar with the abstractions of evil mode
