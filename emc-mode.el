@@ -1,4 +1,4 @@
-;;; evil-multiple-cursors.el --- Multiple cursors for the evil mode
+;;; emc-mode.el --- Multiple cursors minor mode for evil
 
 ;; Author: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Version: 0.0.1
@@ -78,6 +78,6 @@
   (evil-multiple-cursors-override-mode -1))
 
 
-(provide 'evil-multiple-cursors)
+(provide 'emc-mode)
 
-;;; evil-multiple-cursors.el ends here
+;;; emc-mode.el ends here
