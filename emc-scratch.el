@@ -819,6 +819,8 @@ otherwise execute BODY."
          (kill-ring-yank-pointer (emc-get-cursor-kill-ring-yank-pointer cursor))
          (keys-string (emc-get-command-keys-string)))
     (when emc-debug (message "CMD %s keys %s" cmd keys-string))
+
+    ;; TODO in normal state we can use execute-kbd-macro but not in insert
     (cond ((or (eq cmd 'evil-snipe-f)
                (eq cmd 'evil-snipe-F)
                (eq cmd 'evil-snipe-t)
@@ -827,11 +829,8 @@ otherwise execute BODY."
           ((eq cmd 'org-self-insert-command) (self-insert-command 1))
           ((eq cmd 'transpose-chars-before-point) (transpose-chars-before-point 1))
           ((eq cmd 'evil-commentary)
-           (if region
-               (let ((start (overlay-start region))
-                     (end (overlay-end region)))
-                 (evil-commentary start end))
-             (execute-kbd-macro keys-string)))
+           (emc-with-region region 'evil-commentary
+                            (execute-kbd-macro keys-string)))
 
           ((eq cmd 'evil-find-char) (evil-repeat-find-char))
           ((eq cmd 'newline-and-indent) (newline-and-indent))
@@ -841,12 +840,8 @@ otherwise execute BODY."
           ((eq cmd 'evil-delete-backward-char-and-join) (evil-delete-backward-char-and-join 1))
 
           ((eq cmd 'evil-delete-char)
-           ;; (emc-with-region (start end region))
-           (if region
-               (let ((start (overlay-start region))
-                     (end (overlay-end region)))
-                 (evil-delete-char start end))
-             (execute-kbd-macro keys-string)))
+           (emc-with-region region 'evil-delete-char
+                            (execute-kbd-macro keys-string)))
 
           ((eq cmd 'evil-delete-line) (execute-kbd-macro keys-string))
           ((eq cmd 'evil-join) (execute-kbd-macro keys-string))
@@ -902,32 +897,37 @@ otherwise execute BODY."
           ((eq cmd 'evil-visual-char) (evil-force-normal-state))
 
           ((eq cmd 'evil-yank)
-           (if region
-               (let* ((start (overlay-start region))
-                      (end (overlay-end region))
-                      (text (filter-buffer-substring start end)))
-                 (goto-char start)
-                 (evil-yank start end nil nil nil))
-             (execute-kbd-macro keys-string)))
+           (emc-with-region region
+                            (lambda (start end)
+                              (goto-char start)
+                              (evil-yank start end))
+                            (execute-kbd-macro keys-string)))
 
           ((eq cmd 'evil-delete)
-           (if region
-               (let ((start (overlay-start region))
-                     (end (overlay-end region)))
-                 (evil-delete start end))
-             (execute-kbd-macro keys-string)))
+           (emc-with-region region 'evil-delete
+                            (execute-kbd-macro keys-string)))
 
           ((eq cmd 'evil-change)
-           (if region
-               (evil-with-state normal
-                 (let ((start (overlay-start region))
-                       (end (overlay-end region)))
-                   (evil-forward-char)
-                   (evil-delete start end)))
+           (evil-with-state normal
+             (emc-with-region region
+                              (lambda (start end)
+                                (evil-forward-char)
+                                (evil-delete start end))
+                              (execute-kbd-macro
+                               (emc-change-operator-sequence keys-string))))
 
-             (evil-with-state normal
-               (execute-kbd-macro
-                (emc-change-operator-sequence keys-string)))))
+           ;; (if region
+           ;;     (evil-with-state normal
+           ;;       (let ((start (overlay-start region))
+           ;;             (end (overlay-end region)))
+           ;;         (evil-forward-char)
+           ;;         (evil-delete start end)))
+
+           ;;   (evil-with-state normal
+           ;;     (execute-kbd-macro
+           ;;      (emc-change-operator-sequence keys-string))))
+
+           )
 
           ;; TODO make this work
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))
