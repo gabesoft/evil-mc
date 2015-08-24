@@ -44,6 +44,7 @@
 - the number of matches
 - the number of current cursors
 - it should be visibly clear when the multiple cursor mode is engaged
+  - having multiple cursors around without being aware of it could lead to significant loss of work
 * Implementation
 ** Re-implement the current multiple-cursors in terms of evil's abstractions
 - motions

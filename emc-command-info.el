@@ -1,9 +1,9 @@
-;;; emc-command-info.el --- Info for commands to be run at fake cursors
+;;; emc-command-info.el --- Info for the currently running command
 
 ;;; Commentary:
 
-;; This file contains functions for storing and interacting with the command info
-;; to be run for each fake cursor
+;; This file contains functions for storing and interacting with
+;; the currently running command info
 
 (require 'evil)
 (require 'emc-common)
@@ -18,6 +18,10 @@
 
 (evil-define-local-var emc-command-debug nil
   "If true display debug messages about the current command being recorded.")
+
+(defun emc-command-p ()
+  "True if there is data saved for the current command."
+  (not (null emc-command)))
 
 (defun emc-command-reset ()
   "Clear the currently saved command info."
@@ -44,11 +48,13 @@
     (or (eq repeat-type 'motion)
 
         ;; extended commands (should be configurable by user)
+
         (eq cmd 'evil-commentary)
         (eq cmd 'org-self-insert-command)
         (eq cmd 'transpose-chars-before-point)
 
         ;; core evil + emacs commands
+
         (eq cmd 'backward-delete-char-untabify)
         (eq cmd 'copy-to-the-end-of-line)
         (eq cmd 'delete-backward-char)
@@ -61,6 +67,7 @@
         (eq cmd 'evil-delete-backward-word)
         (eq cmd 'evil-delete-char)
         (eq cmd 'evil-delete-line)
+        (eq cmd 'evil-digit-argument-or-evil-beginning-of-line)
         (eq cmd 'evil-downcase)
         (eq cmd 'evil-insert-line)
         (eq cmd 'evil-invert-char)
@@ -80,6 +87,8 @@
         (eq cmd 'move-text-down)
         (eq cmd 'move-text-up)
         (eq cmd 'newline-and-indent)
+        (eq cmd 'paste-after-current-line)
+        (eq cmd 'paste-before-current-line)
         (eq cmd 'self-insert-command)
         (eq cmd 'yank)
 
@@ -109,10 +118,13 @@
 
 (defun emc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
+  (when (and (not emc-running-command)
+             (not (emc-command-recording-p)))
+    (setq emc-command nil))
   (when (and (not (emc-command-recording-p))
              (not emc-running-command)
-             (not (evil-emacs-state-p)))
-    (setq emc-command nil)
+             (not (evil-emacs-state-p))
+             (emc-has-cursors-p))
     (let ((cmd this-command))
       (when (emc-supported-command-p cmd)
         (setq emc-command-recording t)
@@ -149,19 +161,44 @@
      :keys-post-raw (this-single-command-raw-keys))
     (when emc-command-debug
       (message "| CMD-FINISH %s %s" emc-command this-command))
-    (ignore-errors (emc-finalize-command)))
+    (ignore-errors
+      (condition-case error
+          (emc-finalize-command)
+        (error (message "Saving command %s failed with %s"
+                         (emc-get-command-name)
+                         (error-message-string error))
+               nil))))
   (setq emc-command-recording nil))
 
-(defun emc-get-command-keys-string (name)
+(defun emc-key-to-char (key)
+  "Converts KEY to a character if it is not one already."
+  (cond ((characterp key) key)
+        ((string-equal key "escape") 27)
+        ((string-equal key "backspace") 127)
+        (t (error "Invalid key %s" key))))
+
+(defun emc-get-command-keys (&optional name)
+  "Get the current command keys with NAME as a list."
+  (mapcar 'emc-key-to-char
+          (listify-key-sequence
+           (emc-get-command-property (or name :keys)))))
+
+(defun emc-get-command-keys-string (&optional name)
   "Get the current command keys with NAME as a string."
   (when emc-command
-    (let* ((keys (emc-get-command-keys name))
+    (let* ((keys (emc-get-command-keys (or name :keys)))
            (keys-string (mapcar 'char-to-string keys)))
       (apply 'concat keys-string))))
 
-(defun emc-get-command-keys (name)
-  "Get the current command keys with NAME as a list."
-  (listify-key-sequence (emc-get-command-property name)))
+(defun emc-get-command-name ()
+  "Return the current command name."
+  (when emc-command
+    (emc-get-command-property :name)))
+
+(defun emc-get-command-state ()
+  "Return the current command end evil state."
+  (when emc-command
+    (emc-get-command-property :evil-state-end)))
 
 (defun emc-finalize-command ()
   "Makes the command data ready for use, after a save.."
@@ -174,13 +211,14 @@
     (unless (null seq)
       (setq keys (append keys (or post last))))
     (emc-set-command-properties :keys keys))
-  (message "< CMD-DONE %s %s %s %s %s -> %s"
-           (emc-get-object-property emc-command :name)
-           (emc-get-command-keys-string :keys-pre)
-           (emc-get-command-keys-string :keys-seq)
-           (emc-get-command-keys-string :keys-post)
-           (emc-get-command-keys-string :last-input)
-           (emc-get-command-keys-string :keys)))
+  (when emc-command-debug
+    (message "< CMD-DONE %s %s %s %s %s -> %s"
+             (emc-get-object-property emc-command :name)
+             (emc-get-command-keys-string :keys-pre)
+             (emc-get-command-keys-string :keys-seq)
+             (emc-get-command-keys-string :keys-post)
+             (emc-get-command-keys-string :last-input)
+             (emc-get-command-keys-string :keys))))
 
 (defun emc-add-command-hooks ()
   "Add hooks used for saving the current command."
