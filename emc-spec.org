@@ -106,6 +106,9 @@
 * Issues
 ** make yank/paste work with the spacemacs micro paste mode
 ** undo after paste does not work properly (requires an additional undo for the real cursor)
+** when a match is at the end of a line that cursor behaves differently than the rest of the cursors
+*** undo cursor does not remove the fake cursor
+*** changing text starts typing in the wrong position (relative to other cursors that are not at the end of a line)
 * Preparation
 ** TODO Understand the implementation of emacs multiple-cursors
 ** TODO Get familiar with the abstractions of evil mode
