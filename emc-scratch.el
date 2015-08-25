@@ -837,6 +837,10 @@ optionally storing PREV-MARK and PREV-POINT."
                                  (error-message-string error)))))
              (setq region (emc-refresh-region region orig))))
 
+          ((eq cmd 'evil-visual-block)
+           (evil-force-normal-state)
+           (error "visual block is not supported"))
+
           ((eq cmd 'evil-visual-line)
            (setq region (if (and region (eq region-type 'line))
                             (emc-refresh-region nil (point))

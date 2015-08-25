@@ -82,6 +82,7 @@
         (eq cmd 'evil-upcase)
         (eq cmd 'evil-visual-char)
         (eq cmd 'evil-visual-line)
+        (eq cmd 'evil-visual-block)
         (eq cmd 'evil-yank)
         (eq cmd 'keyboard-quit)
         (eq cmd 'move-text-down)
