@@ -888,6 +888,9 @@ otherwise execute BODY."
                (eq cmd 'evil-snipe-t)
                (eq cmd 'evil-snipe-T)) (evil-snipe-repeat))
 
+          ((eq cmd 'yaml-electric-dash-and-dot) (yaml-electric-dash-and-dot 1))
+          ((eq cmd 'yaml-electric-bar-and-angle) (yaml-electric-bar-and-angle 1))
+
           ((eq cmd 'org-self-insert-command) (self-insert-command 1))
           ((eq cmd 'transpose-chars-before-point) (transpose-chars-before-point 1))
           ((eq cmd 'evil-commentary)

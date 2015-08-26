@@ -52,6 +52,8 @@
         (eq cmd 'evil-commentary)
         (eq cmd 'org-self-insert-command)
         (eq cmd 'transpose-chars-before-point)
+        (eq cmd 'yaml-electric-dash-and-dot)
+        (eq cmd 'yaml-electric-bar-and-angle)
 
         ;; core evil + emacs commands
 
@@ -119,6 +121,7 @@
 
 (defun emc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
+  (when emc-command-debug (message "> CMD-TEST %s %s" this-command (this-command-keys)))
   (when (and (not emc-running-command)
              (not (emc-command-recording-p)))
     (setq emc-command nil))
