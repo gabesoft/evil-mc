@@ -59,7 +59,13 @@
 *** in motion after hooks simulate the current motion for all fake cursors
 *** in operator after hook run the last operator command for all fake cursors
 *** in the exit insert mode hook, repeat the last command (same as dot) for all the fake cursors
+
 **** see ~evil-repeat~ 
+*** finish implementing the visual selection behavior
+- going between visual line and visual
+*** implement paste over a visual selection
+- should overwrite the selected text
+- the overwritten text should be added to the kill ring
 ** Store the number of cursors in a variable, see ~mc/num-cursors~
 ** Need a place to store state for each cursor
 ** Debugging
@@ -163,6 +169,7 @@
 - store state for the current fake cursor
 - move cursor to the next pattern match (wrap)
 ** TODO Implement motions for the fake and real cursors
+
 - all evil motions should work for all cursors
 - other motions that are built using evil abstractions should work such as %, etc
 - after exiting insert the cursor moves to the left one char: need to do the same for all fake cursors
@@ -185,3 +192,4 @@
 - all operations performed in insert state should happen for all cursors
 ** Ensure undo/redo works properly for all changes and all cursors
 - after undo position the cursors in the proper places
+  

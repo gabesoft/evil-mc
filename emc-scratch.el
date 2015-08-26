@@ -704,19 +704,19 @@
 ;;         ((null key) nil)
 ;;         (t key)))
 
-(defun emc-change-operator-sequence (keys-string)
-  "Return the sequence of keys to run an `evil-change' keyboard macro for fake cursors based on KEYS-STRING."
-  (let* ((keys-with-count (evil-extract-count keys-string))
-         (cnt (nth 0 keys-with-count))
-         (fst (nth 2 keys-with-count))
-         (snd (nth 3 keys-with-count))
-         (res (apply 'concat (list "d" (cond ((string-equal snd "w") "e")  ;; TODO use a map
-                                             ((string-equal snd "W") "E")
-                                             (t snd))))))
-    (cond ((string-equal keys-string "cc") "^C")
-          (t (concat "l" (if (null cnt)
-                             res
-                           (concat (number-to-string cnt) res)))))))
+;; (defun emc-change-operator-sequence (keys-string)
+;;   "Return the sequence of keys to run an `evil-change' keyboard macro for fake cursors based on KEYS-STRING."
+;;   (let* ((keys-with-count (evil-extract-count keys-string))
+;;          (cnt (nth 0 keys-with-count))
+;;          (fst (nth 2 keys-with-count))
+;;          (snd (nth 3 keys-with-count))
+;;          (res (apply 'concat (list "d" (cond ((string-equal snd "w") "e")  ;; TODO use a map
+;;                                              ((string-equal snd "W") "E")
+;;                                              (t snd))))))
+;;     (cond ((string-equal keys-string "cc") "^C")
+;;           (t (concat "l" (if (null cnt)
+;;                              res
+;;                            (concat (number-to-string cnt) res)))))))
 
 ;; (defun emc-find-region (pos)
 ;;   "Find the region that ends or starts with POS according to its direction."
@@ -912,8 +912,27 @@ otherwise execute BODY."
 
           ;; TODO fix undo after paste
           ;;      all fake cursors and the real one should undo as one step
-          ((eq cmd 'evil-paste-before) (evil-paste-before 1))
-          ((eq cmd 'evil-paste-after) (evil-paste-after 1))
+          ((or (eq cmd 'evil-paste-after) (eq cmd 'evil-paste-before))
+           (let (new-kill-ring new-kill-ring-yank-pointer)
+             (let ((kill-ring (copy-sequence kill-ring))
+                   (kill-ring-yank-pointer nil))
+               (emc-with-region region
+                                (lambda (start end)
+                                  (evil-delete start end)
+                                  (when (and (not (bolp))
+                                             (eq cmd 'evil-paste-after))
+                                    (evil-backward-char))))
+               (setq new-kill-ring kill-ring)
+               (setq new-kill-ring-yank-pointer kill-ring-yank-pointer))
+
+             ;; execute paste with the old key ring
+             (funcall cmd 1)
+
+             ;; update the kill ring with the overwritten text
+             (setq kill-ring new-kill-ring)
+             (setq kill-ring-yank-pointer new-kill-ring-yank-pointer)))
+
+          ;; TODO implement visual paste
           ((eq cmd 'paste-before-current-line) (paste-before-current-line 1))
           ((eq cmd 'paste-after-current-line) (paste-after-current-line 1))
 
@@ -964,21 +983,28 @@ otherwise execute BODY."
            (emc-with-region region 'evil-delete
                             (execute-kbd-macro keys-string)))
 
+
+          ;; End of line behavior test
+          ;; abc-null
+          ;; abc null
+          ;; (null 'a)
+          ;; (void-null 'b)
+          ;; (null)
+
           ((eq cmd 'evil-change)
            (evil-with-state normal
              (emc-with-region region
                               (lambda (start end)
                                 (evil-forward-char)
                                 (evil-delete start end))
-                              (execute-kbd-macro
-                               (emc-change-operator-sequence keys-string)))))
+                              (evil-forward-char)
+                              (execute-kbd-macro keys-string))))
 
           ;; TODO make this work
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))
           ;; evil-surround integration cs'" etc
 
           (t (funcall cmd)))
-    ;; (message "kill %s %s" kill-ring kill-ring-yank-pointer)
     (emc-put-object-property cursor
                              :kill-ring kill-ring
                              :kill-ring-yank-pointer kill-ring-yank-pointer
