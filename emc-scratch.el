@@ -781,7 +781,7 @@ optionally storing PREV-MARK and PREV-POINT."
     (emc-refresh-char-region (emc-get-region-mark region) orig-point))))
 
 (defun emc-exchange-point-and-mark (region)
-  "Ex)change point and mark for a fake REGION."
+  "Exchange point and mark for a fake REGION."
   (let* ((mark (emc-get-region-mark region))
          (point (emc-get-region-point region)))
     (when region
@@ -815,12 +815,14 @@ optionally storing PREV-MARK and PREV-POINT."
                (eq cmd 'evil-inner-WORD)
                (eq cmd 'evil-inner-paragraph)
                (eq cmd 'evil-inner-bracket)
+               (eq cmd 'evil-inner-double-quote)
                (eq cmd 'evil-inner-sentence)
                (eq cmd 'evil-a-paren)
                (eq cmd 'evil-a-word)
                (eq cmd 'evil-a-WORD)
                (eq cmd 'evil-a-paragraph)
                (eq cmd 'evil-a-bracket)
+               (eq cmd 'evil-a-double-quote)
                (eq cmd 'evil-a-sentence))
            (let* ((limits (funcall cmd))
                   (start (nth 0 limits))
@@ -840,6 +842,10 @@ optionally storing PREV-MARK and PREV-POINT."
           ((eq cmd 'evil-visual-block)
            (evil-force-normal-state)
            (error "visual block is not supported"))
+
+          ;; TODO left for visual line
+          ;; - exchange point and mark
+          ;; - keep track of the visual char region under the line region
 
           ((eq cmd 'evil-visual-line)
            (setq region (if (and region (eq region-type 'line))
