@@ -49,6 +49,14 @@ set to the specified values."
   "Return a new region with the type set to TYPE."
   (emc-put-region-property region :type type))
 
+(defun emc-get-pos-at-bol (pos)
+  "Get the position at the beginning of the line with POS."
+  (save-excursion (goto-char pos) (point-at-bol)))
+
+(defun emc-get-pos-at-eol (pos)
+  "Get the position at the end of the line with POS."
+  (save-excursion (goto-char pos) (point-at-eol)))
+
 (defun emc-calculate-region-bounds (prev-mark prev-point point)
   "Calculate new region bounds based on PREV-MARK PREV-POINT and current POINT."
   (let ((mark (or prev-mark prev-point)))
@@ -58,24 +66,22 @@ set to the specified values."
           ((< point mark) (cons mark point))
           (t (cons point (1+ (point)))))))
 
+(defun emc-make-region-overlay (start end)
+  "Make a visual region overlay from START to END."
+  (let ((overlay (make-overlay start end nil nil nil)))
+    (overlay-put overlay 'face 'emc-region-face)
+    (overlay-put overlay 'priority 99)
+    overlay))
+
+
 (defun emc-char-region-overlay (mark point)
   "Make an overlay for a visual region of type char from MARK to POINT."
   (let* ((start (if (< mark point) mark point))
          (end (if (< mark point) point mark))
-         (overlay (make-overlay start end nil nil nil)))
-    (overlay-put overlay 'face 'emc-region-face)
-    (overlay-put overlay 'priority 99)
+         (overlay (emc-make-region-overlay start end)))
     (overlay-put overlay 'mark mark)
     (overlay-put overlay 'point point)
     overlay))
-
-(defun emc-get-pos-at-bol (pos)
-  "Get the position at the beginning of the line with POS."
-  (save-excursion (goto-char pos) (point-at-bol)))
-
-(defun emc-get-pos-at-eol (pos)
-  "Get the position at the end of the line with POS."
-  (save-excursion (goto-char pos) (point-at-eol)))
 
 (defun emc-line-region-overlay (mark point)
   "Make an overlay for a visual region of type line from MARK to POINT."
@@ -85,21 +91,19 @@ set to the specified values."
          (end-line (line-number-at-pos end-pos))
          (start (emc-get-pos-at-bol start-pos))
          (end (emc-get-pos-at-eol end-pos))
-         (overlay (make-overlay start end nil nil nil)))
-    (overlay-put overlay 'face 'emc-region-face)
-    (overlay-put overlay 'priority 99)
-    (overlay-put overlay 'mark start)
-    (overlay-put overlay 'point end)
+         (overlay (emc-make-region-overlay start end)))
+    (overlay-put overlay 'mark (if (< mark point) start end))
+    (overlay-put overlay 'point (if (< mark point) end start))
     overlay))
 
 (defun emc-get-region-overlay (region)
   "Creates an overlay for REGION."
-  (let (mark point)
+  (let ((mark (emc-get-region-mark region))
+        (point (emc-get-region-point region)))
     (cond ((emc-char-region-p region)
-           (setq mark (emc-get-region-mark region))
-           (setq point (emc-get-region-point region)))
+           (emc-char-region-overlay mark point))
           ((emc-line-region-p region)
-           (setq mark (emc-get-region-mark region))))))
+           (emc-line-region-overlay mark point)))))
 
 ;; TODO left here
 

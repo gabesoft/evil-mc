@@ -738,7 +738,7 @@
 ;; TODO move overlay functions to own file
 ;; TODO move region functions to own file
 
-(defun emc-make-region-overlay (mark point &optional type prev-mark prev-point)
+(defun emc-make-region-overlay-old (mark point &optional type prev-mark prev-point)
   "Make a visual region overlay from MARK to POINT."
   (let* ((start (if (< mark point) mark point))
          (end (if (< mark point) point mark))
@@ -757,7 +757,7 @@
 optionally storing PREV-MARK and PREV-POINT."
   (let ((start (point-at-bol))
         (end (point-at-eol)))
-    (emc-make-region-overlay start (1+ end) 'line prev-mark prev-point)))
+    (emc-make-region-overlay-old start (1+ end) 'line prev-mark prev-point)))
 
 (defun emc-char-region-bounds (orig-mark orig-point)
   "Calculates the new bounds for a char region based on ORIG-MARK and ORIG-POINT."
@@ -771,7 +771,7 @@ optionally storing PREV-MARK and PREV-POINT."
 (defun emc-refresh-char-region (orig-mark orig-point)
   "Create a new char region based on ORIG-MARK and ORIG-POINT."
   (let ((bounds (emc-char-region-bounds orig-mark orig-point)))
-    (emc-make-region-overlay (car bounds) (cdr bounds))))
+    (emc-make-region-overlay-old (car bounds) (cdr bounds))))
 
 (defun emc-refresh-line-region (orig-mark orig-point)
   "Create a new line region based on ORIG-MARK and ORIG-POINT."
@@ -796,7 +796,7 @@ optionally storing PREV-MARK and PREV-POINT."
          (point (emc-get-region-overlay-point region)))
     (when region
       (let (new-region)
-        (setq new-region (emc-make-region-overlay point mark))
+        (setq new-region (emc-make-region-overlay-old point mark))
         (goto-char (if (< mark point) mark (1- mark)))
         new-region))))
 
