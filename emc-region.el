@@ -15,17 +15,31 @@ set to the specified values."
 
 (defun emc-get-region-property (region name)
   "Return the value of the property with NAME from REGION."
-  (emc-get-object-property name))
+  (when region (emc-get-object-property region name)))
 
-(defun emc-get-region-mark (region mark)
+(defun emc-get-region-overlay (region)
+  "Return the overlay from REGION."
+  (emc-get-region-property region :overlay))
+
+(defun emc-get-region-mark (region)
   "Return the mark from REGION."
   (emc-get-region-property region :mark))
 
-(defun emc-get-region-point (region point)
+(defun emc-get-region-point (region)
   "Return the point from REGION."
   (emc-get-region-property region :point))
 
-(defun emc-get-region-type (region type)
+(defun emc-get-region-visible-mark (region)
+  "Return REGION's visible mark."
+  (let ((overlay (get-region-overlay region)))
+    (when overlay (overlay-get overlay mark))))
+
+(defun emc-get-region-visible-point (region)
+  "Return REGION's visible point."
+  (let ((overlay (get-region-overlay region)))
+    (when overlay (overlay-get overlay point))))
+
+(defun emc-get-region-type (region)
   "Return the type from REGION."
   (emc-get-region-property region :type))
 
@@ -36,6 +50,10 @@ set to the specified values."
 (defun emc-char-region-p (region)
   "True if REGION is of type char."
   (eq (emc-get-region-type region) 'char))
+
+(defun emc-put-region-overlay (region overlay)
+  "Return a new region with the overlay set to OVERLAY."
+  (emc-put-region-property region :overlay overlay))
 
 (defun emc-put-region-mark (region mark)
   "Return a new region with the mark set to MARK."
@@ -72,7 +90,6 @@ set to the specified values."
     (overlay-put overlay 'face 'emc-region-face)
     (overlay-put overlay 'priority 99)
     overlay))
-
 
 (defun emc-char-region-overlay (mark point)
   "Make an overlay for a visual region of type char from MARK to POINT."
