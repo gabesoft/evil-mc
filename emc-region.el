@@ -1,0 +1,108 @@
+;;; emc-region.el --- Visual region
+
+;;; Commentary:
+
+;; This file contains functions for creating a visual region for a fake cursor
+
+(require 'emc-common)
+
+;;; Code:
+
+(defun emc-put-region-property (region &rest properties)
+  "Return a new region that has one or more PROPERTIES
+set to the specified values."
+  (apply 'emc-put-object-property (cons region properties)))
+
+(defun emc-get-region-property (region name)
+  "Return the value of the property with NAME from REGION."
+  (emc-get-object-property name))
+
+(defun emc-get-region-mark (region mark)
+  "Return the mark from REGION."
+  (emc-get-region-property region :mark))
+
+(defun emc-get-region-point (region point)
+  "Return the point from REGION."
+  (emc-get-region-property region :point))
+
+(defun emc-get-region-type (region type)
+  "Return the type from REGION."
+  (emc-get-region-property region :type))
+
+(defun emc-line-region-p (region)
+  "True if REGION is of type line."
+  (eq (emc-get-region-type region) 'line))
+
+(defun emc-char-region-p (region)
+  "True if REGION is of type char."
+  (eq (emc-get-region-type region) 'char))
+
+(defun emc-put-region-mark (region mark)
+  "Return a new region with the mark set to MARK."
+  (emc-put-region-property region :mark mark))
+
+(defun emc-put-region-point (region point)
+  "Return a new region with the point set to POINT."
+  (emc-put-region-property region :point point))
+
+(defun emc-put-region-type (region type)
+  "Return a new region with the type set to TYPE."
+  (emc-put-region-property region :type type))
+
+(defun emc-calculate-region-bounds (prev-mark prev-point point)
+  "Calculate new region bounds based on PREV-MARK PREV-POINT and current POINT."
+  (let ((mark (or prev-mark prev-point)))
+    (cond ((and (<= mark prev-point) (< point mark)) (setq mark (1+ mark)))
+          ((and (< prev-point mark) (<= mark point)) (setq mark (1- mark))))
+    (cond ((< mark point) (cons mark (1+ point)))
+          ((< point mark) (cons mark point))
+          (t (cons point (1+ (point)))))))
+
+(defun emc-char-region-overlay (mark point)
+  "Make an overlay for a visual region of type char from MARK to POINT."
+  (let* ((start (if (< mark point) mark point))
+         (end (if (< mark point) point mark))
+         (overlay (make-overlay start end nil nil nil)))
+    (overlay-put overlay 'face 'emc-region-face)
+    (overlay-put overlay 'priority 99)
+    (overlay-put overlay 'mark mark)
+    (overlay-put overlay 'point point)
+    overlay))
+
+(defun emc-get-pos-at-bol (pos)
+  "Get the position at the beginning of the line with POS."
+  (save-excursion (goto-char pos) (point-at-bol)))
+
+(defun emc-get-pos-at-eol (pos)
+  "Get the position at the end of the line with POS."
+  (save-excursion (goto-char pos) (point-at-eol)))
+
+(defun emc-line-region-overlay (mark point)
+  "Make an overlay for a visual region of type line from MARK to POINT."
+  (let* ((start-pos (if (< mark point) mark point))
+         (end-pos (if (< mark point) point mark))
+         (start-line (line-number-at-pos start-pos))
+         (end-line (line-number-at-pos end-pos))
+         (start (emc-get-pos-at-bol start-pos))
+         (end (emc-get-pos-at-eol end-pos))
+         (overlay (make-overlay start end nil nil nil)))
+    (overlay-put overlay 'face 'emc-region-face)
+    (overlay-put overlay 'priority 99)
+    (overlay-put overlay 'mark start)
+    (overlay-put overlay 'point end)
+    overlay))
+
+(defun emc-get-region-overlay (region)
+  "Creates an overlay for REGION."
+  (let (mark point)
+    (cond ((emc-char-region-p region)
+           (setq mark (emc-get-region-mark region))
+           (setq point (emc-get-region-point region)))
+          ((emc-line-region-p region)
+           (setq mark (emc-get-region-mark region))))))
+
+;; TODO left here
+
+(provide 'emc-region)
+
+;;; emc-region.el ends here

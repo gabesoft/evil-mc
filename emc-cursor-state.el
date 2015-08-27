@@ -1,4 +1,4 @@
-;;; cursor-state.el --- State saved for each fake cursor
+;;; emc-cursor-state.el --- State saved for each fake cursor
 
 ;;; Commentary:
 

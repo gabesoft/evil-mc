@@ -107,13 +107,10 @@
         ((evil-operator-state-p) 'operator)
         ((evil-emacs-state-p) 'emacs)))
 
-(defun emc-set-command-properties (&rest properties)
-  "Store PROPERTIES and their values into `emc-command'."
-  (while properties
-    (setq emc-command (emc-put-object-property
-                       emc-command
-                       (pop properties)
-                       (pop properties)))))
+(defun emc-set-command-property (&rest properties)
+  "Set one or more command PROPERTIES and their values into `emc-command'."
+  (setq emc-command (apply 'emc-put-object-property
+                           (cons emc-command properties))))
 
 (defun emc-get-command-property (name)
   "Return the current command property with NAME."
@@ -132,7 +129,7 @@
     (let ((cmd this-command))
       (when (emc-supported-command-p cmd)
         (setq emc-command-recording t)
-        (emc-set-command-properties
+        (emc-set-command-property
          :name cmd
          :last last-command
          :operator-pending (evil-operator-state-p)
@@ -145,7 +142,7 @@
                                      can-return-switch-frame cmd-loop)
   "Save the current command key sequence."
   (when (emc-command-recording-p)
-    (emc-set-command-properties
+    (emc-set-command-property
      :keys-seq (vconcat
                 (emc-get-command-property :keys-seq)
                 (this-command-keys-vector)))
@@ -158,7 +155,7 @@
 (defun emc-finish-command-save ()
   "Completes the save of a command."
   (when (emc-command-recording-p)
-    (emc-set-command-properties
+    (emc-set-command-property
      :keys-post (this-command-keys-vector)
      :last-input (vector last-input-event)
      :evil-state-end (emc-get-evil-state)
@@ -169,8 +166,8 @@
       (condition-case error
           (emc-finalize-command)
         (error (message "Saving command %s failed with %s"
-                         (emc-get-command-name)
-                         (error-message-string error))
+                        (emc-get-command-name)
+                        (error-message-string error))
                nil))))
   (setq emc-command-recording nil))
 
@@ -214,7 +211,7 @@
     (setq keys (or seq pre))
     (unless (null seq)
       (setq keys (append keys (or post last))))
-    (emc-set-command-properties :keys keys))
+    (emc-set-command-property :keys keys))
   (when emc-command-debug
     (message "< CMD-DONE %s %s %s %s %s -> %s"
              (emc-get-object-property emc-command :name)

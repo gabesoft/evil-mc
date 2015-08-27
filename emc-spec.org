@@ -21,6 +21,7 @@
 - should be able to cycle cursors
 - gg should go to the first cursor
 - G should go to the last cursor
+- should be able to freeze the fake cursors temporarily
 - should be able to align all cursors at 
   - start of line
   - end of line
