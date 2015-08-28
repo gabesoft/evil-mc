@@ -107,7 +107,7 @@ set to the specified values."
          (start-line (line-number-at-pos start-pos))
          (end-line (line-number-at-pos end-pos))
          (start (emc-get-pos-at-bol start-pos))
-         (end (emc-get-pos-at-eol end-pos))
+         (end (1+ (emc-get-pos-at-eol end-pos)))
          (overlay (emc-make-region-overlay start end)))
     (overlay-put overlay 'mark (if (< mark point) start end))
     (overlay-put overlay 'point (if (< mark point) end start))
@@ -122,7 +122,27 @@ set to the specified values."
           ((emc-line-region-p region)
            (emc-line-region-overlay mark point)))))
 
-;; TODO left here
+(defun emc-create-region (type)
+  "Creates a region of TYPE."
+  (emc-update-region (emc-put-region-property nil :point (point) :type type)))
+
+(defun emc-update-region (region)
+  "Makes a new region from REGION moved to reflect the current cursor position."
+  (let* ((prev-mark (emc-get-region-mark region))
+         (prev-point (emc-get-region-point region))
+         (type (emc-get-region-type region))
+         (bounds (emc-calculate-region-bounds prev-mark prev-point (point)))
+         (new-region (emc-put-region-property nil
+                                              :mark (car bounds)
+                                              :point (cdr bounds)
+                                              :type type)))
+    (emc-put-region-overlay new-region
+                            (emc-get-region-overlay new-region))))
+
+
+;; (emc-create-region 'line)
+;; (emc-create-region 'char)
+
 
 (provide 'emc-region)
 

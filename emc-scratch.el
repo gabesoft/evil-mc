@@ -8,12 +8,13 @@
 (require 'emc-common)
 (require 'emc-cursor-state)
 (require 'emc-command-info)
-;; (require 'emc-region)
+(require 'emc-region)
 
 (evil-define-local-var emc-watch-buffers
   '("emc-common"
     "emc-cursor-state"
     "emc-command-info"
+    "emc-region"
     "emc-scratch"))
 
 ;; (remove-hook 'auto-save-mode-hook (lambda () (message "ASMH")))
