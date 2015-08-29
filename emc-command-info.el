@@ -174,9 +174,11 @@
 (defun emc-key-to-char (key)
   "Converts KEY to a character if it is not one already."
   (cond ((characterp key) key)
-        ((string-equal key "escape") 27)
-        ((string-equal key "backspace") 127)
-        (t (error "Invalid key %s" key))))
+        ((eq 'escape key) 27)
+        ((eq 'backspace key) 127)
+        ((and (stringp key) (string-equal key "escape")) 27)
+        ((and (stringp key) (string-equal key "backspace")) 127)
+        (t (message "Invalid key %s %s" key (type-of key)) 0)))
 
 (defun emc-get-command-keys (&optional name)
   "Get the current command keys with NAME as a list."

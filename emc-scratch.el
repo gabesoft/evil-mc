@@ -206,7 +206,9 @@
         (dir (or direction 'forward)))
     (setq evil-ex-search-pattern pat)
     (setq evil-ex-search-direction dir)
-    (evil-ex-find-next pat dir t)))
+    (let ((next (evil-ex-find-next pat dir t)))
+      (when (eq next t) (goto-char (1- (point))))
+      next)))
 
 ;; (defun emc-get-visual-selection ()
 ;;   "Gets the current visual selection"
@@ -270,9 +272,16 @@
     (emc-goto-next-match (emc-get-pattern) 'backward)
     (emc-goto-next-match (emc-get-pattern) 'forward)))
 
+(defun emc-remove-cursor-region (cursor)
+  "Deletes CURSOR's region and returns a new cursor with the region removed."
+  (emc-delete-region-overlay (emc-get-cursor-region cursor))
+  (emc-put-cursor-region cursor nil))
+
 (defun emc-make-cursor-and-goto-next-match ()
   "Create a cursor at point and go to next match if any."
   (let ((cursor (emc-draw-cursor-at-point)))
+    (setq emc-cursor-list
+          (mapcar 'emc-remove-cursor-region emc-cursor-list))
     (evil-exit-visual-state)
     (if (emc-goto-next-match (emc-get-pattern) 'forward)
         (emc-add-cursor cursor)
@@ -285,13 +294,14 @@
            (emc-goto-next-match (emc-get-pattern) 'backward))
       (progn
         (emc-goto-next-match (emc-get-pattern) 'forward)
-        (emc-remove-overlay-at-point))
+        (emc-remove-overlay-at-point)
+        (when (null emc-cursor-list) (setq emc-pattern nil)))
     (error "No more matches found")))
 
 (defun emc-skip-cursor-and-goto-next-match ()
   "Skip making a cursor at point and go to next match if any."
   (evil-exit-visual-state)
-  (unless (emc-goto-next-match (emc-get-pattern) 'forward)
+  (unless (emc-goto-next-match (emc-get-pattern) 'forward) ;; TODO support wrap
     (error "No more matches found")))
 
 (evil-define-command emc-make-next-cursor ()
@@ -300,11 +310,21 @@
   (interactive)
   (let ((emc-cursor-command t)) ;; TODO: this is no longer needed, but need to ensure that no commands are recorded during cursors creation
     (emc-command-reset)
-    (cond ((evil-visual-state-p)
-           (emc-set-pattern-from-visual-selection)
-           (emc-make-cursor-and-goto-next-match))
-          ((emc-get-pattern) (emc-make-cursor-and-goto-next-match))
-          (t (error "No more matches or no visual selection found")))))
+    (when (and (evil-visual-state-p)
+               (null (emc-get-pattern)))
+      (emc-set-pattern-from-visual-selection))
+    (when (evil-visual-state-p)
+      (when (< (point) (mark)) (evil-exchange-point-and-mark))
+      (goto-char (1- (point))))
+    (if (emc-get-pattern)
+        (emc-make-cursor-and-goto-next-match)
+      (error "No more matches or no visual selection found"))))
+
+    ;; (cond ((evil-visual-state-p)
+    ;;        (emc-set-pattern-from-visual-selection)
+    ;;        (emc-make-cursor-and-goto-next-match))
+    ;;       ((emc-get-pattern) (emc-make-cursor-and-goto-next-match))
+    ;;       (t (error "No more matches or no visual selection found")))))
 
 (evil-define-command emc-skip-next-cursor ()
   "Skip the next cursor."
@@ -354,13 +374,12 @@
   :repeat ignore
   (interactive)
   (dolist (cursor emc-cursor-list)
-    ;; (message "CURSOR-DESTROY %s" cursor)
     (let ((overlay (emc-get-cursor-overlay cursor))
           (region (emc-get-cursor-region cursor)))
       (when overlay (delete-overlay overlay))
-      (emc-delete-region-overlay region))
-    (setq emc-cursor-list nil)
-    (setq emc-pattern nil)))
+      (emc-delete-region-overlay region)))
+  (setq emc-cursor-list nil)
+  (setq emc-pattern nil))
 
 ;; (remove-overlays)
 ;; (setq emc-pattern nil)
@@ -860,18 +879,14 @@
            (error "visual block is not supported"))
 
           ((eq cmd 'evil-visual-line)
-           (cond ((null region)
+           (cond ((or (null region) (eq region-type 'line))
                   (setq region (emc-create-region (point) (point) 'line)))
-                 ((eq region-type 'line)
-                  (error "line region detected"))
                  (t
                   (setq region (emc-change-region-type region 'line)))))
 
           ((eq cmd 'evil-visual-char)
-           (cond ((null region)
+           (cond ((or (null region) (eq region-type 'char))
                   (setq region (emc-create-region (point) (point) 'char)))
-                 ((eq region-type 'char)
-                  (error "char region detected"))
                  (t
                   (setq region (emc-change-region-type region 'char)))))
 
@@ -976,12 +991,13 @@ otherwise execute BODY."
           ((eq cmd 'move-text-down) (move-text-down 1))
           ((eq cmd 'move-text-up) (move-text-up 1))
 
-          ;; (execute-kbd-macro "f-")
-          ;; (execute-kbd-macro "f-")
-          ;; (execute-kbd-macro "f-")
+
           ;; (execute-kbd-macro "J")
           ;; (execute-kbd-macro "J")
           ;; (execute-kbd-macro "J")
+          ;; (execute-kbd-macro "f-")
+          ;; (execute-kbd-macro "f-")
+          ;; (execute-kbd-macro "f-")
           ;; (execute-kbd-macro "ft")
           ;; (execute-kbd-macro "ft")
           ;; (execute-kbd-macro "ft")
@@ -1014,25 +1030,50 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-delete)
            (emc-with-region region 'evil-delete
-                            (execute-kbd-macro keys-string)))
+                            (execute-kbd-macro keys-string))
+           (when (eolp) (evil-end-of-line)))
 
 
           ;; End of line behavior test
-          ;; abc-null
-          ;; abc null
+          ;; cmd-null
+          ;; cmd-null
+          ;; cmd null
           ;; (null 'a)
           ;; (void-null 'b)
           ;; (null)
 
           ;; TODO fix change when region is of type 'line
+          ;;      - cursors loose their position
+          ;;      - should work the same as cc
+          ;;      - fix cc as well when at the end of the line
           ((eq cmd 'evil-change)
            (evil-with-state normal
-             (emc-with-region region
-                              (lambda (start end)
-                                (evil-forward-char)
-                                (evil-delete start end))
+             (cond ((emc-char-region-p region)
+                    (emc-with-region
+                     region (lambda (start end)
                               (evil-forward-char)
-                              (execute-kbd-macro keys-string))))
+                              (evil-delete start end))))
+                   ((emc-line-region-p region)
+                    (setq keys-string "cc")))
+
+             (evil-forward-char)
+             (execute-kbd-macro keys-string)
+
+             ;; (cond ((null region)
+             ;;        (evil-forward-char)
+             ;;        (execute-kbd-macro keys-string))
+             ;;       ((emc-char-region-p region)
+             ;;        (emc-with-region region
+             ;;                         (lambda (start end)
+             ;;                           (evil-forward-char)
+             ;;                           (evil-delete start end))
+             ;;                         (evil-forward-char)
+             ;;                         (execute-kbd-macro keys-string)))
+             ;;       ((emc-line-region-p region)
+             ;;        (evil-forward-char)
+             ;;        (execute-kbd-macro "cc")))
+
+             ))
 
           ;; TODO make this work
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))

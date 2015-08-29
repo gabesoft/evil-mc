@@ -111,11 +111,27 @@
 - insert does not seem to work in org mode (org-self-insert-command)
 ** Operator commands need to be done using evil-operator-range to get the beginning and end positions
 * Issues
-** make yank/paste work with the spacemacs micro paste mode
-** undo after paste does not work properly (requires an additional undo for the real cursor)
-** when a match is at the end of a line that cursor behaves differently than the rest of the cursors
+** TODO make yank/paste work with the spacemacs micro paste mode
+*** pressing p multiple times cycles the kill-ring
+** DONE when a match is at the end of a line that cursor behaves differently than the rest of the cursors
+CLOSED: [2015-08-29 Sat 12:10]
 *** undo cursor does not remove the fake cursor
 *** changing text starts typing in the wrong position (relative to other cursors that are not at the end of a line)
+** DONE fix change with visual region of type line
+CLOSED: [2015-08-29 Sat 14:32]
+*** the fake cursors loose their positions
+*** or determine what the correct behavior is
+** TODO fix move text up/down or throw a not supported error
+** TODO fix motions with a number
+*** motions such as 4j, 4k, etc should work properly
+*** what about H L M motions?
+** TODO fix undo after a paste
+*** currently a second undo is necessary for the real cursor
+** TODO fix cursor positions after undo
+*** after undo of certain actions the cursors end up in the wrong position
+- after cc for example
+** TODO fix transpose-chars-before-point at the end of line
+*** at the end of line it causes the fake cursors to go to the next line
 * Preparation
 ** TODO Understand the implementation of emacs multiple-cursors
 ** TODO Get familiar with the abstractions of evil mode
