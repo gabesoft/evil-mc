@@ -29,15 +29,15 @@ set to the specified values."
   "Return the point from REGION."
   (emc-get-region-property region :point))
 
-(defun emc-get-region-visible-mark (region)
-  "Return REGION's visible mark."
-  (let ((overlay (get-region-overlay region)))
-    (when overlay (overlay-get overlay mark))))
+(defun emc-get-region-start (region)
+  "Return REGION's overlay start position."
+  (let ((overlay (emc-get-region-overlay region)))
+    (when overlay (overlay-start overlay))))
 
-(defun emc-get-region-visible-point (region)
-  "Return REGION's visible point."
-  (let ((overlay (get-region-overlay region)))
-    (when overlay (overlay-get overlay point))))
+(defun emc-get-region-end (region)
+  "Return REGION's overlay end position."
+  (let ((overlay (emc-get-region-overlay region)))
+    (when overlay (overlay-end overlay))))
 
 (defun emc-get-region-type (region)
   "Return the type from REGION."
@@ -113,7 +113,7 @@ set to the specified values."
     (overlay-put overlay 'point (if (< mark point) end start))
     overlay))
 
-(defun emc-get-region-overlay (region)
+(defun emc-create-region-overlay (region)
   "Creates an overlay for REGION."
   (let ((mark (emc-get-region-mark region))
         (point (emc-get-region-point region)))
@@ -122,27 +122,49 @@ set to the specified values."
           ((emc-line-region-p region)
            (emc-line-region-overlay mark point)))))
 
-(defun emc-create-region (type)
-  "Creates a region of TYPE."
-  (emc-update-region (emc-put-region-property nil :point (point) :type type)))
+(defun emc-update-region-overlay (region)
+  "Return a new region based on REGION with the overlay updated."
+  (emc-put-region-overlay region (emc-create-region-overlay region)))
 
-(defun emc-update-region (region)
-  "Makes a new region from REGION moved to reflect the current cursor position."
-  (let* ((prev-mark (emc-get-region-mark region))
+(defun emc-create-region (mark point type)
+  "Creates a region given MARK, POINT, and TYPE."
+  (emc-update-region (emc-put-region-property nil
+                                              :mark mark
+                                              :point (or point (point))
+                                              :type type)))
+
+(defun emc-update-region (region &optional point)
+  "Makes a new region from REGION moved to according to POINT."
+  (let* ((point (or point (point)))
+         (prev-mark (emc-get-region-mark region))
          (prev-point (emc-get-region-point region))
          (type (emc-get-region-type region))
-         (bounds (emc-calculate-region-bounds prev-mark prev-point (point)))
+         (bounds (emc-calculate-region-bounds prev-mark prev-point point))
          (new-region (emc-put-region-property nil
                                               :mark (car bounds)
                                               :point (cdr bounds)
                                               :type type)))
-    (emc-put-region-overlay new-region
-                            (emc-get-region-overlay new-region))))
+    (emc-update-region-overlay new-region)))
 
+(defun emc-change-region-type (region new-type)
+  "Returns a new region with the type set to NEW-TYPE."
+  (let ((new-region (emc-put-region-type region new-type)))
+    (emc-update-region-overlay new-region)))
 
-;; (emc-create-region 'line)
-;; (emc-create-region 'char)
+(defun emc-exchange-region-point-and-mark (region)
+  "Return a new region identical to REGION but with point and mark exchanged."
+  (let* ((mark (emc-get-region-mark region))
+         (point (emc-get-region-point region))
+         (new-region (emc-put-region-property region
+                                              :mark point
+                                              :point mark)))
+    (emc-update-region-overlay new-region)))
 
+(defun emc-delete-region-overlay (region)
+  "Deletes the overlay associated with REGION."
+  (when region
+    (let ((overlay (emc-get-region-overlay region)))
+      (when overlay (delete-overlay overlay)))))
 
 (provide 'emc-region)
 

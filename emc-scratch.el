@@ -136,31 +136,31 @@
   (remove-overlays)
   (setq emc-cursor-list nil))
 
-(defun emc-get-region-overlay-type (region)
-  "Return the REGION's type."
-  (when region (overlay-get region 'type)))
+;; (defun emc-get-region-overlay-type (region)
+;;   "Return the REGION's type."
+;;   (when region (overlay-get region 'type)))
 
-(defun emc-get-region-overlay-mark (region)
-  "Return the REGION's mark."
-  (when region (overlay-get region 'mark)))
+;; (defun emc-get-region-overlay-mark (region)
+;;   "Return the REGION's mark."
+;;   (when region (overlay-get region 'mark)))
 
-(defun emc-get-region-overlay-point (region)
-  "Return the REGION's point."
-  (when region (overlay-get region 'point)))
+;; (defun emc-get-region-overlay-point (region)
+;;   "Return the REGION's point."
+;;   (when region (overlay-get region 'point)))
 
-(defun emc-get-region-overlay-prev-mark (region)
-  "Return the REGION's prev mark."
-  (when region (overlay-get region 'prev-mark)))
+;; (defun emc-get-region-overlay-prev-mark (region)
+;;   "Return the REGION's prev mark."
+;;   (when region (overlay-get region 'prev-mark)))
 
-(defun emc-get-region-overlay-prev-point (region)
-  "Return the REGION's prev point."
-  (when region (overlay-get region 'prev-point)))
+;; (defun emc-get-region-overlay-prev-point (region)
+;;   "Return the REGION's prev point."
+;;   (when region (overlay-get region 'prev-point)))
 
-(defun emc-get-region-overlay-direction (region)
-  "Return the direction of a visual region."
-  (let ((mark (emc-get-region-overlay-mark region))
-        (point (emc-get-region-overlay-point region)))
-    (if (< point mark) -1 1)))
+;; (defun emc-get-region-overlay-direction (region)
+;;   "Return the direction of a visual region."
+;;   (let ((mark (emc-get-region-overlay-mark region))
+;;         (point (emc-get-region-overlay-point region)))
+;;     (if (< point mark) -1 1)))
 
 ;; (emc-make-region-overlay (point) (+ (point) 30))
 
@@ -208,20 +208,20 @@
     (setq evil-ex-search-direction dir)
     (evil-ex-find-next pat dir t)))
 
-(defun emc-get-visual-selection ()
-  "Gets the current visual selection"
-  (if (evil-visual-state-p)
-      (let* ((range (evil-visual-range))
-             (start (car range))
-             (end (car (cdr range))))
-        (buffer-substring-no-properties start end))))
+;; (defun emc-get-visual-selection ()
+;;   "Gets the current visual selection"
+;;   (if (evil-visual-state-p)
+;;       (let* ((range (evil-visual-range))
+;;              (start (car range))
+;;              (end (car (cdr range))))
+;;         (buffer-substring-no-properties start end))))
 
-(defun emc-print-visual-selection ()
-  "Prints the current visual selection."
-  (interactive)
-  (let ((visual (emc-get-visual-selection)))
-    (if visual (message visual)
-      (error "No visual selection found"))))
+;; (defun emc-print-visual-selection ()
+;;   "Prints the current visual selection."
+;;   (interactive)
+;;   (let ((visual (emc-get-visual-selection)))
+;;     (if visual (message visual)
+;;       (error "No visual selection found"))))
 
 ;; (emc-remove-cursors "next")
 
@@ -244,7 +244,10 @@
 (defun emc-add-cursor (overlay)
   "Create a cursor object from OVERLAY and add it to the cursors list."
   (setq emc-cursor-list
-        (cons (emc-put-cursor-overlay nil overlay)
+        (cons (emc-put-cursor-property nil
+                                       :overlay overlay
+                                       :kill-ring (copy-sequence kill-ring)
+                                       :kill-ring-yank-pointer nil)
               emc-cursor-list)))
 
 ;; (defun emc-add-region (region)
@@ -355,7 +358,7 @@
     (let ((overlay (emc-get-cursor-overlay cursor))
           (region (emc-get-cursor-region cursor)))
       (when overlay (delete-overlay overlay))
-      (when region (delete-overlay region)))
+      (emc-delete-region-overlay region))
     (setq emc-cursor-list nil)
     (setq emc-pattern nil)))
 
@@ -739,86 +742,89 @@
 ;; TODO move overlay functions to own file
 ;; TODO move region functions to own file
 
-(defun emc-make-region-overlay-old (mark point &optional type prev-mark prev-point)
-  "Make a visual region overlay from MARK to POINT."
-  (let* ((start (if (< mark point) mark point))
-         (end (if (< mark point) point mark))
-         (overlay (make-overlay start end nil nil nil)))
-    (overlay-put overlay 'face 'emc-region-face)
-    (overlay-put overlay 'priority 99)
-    (overlay-put overlay 'mark mark)
-    (overlay-put overlay 'point point)
-    (overlay-put overlay 'type (or type 'char))
-    (overlay-put overlay 'prev-mark prev-mark)
-    (overlay-put overlay 'prev-point prev-point)
-    overlay))
+;; (defun emc-make-region-overlay-old (mark point &optional type prev-mark prev-point)
+;;   "Make a visual region overlay from MARK to POINT."
+;;   (let* ((start (if (< mark point) mark point))
+;;          (end (if (< mark point) point mark))
+;;          (overlay (make-overlay start end nil nil nil)))
+;;     (overlay-put overlay 'face 'emc-region-face)
+;;     (overlay-put overlay 'priority 99)
+;;     (overlay-put overlay 'mark mark)
+;;     (overlay-put overlay 'point point)
+;;     (overlay-put overlay 'type (or type 'char))
+;;     (overlay-put overlay 'prev-mark prev-mark)
+;;     (overlay-put overlay 'prev-point prev-point)
+;;     overlay))
 
-(defun emc-make-line-region (&optional prev-mark prev-point)
-  "Creates a visual region line for the line at point
-optionally storing PREV-MARK and PREV-POINT."
-  (let ((start (point-at-bol))
-        (end (point-at-eol)))
-    (emc-make-region-overlay-old start (1+ end) 'line prev-mark prev-point)))
+;; (defun emc-make-line-region (&optional prev-mark prev-point)
+;;   "Creates a visual region line for the line at point
+;; optionally storing PREV-MARK and PREV-POINT."
+;;   (let ((start (point-at-bol))
+;;         (end (point-at-eol)))
+;;     (emc-make-region-overlay-old start (1+ end) 'line prev-mark prev-point)))
 
-(defun emc-char-region-bounds (orig-mark orig-point)
-  "Calculates the new bounds for a char region based on ORIG-MARK and ORIG-POINT."
-  (let ((mark (or orig-mark orig-point)))
-    (cond ((and (<= mark orig-point) (< (point) mark)) (setq mark (1+ mark)))
-          ((and (< orig-point mark) (<= mark (point))) (setq mark (1- mark))))
-    (cond ((< mark (point)) (cons mark (1+ (point))))
-          ((< (point) mark) (cons mark (point)))
-          (t (cons (point) (1+ (point)))))))
+;; (defun emc-char-region-bounds (orig-mark orig-point)
+;;   "Calculates the new bounds for a char region based on ORIG-MARK and ORIG-POINT."
+;;   (let ((mark (or orig-mark orig-point)))
+;;     (cond ((and (<= mark orig-point) (< (point) mark)) (setq mark (1+ mark)))
+;;           ((and (< orig-point mark) (<= mark (point))) (setq mark (1- mark))))
+;;     (cond ((< mark (point)) (cons mark (1+ (point))))
+;;           ((< (point) mark) (cons mark (point)))
+;;           (t (cons (point) (1+ (point)))))))
 
-(defun emc-refresh-char-region (orig-mark orig-point)
-  "Create a new char region based on ORIG-MARK and ORIG-POINT."
-  (let ((bounds (emc-char-region-bounds orig-mark orig-point)))
-    (emc-make-region-overlay-old (car bounds) (cdr bounds))))
+;; (defun emc-refresh-char-region (orig-mark orig-point)
+;;   "Create a new char region based on ORIG-MARK and ORIG-POINT."
+;;   (let ((bounds (emc-char-region-bounds orig-mark orig-point)))
+;;     (emc-make-region-overlay-old (car bounds) (cdr bounds))))
 
-(defun emc-refresh-line-region (orig-mark orig-point)
-  "Create a new line region based on ORIG-MARK and ORIG-POINT."
-  (let* ((mark (or orig-mark orig-point))
-         (mark-line (line-number-at-pos mark))
-         (point (point))
-         (point-line (line-number-at-pos point)))
-    (cond ((eq point-line mark-line) (emc-make-line-region orig-mark orig-point))
-          (t (message "TODO: implement") nil))))
+;; (defun emc-refresh-line-region (orig-mark orig-point)
+;;   "Create a new line region based on ORIG-MARK and ORIG-POINT."
+;;   (let* ((mark (or orig-mark orig-point))
+;;          (mark-line (line-number-at-pos mark))
+;;          (point (point))
+;;          (point-line (line-number-at-pos point)))
+;;     (cond ((eq point-line mark-line) (emc-make-line-region orig-mark orig-point))
+;;           (t (message "TODO: implement") nil))))
 
-(defun emc-refresh-region (region orig-point)
-  "Refresh the visual REGION when point moved from ORIG-POINT to current location."
-  (cond
-   ((eq (emc-get-region-overlay-type region) 'line)
-    (emc-refresh-line-region (emc-get-region-overlay-mark region) orig-point))
-   (t
-    (emc-refresh-char-region (emc-get-region-overlay-mark region) orig-point))))
+;; (defun emc-refresh-region (region orig-point)
+;;   "Refresh the visual REGION when point moved from ORIG-POINT to current location."
+;;   (cond
+;;    ((eq (emc-get-region-overlay-type region) 'line)
+;;     (emc-refresh-line-region (emc-get-region-overlay-mark region) orig-point))
+;;    (t
+;;     (emc-refresh-char-region (emc-get-region-overlay-mark region) orig-point))))
 
-(defun emc-exchange-point-and-mark (region)
-  "Exchange point and mark for a fake REGION."
-  (let* ((mark (emc-get-region-overlay-mark region))
-         (point (emc-get-region-overlay-point region)))
-    (when region
-      (let (new-region)
-        (setq new-region (emc-make-region-overlay-old point mark))
-        (goto-char (if (< mark point) mark (1- mark)))
-        new-region))))
+;; (defun emc-exchange-point-and-mark-old (region)
+;;   "Exchange point and mark for a fake REGION."
+;;   (let* ((mark (emc-get-region-overlay-mark region))
+;;          (point (emc-get-region-overlay-point region)))
+;;     (when region
+;;       (let (new-region)
+;;         (setq new-region (emc-make-region-overlay-old point mark))
+;;         ;; (goto-char (if (< mark point) mark (1- mark)))
+;;         new-region))))
 
 (defun emc-run-last-command-visual (cursor)
   "Run the last stored command in visual mode given CURSOR and REGION."
   (let* ((cmd (emc-get-command-name))
          (region (emc-get-cursor-region cursor))
-         (region-type (emc-get-region-overlay-type region))
+         (region-type (emc-get-region-type region))
          (repeat-type (evil-get-command-property cmd :repeat)))
     (when emc-debug (message "CMD-VISUAL %s" cmd))
     (cond ((or (eq cmd 'exchange-point-and-mark)
                (eq cmd 'evil-exchange-point-and-mark))
-           (setq region (emc-exchange-point-and-mark region)))
+           (let* ((new-region (emc-exchange-region-point-and-mark region))
+                  (mark (emc-get-region-mark new-region))
+                  (point (emc-get-region-point new-region)))
+             (goto-char (if (< mark point) (1- point) point))
+             (setq region new-region)))
 
           ((or (eq cmd 'evil-snipe-f)
                (eq cmd 'evil-snipe-F)
                (eq cmd 'evil-snipe-t)
                (eq cmd 'evil-snipe-T))
-           (let ((orig (point)))
-             (evil-snipe-repeat)
-             (setq region (emc-refresh-region region orig))))
+           (evil-snipe-repeat)
+           (setq region (emc-update-region region)))
 
           ;; TODO add all text objects from ev
           ((or (eq cmd 'evil-inner-paren)
@@ -839,51 +845,51 @@ optionally storing PREV-MARK and PREV-POINT."
                   (start (nth 0 limits))
                   (end (1- (nth 1 limits))))
              (goto-char end)
-             (setq region (emc-refresh-region nil start))))
+             (setq region (emc-create-region start end 'char))))
 
           ((eq repeat-type 'motion)
-           (let ((orig (point)))
-             (ignore-errors
-               (condition-case error
-                   (funcall cmd)
-                 (error (message "%s failed with %s" cmd
-                                 (error-message-string error)))))
-             (setq region (emc-refresh-region region orig))))
+           (ignore-errors
+             (condition-case error
+                 (funcall cmd)
+               (error (message "%s failed with %s" cmd
+                               (error-message-string error)))))
+           (setq region (emc-update-region region)))
 
           ((eq cmd 'evil-visual-block)
            (evil-force-normal-state)
            (error "visual block is not supported"))
 
-          ;; TODO left for visual line
-          ;; - exchange point and mark
-          ;; - keep track of the visual char region under the line region
-          ;; - fix change and delete
-
           ((eq cmd 'evil-visual-line)
-           (setq region (if (and region (eq region-type 'line))
-                            (emc-refresh-region nil (point))
-                          (emc-make-line-region
-                           (emc-get-region-overlay-mark region)
-                           (emc-get-region-overlay-point region)))))
+           (cond ((null region)
+                  (setq region (emc-create-region (point) (point) 'line)))
+                 ((eq region-type 'line)
+                  (error "line region detected"))
+                 (t
+                  (setq region (emc-change-region-type region 'line)))))
 
           ((eq cmd 'evil-visual-char)
-           (setq region (if (and region (eq region-type 'char))
-                            nil
-                          (emc-refresh-region nil
-                                              (or (emc-get-region-overlay-prev-mark region)
-                                                  (point))))))
+           (cond ((null region)
+                  (setq region (emc-create-region (point) (point) 'char)))
+                 ((eq region-type 'char)
+                  (error "char region detected"))
+                 (t
+                  (setq region (emc-change-region-type region 'char)))))
 
           (t (message "not implemented")))
     (emc-put-cursor-region cursor region)))
 
 (defmacro emc-with-region (region fn &rest body)
-  "When the REGION exists and is an overlay execute FN
+  "When the REGION exists and has an overlay execute FN
 otherwise execute BODY."
-  `(if (and ,region (overlayp ,region))
-       (let ((start (overlay-start ,region))
-             (end (overlay-end ,region)))
+  `(if region
+       (let ((start (emc-get-region-start ,region))
+             (end (emc-get-region-end ,region)))
          (funcall ,fn start end))
      ,@body))
+
+(defun emc-ends-with-newline-p (text)
+  "True if TEXT ends with a newline character."
+  (string-match-p "\n$" text))
 
 (defun emc-run-last-command (cursor)
   "Run the last stored command for CURSOR."
@@ -895,10 +901,10 @@ otherwise execute BODY."
     (when emc-debug (message "CMD %s keys %s" cmd keys-string))
 
     ;; TODO in normal state we can use execute-kbd-macro but not in insert
-    (cond ((or (eq cmd 'evil-snipe-f)
-               (eq cmd 'evil-snipe-F)
-               (eq cmd 'evil-snipe-t)
-               (eq cmd 'evil-snipe-T)) (evil-snipe-repeat))
+    (cond ((or (eq cmd  'evil-snipe-f)
+               (eq cmd  'evil-snipe-F)
+               (eq cmd  'evil-snipe-t)
+               (eq cmd  'evil-snipe-T)) (evil-snipe-repeat))
 
           ((eq cmd 'yaml-electric-dash-and-dot) (yaml-electric-dash-and-dot 1))
           ((eq cmd 'yaml-electric-bar-and-angle) (yaml-electric-bar-and-angle 1))
@@ -927,33 +933,39 @@ otherwise execute BODY."
           ((eq cmd 'evil-append-line) (evil-append-line 1))
 
           ((eq cmd 'backward-delete-char-untabify) (delete-backward-char 1))
-          ;; ((eq cmd 'delete-backward-char) (delete-char -1))
           ((eq cmd 'delete-backward-char) (delete-backward-char 1))
           ((eq cmd 'evil-replace) (evil-repeat 1))
 
           ;; TODO fix undo after paste
           ;;      all fake cursors and the real one should undo as one step
-          ((or (eq cmd 'evil-paste-after) (eq cmd 'evil-paste-before))
-           (let (new-kill-ring new-kill-ring-yank-pointer)
-             (let ((kill-ring (copy-sequence kill-ring))
-                   (kill-ring-yank-pointer nil))
-               (emc-with-region region
-                                (lambda (start end)
-                                  (evil-delete start end)
-                                  (when (and (not (bolp))
-                                             (eq cmd 'evil-paste-after))
-                                    (evil-backward-char))))
-               (setq new-kill-ring kill-ring)
-               (setq new-kill-ring-yank-pointer kill-ring-yank-pointer))
+          ((or (eq cmd 'evil-paste-after)
+               (eq cmd 'evil-paste-before))
 
-             ;; execute paste with the old key ring
-             (funcall cmd 1)
+           (cond ((null region) (funcall cmd 1))
+                 ((emc-char-region-p region)
+                  (let (new-kill-ring new-kill-ring-yank-pointer)
+                    (let ((kill-ring (copy-sequence kill-ring))
+                          (kill-ring-yank-pointer nil))
 
-             ;; update the kill ring with the overwritten text
-             (setq kill-ring new-kill-ring)
-             (setq kill-ring-yank-pointer new-kill-ring-yank-pointer)))
+                      (emc-with-region region 'evil-delete)
+                      (setq new-kill-ring kill-ring)
+                      (setq new-kill-ring-yank-pointer kill-ring-yank-pointer))
 
-          ;; TODO implement visual paste
+                    ;; execute paste with the old key ring
+                    (evil-paste-before 1)
+
+                    ;; update the kill ring with the overwritten text
+                    (setq kill-ring new-kill-ring)
+                    (setq kill-ring-yank-pointer new-kill-ring-yank-pointer)))
+                 ((emc-line-region-p region)
+                  (let ((text (substring-no-properties (current-kill 0 t)))
+                        (start (emc-get-region-start region))
+                        (end (emc-get-region-end region)))
+                    (unless (emc-ends-with-newline-p text)
+                      (evil-insert-newline-below))
+                    (evil-paste-after 1)
+                    (save-excursion (evil-delete start end 'line))))))
+
           ((eq cmd 'paste-before-current-line) (paste-before-current-line 1))
           ((eq cmd 'paste-after-current-line) (paste-after-current-line 1))
 
@@ -964,15 +976,15 @@ otherwise execute BODY."
           ((eq cmd 'move-text-down) (move-text-down 1))
           ((eq cmd 'move-text-up) (move-text-up 1))
 
-          ;; (execute-kbd-macro "ft")
-          ;; (execute-kbd-macro "ft")
-          ;; (execute-kbd-macro "ft")
-          ;; (execute-kbd-macro "J")
-          ;; (execute-kbd-macro "J")
-          ;; (execute-kbd-macro "J")
           ;; (execute-kbd-macro "f-")
           ;; (execute-kbd-macro "f-")
           ;; (execute-kbd-macro "f-")
+          ;; (execute-kbd-macro "J")
+          ;; (execute-kbd-macro "J")
+          ;; (execute-kbd-macro "J")
+          ;; (execute-kbd-macro "ft")
+          ;; (execute-kbd-macro "ft")
+          ;; (execute-kbd-macro "ft")
           ;; (eq cmd 'evil-upcase)
           ;; (eq cmd 'evil-invert-char)
           ;; (eq cmd 'evil-upcase)
@@ -1081,16 +1093,19 @@ otherwise execute BODY."
                 (let ((new-cursor nil))
                   ;; (message "cmd %s" emc-command-info)
                   ;; (message "cursor %s -> %s" cursor new-cursor)
-                  ;; (message "region %s -> %s" region new-region)
 
 
                   (goto-char (overlay-start overlay))
                   (setq new-cursor (emc-run-command cursor))
 
+                  ;; (message "region %s -> %s" region
+                  ;;          (emc-get-cursor-region new-cursor))
+
                   ;; (message "OLD CURSOR %s NEW CURSOR %s" cursor new-cursor)
 
                   (when overlay (delete-overlay overlay))
-                  (when region (delete-overlay region))
+                  (emc-delete-region-overlay region)
+                  ;; (when region (delete-overlay (emc-get-region-overlay region)))
 
                   (setq new-cursor (emc-put-cursor-overlay
                                     new-cursor (emc-draw-cursor-at-point)))
