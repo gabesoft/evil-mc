@@ -5,6 +5,7 @@
 ;; (load-file "emc-cursor-state.el")
 ;; (load-file "emc-command-info.el")
 
+(require 'emc-vars)
 (require 'emc-common)
 (require 'emc-cursor-state)
 (require 'emc-command-info)
@@ -45,74 +46,6 @@
 ;; (file-name-base)
 ;; (buffer-file-name (window-buffer))
 ;; (get-file-buffer (current-buffer))
-
-(defface emc-cursor-face
-  '((((class color) (min-colors 88) (background dark))
-     :background "#389867")
-    (((class color) (min-colors 88) (background light) (type gtk))
-     :distant-foreground "gtk_selection_fg_color"
-     :background "gtk_selection_bg_color")
-    (((class color) (min-colors 88) (background light) (type ns))
-     :distant-foreground "ns_selection_fg_color"
-     :background "ns_selection_bg_color")
-    (((class color) (min-colors 88) (background light))
-     :background "lightgoldenrod2")
-    (((class color) (min-colors 16) (background dark))
-     :background "blue3")
-    (((class color) (min-colors 16) (background light))
-     :background "lightgoldenrod2")
-    (((class color) (min-colors 8))
-     :background "blue" :foreground "white")
-    (((type tty) (class mono))
-     :inverse-video t)
-    (t :background "gray"))
-  "Basic face for highlighting the region."
-  :version "21.1"
-  :group 'basic-faces)
-
-(defface emc-cursor-inverse-face
-  '((t (:inverse-video t :line-width 1)))
-  "The face used for fake cursors"
-  :group 'emc-multiple-cursors)
-
-(defface emc-cursor-normal-state
-  '((((background dark))
-     (:box (:line-width -1 :color "#D13A82") :height 1 :background "#0A3641"))
-    (t (:box (:line-width -1 :color "#D13A82") :height 1 :background "gray90")))
-  "The face used for fake cursors in normal state.")
-
-(defface emc-cursor-insert-state
-  '((((background dark))
-     (:underline (:line-width -1 :color "#D13A82") :height 1 :background "#0A3641"))
-    (t (:underline (:line-width -1 :color "#D13A82") :height 1 :background "gray90")))
-  "The face used for fake cursors in insert state.")
-
-(defvar emc-running-command nil
-  "True when running a command for all cursors.")
-
-(defvar emc-cursor-command nil
-  "True if the current command is an emc cursor command.")
-
-(defun emc-has-cursors-p ()
-  "True if there are any fake cursors."
-  (not (null emc-cursor-list)))
-
-(evil-define-local-var emc-debug nil
-  "If true print debug information.")
-
-(defface emc-region-face
-  '((t :inherit region))
-  "The face used for fake regions"
-  :group 'evil-multiple-cursors)
-
-(evil-define-local-var emc-cursor-list nil
-  "The list of current fake cursors")
-
-;; (evil-define-local-var emc-region-list nil
-;;   "The list of current fake regions")
-
-(evil-define-local-var emc-pattern nil
-  "The current pattern")
 
 (defun emc-make-cursor-at-eol (pos)
   "Make a cursor overlay at POS assuming pos is at the end of line."
@@ -237,12 +170,17 @@
         (error "At least 2 characters required for creating a cursor")
       (setq emc-pattern (cons pattern (cons end start))))))
 
+(defun emc-print-pattern ()
+  "Print the curent pattern."
+  (interactive)
+  (message "%s" emc-pattern))
+
 (defun emc-get-pattern ()
-  "Gets the current pattern if any."
+  "Get the current pattern if any."
   (when emc-pattern (car emc-pattern)))
 
 (defun emc-get-position ()
-  "Gets the position of the current pattern if any."
+  "Get the position of the current pattern if any."
   (when emc-pattern (cdr emc-pattern)))
 
 (defun emc-add-cursor (overlay)
@@ -1004,16 +942,31 @@ otherwise execute BODY."
           ((eq cmd 'evil-visual-char) (evil-force-normal-state))
           ((eq cmd 'evil-visual-line) (evil-force-normal-state))
 
+          ((eq cmd 'evil-surround-region)
+           (emc-with-region
+            region
+            (lambda (start end)
+              (evil-surround-region
+               start end nil (emc-get-command-key :last-input)))))
+
           ((eq cmd 'evil-yank)
-           (emc-with-region region
-                            (lambda (start end)
-                              (goto-char start)
-                              (evil-yank start end))
-                            (execute-kbd-macro keys-string)))
+           (cond ((null region)
+                  (execute-kbd-macro keys-string))
+                 ((emc-char-region-p region)
+                  (emc-with-region region
+                                   (lambda (start end)
+                                     (goto-char start)
+                                     (evil-yank start end))))
+                 ((emc-line-region-p region)
+                  (execute-kbd-macro "yy"))))
 
           ((eq cmd 'evil-delete)
-           (emc-with-region region 'evil-delete
-                            (execute-kbd-macro keys-string))
+           (cond ((null region)
+                  (execute-kbd-macro keys-string))
+                 ((emc-char-region-p region)
+                  (emc-with-region region 'evil-delete))
+                 ((emc-line-region-p region)
+                  (execute-kbd-macro "dd")))
            (when (eolp) (evil-end-of-line)))
 
 
@@ -1025,15 +978,17 @@ otherwise execute BODY."
           ;; (void-null 'b)
           ;; (null)
 
-          ;; (execute-kbd-macro "J2")
-          ;; (execute-kbd-macro "J3")
-          ;; (execute-kbd-macro "J4")
-          ;; (execute-kbd-macro "f-3")
-          ;; (execute-kbd-macro "f-4")
-          ;; (execute-kbd-macro "f-5")
-          ;; (execute-kbd-macro "ft")
-          ;; (execute-kbd-macro "ft")
-          ;; (execute-kbd-macro "ft")
+          ;;  "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
+          ;;  "< CMD-DONE cms pre cms seq cms post cms raw cms last cms -> %s"
+          ;; (execute-kbd-macro"J2")
+          ;; (execute-kbd-macro"J3")
+          ;; (execute-kbd-macro"J4")
+          ;; (execute-kbd-macro "f-7")
+          ;; (execute-kbd-macro "f-8")
+          ;; (execute-kbd-macro "f-9")
+          ;; (execute-kbd-macro "ft 1")
+          ;; (execute-kbd-macro "ft 2")
+          ;; (execute-kbd-macro "ft 3")
           ;; (eq cmd 'evil-upcase)
           ;; (eq cmd 'evil-invert-char)
           ;; (eq cmd 'evil-upcase)
@@ -1104,6 +1059,8 @@ otherwise execute BODY."
       (evil-with-single-undo
         ;; (evil-with-transient-mark-mode)
         ;; (message "BEFORE-VISUAL %s" (evil-visual-state-p))
+        ;; (evil-without-repeat)
+        ;; (evil-repeat-abort)
         (save-excursion
           (let ((cursor-list nil))
             ;; (message "RUN COMMAND FOR ALL %s" (length emc-cursor-list))

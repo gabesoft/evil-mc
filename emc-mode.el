@@ -3,7 +3,7 @@
 ;; Author: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Version: 0.0.1
 ;; Keywords: evil editing cursors vim evil-multiple-cursors emc
-;; Package-Requires ((emacs "24") (evil "1.2.1"))
+;; Package-Requires ((emacs "24") (evil "1.2.3"))
 ;; Homepage: https://github.com/gabesoft/evil-multiple-cursors
 ;;
 ;; This file is not part of GNU Emacs.

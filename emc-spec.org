@@ -221,3 +221,11 @@ CLOSED: [2015-08-29 Sat 17:37]
 **** after undo of certain actions the cursors end up in the wrong position
 - after cc for example
 ** TODO Implement redo for fake cursors
+** TODO Implement paste/copy from/to registers
+** TODO Determine why some keys are lost
+*** for example the command "csbB" results in "csB"
+*** use before advice for evil-repeat recording commands
+- evil-repeat-keystrokes, etc
+*** ensure the post-command-hook is appended rather than inserted at the front
+** TODO Use all vars through methods rather than directly
+

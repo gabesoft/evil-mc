@@ -10,15 +10,6 @@
 
 ;;; Code:
 
-(evil-define-local-var emc-command nil
-  "Data for the current command to be executed by the fake cursors.")
-
-(evil-define-local-var emc-command-recording nil
-  "True if recording `this-command' data.")
-
-(evil-define-local-var emc-command-debug nil
-  "If true display debug messages about the current command being recorded.")
-
 (defun emc-command-p ()
   "True if there is data saved for the current command."
   (not (null emc-command)))
@@ -84,6 +75,7 @@
         (eq cmd 'evil-paste-before)
         (eq cmd 'evil-repeat)
         (eq cmd 'evil-replace)
+        (eq cmd 'evil-surround-region)
         (eq cmd 'evil-upcase)
         (eq cmd 'evil-visual-char)
         (eq cmd 'evil-visual-line)
@@ -140,6 +132,18 @@
          :keys-pre (this-command-keys-vector))
         (when emc-command-debug
           (message "> CMD-BEGIN %s" emc-command))))))
+(put 'emc-begin-command-save 'permanent-local-hook t)
+
+(defun emc-save-keystrokes (flag)
+  "Save the current command key sequence."
+  ;; TODO use this instead of `emc-save-key-sequence'
+  ;;      also add all advices for other evil-repeat recording functions if appropriate
+  ;;      must account for cases in which this does not fire (such as "ytd", etc)
+  (when emc-command-debug
+    (message "emc-save-keystrokes %s %s %s"
+             flag
+             (this-command-keys)
+             (this-command-keys-vector))))
 
 (defun emc-save-key-sequence (prompt &optional continue-echo dont-downcase-last
                                      can-return-switch-frame cmd-loop)
@@ -150,9 +154,11 @@
                 (emc-get-command-property :keys-seq)
                 (this-command-keys-vector)))
     (when emc-command-debug
-      (message "+ CMD-KEY-SEQ %s %s %s"
+      (message "+ CMD-KEY-SEQ %s %s %s %s %s"
                (this-command-keys)
                (this-command-keys-vector)
+               (this-single-command-raw-keys)
+               last-input-event
                this-command))))
 
 (defun emc-finish-command-save ()
@@ -173,6 +179,7 @@
                         (error-message-string error))
                nil))))
   (setq emc-command-recording nil))
+(put 'emc-finish-command-save 'permanent-local-hook t)
 
 (defun emc-key-to-char (key)
   "Converts KEY to a character if it is not one already."
@@ -183,14 +190,18 @@
         ((and (stringp key) (string-equal key "backspace")) 127)
         (t (message "Invalid key %s %s" key (type-of key)) 0)))
 
+(defun emc-get-command-key (&optional name index)
+  "Get the command key, stored at the property with NAME, at INDEX."
+  (nth (or index 0) (emc-get-command-keys name)))
+
 (defun emc-get-command-keys (&optional name)
-  "Get the current command keys with NAME as a list."
+  "Get the command keys, stored at the property with NAME, as a list."
   (mapcar 'emc-key-to-char
           (listify-key-sequence
            (emc-get-command-property (or name :keys)))))
 
 (defun emc-get-command-keys-string (&optional name)
-  "Get the current command keys with NAME as a string."
+  "Get the command keys, stored at the property with NAME, as a string."
   (when emc-command
     (let* ((keys (emc-get-command-keys (or name :keys)))
            (keys-string (mapcar 'char-to-string keys)))
@@ -211,18 +222,22 @@
   (let ((pre (emc-get-command-keys :keys-pre))
         (seq (emc-get-command-keys :keys-seq))
         (post (emc-get-command-keys :keys-post))
+        (raw (emc-get-command-keys :keys-post-raw))
         (last (emc-get-command-keys :last-input))
         (keys nil))
     (setq keys (or seq pre))
     (unless (null seq)
-      (setq keys (append keys (or post last))))
+      (setq keys (append keys (or post (if (equal raw last)
+                                           last
+                                         (append raw last))))))
     (emc-set-command-property :keys keys))
   (when emc-command-debug
-    (message "< CMD-DONE %s %s %s %s %s -> %s"
+    (message "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
              (emc-get-object-property emc-command :name)
              (emc-get-command-keys-string :keys-pre)
              (emc-get-command-keys-string :keys-seq)
              (emc-get-command-keys-string :keys-post)
+             (emc-get-command-keys-string :keys-post-raw)
              (emc-get-command-keys-string :last-input)
              (emc-get-command-keys-string :keys))))
 
@@ -231,17 +246,19 @@
   (interactive)
   (add-hook 'pre-command-hook 'emc-begin-command-save t t)
 
-  ;; this hook must run before evil-repeat post hook
-  ;; which clears the command keys
-  (add-hook 'post-command-hook 'emc-finish-command-save nil t)
-  (advice-add 'read-key-sequence :before #'emc-save-key-sequence))
+  ;; this hook must run before evil-repeat post hook which clears the command keys
+  ;; after using emc-save-keystrokes this hook must be added at the end
+  (add-hook 'post-command-hook 'emc-finish-command-save t t)
+  (advice-add 'read-key-sequence :before #'emc-save-key-sequence)
+  (advice-add 'evil-repeat-keystrokes :before #'emc-save-keystrokes))
 
 (defun emc-remove-command-hooks ()
   "Remove hooks used for saving the current command."
   (interactive)
   (remove-hook 'pre-command-hook 'emc-begin-command-save t)
   (remove-hook 'post-command-hook 'emc-finish-command-save t)
-  (advice-remove 'read-key-sequence #'emc-save-key-sequence))
+  (advice-remove 'read-key-sequence #'emc-save-key-sequence)
+  (advice-remove 'evil-repeat-keystrokes #'emc-save-keystrokes))
 
 (provide'emc-command-info)
 
