@@ -233,7 +233,9 @@
          (start (car range))
          (end (car (cdr range)))
          (pattern (buffer-substring-no-properties start end)))
-    (setq emc-pattern (cons pattern (cons end start)))))
+    (if (< (length pattern) 2)
+        (error "At least 2 characters required for creating a cursor")
+      (setq emc-pattern (cons pattern (cons end start))))))
 
 (defun emc-get-pattern ()
   "Gets the current pattern if any."
@@ -320,11 +322,11 @@
         (emc-make-cursor-and-goto-next-match)
       (error "No more matches or no visual selection found"))))
 
-    ;; (cond ((evil-visual-state-p)
-    ;;        (emc-set-pattern-from-visual-selection)
-    ;;        (emc-make-cursor-and-goto-next-match))
-    ;;       ((emc-get-pattern) (emc-make-cursor-and-goto-next-match))
-    ;;       (t (error "No more matches or no visual selection found")))))
+;; (cond ((evil-visual-state-p)
+;;        (emc-set-pattern-from-visual-selection)
+;;        (emc-make-cursor-and-goto-next-match))
+;;       ((emc-get-pattern) (emc-make-cursor-and-goto-next-match))
+;;       (t (error "No more matches or no visual selection found")))))
 
 (evil-define-command emc-skip-next-cursor ()
   "Skip the next cursor."
@@ -915,27 +917,21 @@ otherwise execute BODY."
          (keys-string (emc-get-command-keys-string)))
     (when emc-debug (message "CMD %s keys %s" cmd keys-string))
 
-    ;; TODO in normal state we can use execute-kbd-macro but not in insert
-    (cond ((or (eq cmd  'evil-snipe-f)
-               (eq cmd  'evil-snipe-F)
-               (eq cmd  'evil-snipe-t)
-               (eq cmd  'evil-snipe-T)) (evil-snipe-repeat))
-
-          ((eq cmd 'yaml-electric-dash-and-dot) (yaml-electric-dash-and-dot 1))
+    (cond ((eq cmd 'yaml-electric-dash-and-dot) (yaml-electric-dash-and-dot 1))
           ((eq cmd 'yaml-electric-bar-and-angle) (yaml-electric-bar-and-angle 1))
-
           ((eq cmd 'org-self-insert-command) (self-insert-command 1))
           ((eq cmd 'transpose-chars-before-point) (transpose-chars-before-point 1))
+
           ((eq cmd 'evil-commentary)
            (emc-with-region region 'evil-commentary
                             (execute-kbd-macro keys-string)))
 
           ((eq cmd 'evil-find-char) (evil-repeat-find-char))
           ((eq cmd 'newline-and-indent) (newline-and-indent))
-          ((eq cmd 'self-insert-command) (self-insert-command 1))
           ((eq cmd 'evil-append) (evil-append 1))
 
           ((eq cmd 'evil-delete-backward-char-and-join) (evil-delete-backward-char-and-join 1))
+          ((eq cmd 'evil-complete-next) (evil-complete-next))
 
           ((eq cmd 'evil-delete-char)
            (emc-with-region region 'evil-delete-char
@@ -992,24 +988,11 @@ otherwise execute BODY."
           ((eq cmd 'move-text-up) (move-text-up 1))
 
 
-          ;; (execute-kbd-macro "J")
-          ;; (execute-kbd-macro "J")
-          ;; (execute-kbd-macro "J")
-          ;; (execute-kbd-macro "f-")
-          ;; (execute-kbd-macro "f-")
-          ;; (execute-kbd-macro "f-")
-          ;; (execute-kbd-macro "ft")
-          ;; (execute-kbd-macro "ft")
-          ;; (execute-kbd-macro "ft")
-          ;; (eq cmd 'evil-upcase)
-          ;; (eq cmd 'evil-invert-char)
-          ;; (eq cmd 'evil-upcase)
-          ;; (eq cmd 'evil-change-line)
-          ;; (eq cmd 'evil-open-above)
-
           ((eq cmd 'evil-normal-state)
            (evil-insert 1)
            (evil-normal-state))
+
+          ((eq cmd 'yank) (yank))
 
           ((eq cmd 'evil-open-below) (evil-insert-newline-below))
           ((eq cmd 'evil-open-above) (evil-insert-newline-above))
@@ -1042,44 +1025,44 @@ otherwise execute BODY."
           ;; (void-null 'b)
           ;; (null)
 
-          ;; TODO fix change when region is of type 'line
-          ;;      - cursors loose their position
-          ;;      - should work the same as cc
-          ;;      - fix cc as well when at the end of the line
+          ;; (execute-kbd-macro "J2")
+          ;; (execute-kbd-macro "J3")
+          ;; (execute-kbd-macro "J4")
+          ;; (execute-kbd-macro "f-3")
+          ;; (execute-kbd-macro "f-4")
+          ;; (execute-kbd-macro "f-5")
+          ;; (execute-kbd-macro "ft")
+          ;; (execute-kbd-macro "ft")
+          ;; (execute-kbd-macro "ft")
+          ;; (eq cmd 'evil-upcase)
+          ;; (eq cmd 'evil-invert-char)
+          ;; (eq cmd 'evil-upcase)
+          ;; (eq cmd 'evil-change-line)
+          ;; (eq cmd 'evil-open-above)
+
           ((eq cmd 'evil-change)
            (evil-with-state normal
-             (cond ((emc-char-region-p region)
-                    (emc-with-region
-                     region (lambda (start end)
-                              (evil-forward-char)
-                              (evil-delete start end))))
+             (cond ((null region)
+                    (evil-forward-char)
+                    (execute-kbd-macro keys-string))
+                   ((emc-char-region-p region)
+                    (emc-with-region region
+                                     (lambda (start end)
+                                       (evil-forward-char)
+                                       (evil-delete start end))))
                    ((emc-line-region-p region)
-                    (setq keys-string "cc")))
-
-             (evil-forward-char)
-             (execute-kbd-macro keys-string)
-
-             ;; (cond ((null region)
-             ;;        (evil-forward-char)
-             ;;        (execute-kbd-macro keys-string))
-             ;;       ((emc-char-region-p region)
-             ;;        (emc-with-region region
-             ;;                         (lambda (start end)
-             ;;                           (evil-forward-char)
-             ;;                           (evil-delete start end))
-             ;;                         (evil-forward-char)
-             ;;                         (execute-kbd-macro keys-string)))
-             ;;       ((emc-line-region-p region)
-             ;;        (evil-forward-char)
-             ;;        (execute-kbd-macro "cc")))
-
+                    (evil-forward-char)
+                    (execute-kbd-macro "cc")
+                    ;; (evil-change-line (point-at-bol) (point-at-eol))
+                    ;; (indent-according-to-mode)
+                    ))
              ))
 
           ;; TODO make this work
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))
           ;; evil-surround integration cs'" etc
 
-          (t (funcall cmd)))
+          (t (execute-kbd-macro keys-string)))
     (emc-put-object-property cursor
                              :kill-ring kill-ring
                              :kill-ring-yank-pointer kill-ring-yank-pointer

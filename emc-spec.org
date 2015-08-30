@@ -125,11 +125,6 @@ CLOSED: [2015-08-29 Sat 14:32]
 ** TODO fix motions with a number
 *** motions such as 4j, 4k, etc should work properly
 *** what about H L M motions?
-** TODO fix undo after a paste
-*** currently a second undo is necessary for the real cursor
-** TODO fix cursor positions after undo
-*** after undo of certain actions the cursors end up in the wrong position
-- after cc for example
 ** TODO fix transpose-chars-before-point at the end of line
 *** at the end of line it causes the fake cursors to go to the next line
 * Preparation
@@ -164,7 +159,8 @@ CLOSED: [2015-08-29 Sat 14:32]
 - reload on changes
 ** What happens to the cursors that are off screen
 * Development
-** TODO Implement only prev and next based on the visual selection
+** DONE Implement only prev and next based on the visual selection
+CLOSED: [2015-08-29 Sat 17:36]
 - draw the cursors
 - second escape should remove all fake cursors
 - should be able to add a cursor for next match or show a warning message
@@ -185,28 +181,43 @@ CLOSED: [2015-08-29 Sat 14:32]
 - create the next fake cursor at point
 - store state for the current fake cursor
 - move cursor to the next pattern match (wrap)
-** TODO Implement motions for the fake and real cursors
+** DONE Implement motions for the fake and real cursors
+CLOSED: [2015-08-29 Sat 17:36]
 
 - all evil motions should work for all cursors
 - other motions that are built using evil abstractions should work such as %, etc
 - after exiting insert the cursor moves to the left one char: need to do the same for all fake cursors
 - add tests
-** Implement operators
+** DONE Implement operators
+CLOSED: [2015-08-29 Sat 17:36]
 - all built in operators should work
 - all operators implemented using evil abstractions should work
 - add tests
-** Keep the visual selection and ensure that making a visual selection works for all cursors
-- second escape should clear the cursors (if visual selection)
-- first escape should clear the visual selection (if any)
+** DONE Keep the visual selection and ensure that making a visual selection works for all cursors
+CLOSED: [2015-08-29 Sat 17:36]
+- start out in normal mode
 - draw the visual selection for each cursor
 - add tests
-** Implement prev and next based on the word/WORD/symbol at cursor as well
-- add tests
-** Implement skip when adding cursors
-** Add ability to wrap around when doing next or prev
-** Add ability to create cursors for all matches
-** Handle the insert mode
+** TODO Implement cursor creation 
+*** TODO create all cursors matching the word/WORD/symbol at cursor
+*** TODO next should wrap
+*** DONE skip
+CLOSED: [2015-08-29 Sat 17:56]
+*** DONE undo a cursor
+CLOSED: [2015-08-29 Sat 17:56]
+*** TODO create a cursor at point even if it doesn't match the current pattern
+*** TODO delete the cursor at point
+*** TODO navigate through cursors
+*** TODO create/delete at point, as well as navigating through cursors will require a way to freeze the cursors temporarily
+** DONE Handle the insert mode
+CLOSED: [2015-08-29 Sat 17:37]
 - all operations performed in insert state should happen for all cursors
-** Ensure undo/redo works properly for all changes and all cursors
-- after undo position the cursors in the proper places
-  
+** TODO Implement undo for fake cursors
+*** should work with undo-tree as well as Emacs undo
+*** after undo position the cursors in the proper places
+*** TODO fix undo after a paste
+**** currently a second undo is necessary for the real cursor
+*** TODO fix cursor positions after undo
+**** after undo of certain actions the cursors end up in the wrong position
+- after cc for example
+** TODO Implement redo for fake cursors

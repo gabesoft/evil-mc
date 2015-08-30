@@ -51,6 +51,8 @@
 
         (eq cmd 'evil-commentary)
         (eq cmd 'org-self-insert-command)
+        (eq cmd 'spacemacs/evil-numbers-increase)
+        (eq cmd 'spacemacs/evil-numbers-decrease)
         (eq cmd 'transpose-chars-before-point)
         (eq cmd 'yaml-electric-dash-and-dot)
         (eq cmd 'yaml-electric-bar-and-angle)
@@ -64,6 +66,7 @@
         (eq cmd 'evil-append-line)
         (eq cmd 'evil-change)
         (eq cmd 'evil-change-line)
+        (eq cmd 'evil-complete-next)
         (eq cmd 'evil-delete)
         (eq cmd 'evil-delete-backward-char-and-join)
         (eq cmd 'evil-delete-backward-word)
@@ -118,7 +121,7 @@
 
 (defun emc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
-  (when emc-command-debug (message "> CMD-TEST %s %s" this-command (this-command-keys)))
+  (when emc-command-debug (message "> CMD %s %s" this-command (this-command-keys)))
   (when (and (not emc-running-command)
              (not (emc-command-recording-p)))
     (setq emc-command nil))
