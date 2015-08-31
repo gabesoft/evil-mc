@@ -39,6 +39,7 @@
     (or (eq repeat-type 'motion)
 
         ;; extended commands (should be configurable by user)
+        ;; add smartchr commands
 
         (eq cmd 'evil-commentary)
         (eq cmd 'org-self-insert-command)
@@ -178,21 +179,23 @@
        :evil-keys-save-post
        (listify-key-sequence (this-command-keys-vector))))))
 
+;; TODO remove this after integrating emc-save-keystrokes and emc-save-motion
 (defun emc-save-key-sequence (prompt &optional continue-echo dont-downcase-last
                                      can-return-switch-frame cmd-loop)
   "Save the current command key sequence."
-  (when (emc-command-recording-p)
-    (emc-set-command-property
-     :keys-seq (vconcat
-                (emc-get-command-property :keys-seq)
-                (this-command-keys-vector)))
-    (when emc-command-debug
-      (message "+ CMD-KEY-SEQ %s %s %s %s %s"
-               (this-command-keys)
-               (this-command-keys-vector)
-               (this-single-command-raw-keys)
-               last-input-event
-               this-command))))
+  (ignore-errors
+    (when (emc-command-recording-p)
+      (emc-set-command-property
+       :keys-seq (vconcat
+                  (emc-get-command-property :keys-seq)
+                  (this-command-keys-vector)))
+      (when emc-command-debug
+        (message "+ CMD-KEY-SEQ %s %s %s %s %s"
+                 (this-command-keys)
+                 (this-command-keys-vector)
+                 (this-single-command-raw-keys)
+                 last-input-event
+                 this-command)))))
 
 (defun emc-finish-command-save ()
   "Completes the save of a command."
