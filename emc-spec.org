@@ -183,7 +183,6 @@ CLOSED: [2015-08-29 Sat 17:36]
 - move cursor to the next pattern match (wrap)
 ** DONE Implement motions for the fake and real cursors
 CLOSED: [2015-08-29 Sat 17:36]
-
 - all evil motions should work for all cursors
 - other motions that are built using evil abstractions should work such as %, etc
 - after exiting insert the cursor moves to the left one char: need to do the same for all fake cursors
@@ -228,4 +227,9 @@ CLOSED: [2015-08-29 Sat 17:37]
 - evil-repeat-keystrokes, etc
 *** ensure the post-command-hook is appended rather than inserted at the front
 ** TODO Use all vars through methods rather than directly
+** TODO Fix evil-complete-next
+*** currently it only works the first time
+*** should cycle through completions
+** TODO Determine how paste of a non line over a visual line should work
+*** all fake cursors and the real one should behave the same
 

@@ -980,9 +980,12 @@ otherwise execute BODY."
 
           ;;  "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
           ;;  "< CMD-DONE cms pre cms seq cms post cms raw cms last cms -> %s"
-          ;; (execute-kbd-macro"J2")
-          ;; (execute-kbd-macro"J3")
-          ;; (execute-kbd-macro"J4")
+          ;; (execute-kbd-macro "J2")
+          ;; (emc-get-command-property "test")
+          ;; (execute-kbd-macro "J3")
+          ;; (emc-get-command-property "test")
+          ;; (execute-kbd-macro "J4")
+          ;; (emc-get-command-property "test")
           ;; (execute-kbd-macro "f-7")
           ;; (execute-kbd-macro "f-8")
           ;; (execute-kbd-macro "f-9")
@@ -1007,11 +1010,7 @@ otherwise execute BODY."
                                        (evil-delete start end))))
                    ((emc-line-region-p region)
                     (evil-forward-char)
-                    (execute-kbd-macro "cc")
-                    ;; (evil-change-line (point-at-bol) (point-at-eol))
-                    ;; (indent-according-to-mode)
-                    ))
-             ))
+                    (execute-kbd-macro "cc")))))
 
           ;; TODO make this work
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))

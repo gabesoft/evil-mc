@@ -107,6 +107,14 @@
   (setq emc-command (apply 'emc-put-object-property
                            (cons emc-command properties))))
 
+(defun emc-add-command-property (&rest properties)
+  "Add to the values of one or more command PROPERTIES and set into `emc-command'."
+  (while properties
+    (let* ((name (pop properties))
+           (current (emc-get-command-property name))
+           (value (pop properties)))
+      (emc-set-command-property name (nconc current value)))))
+
 (defun emc-get-command-property (name)
   "Return the current command property with NAME."
   (emc-get-object-property emc-command name))
@@ -140,10 +148,35 @@
   ;;      also add all advices for other evil-repeat recording functions if appropriate
   ;;      must account for cases in which this does not fire (such as "ytd", etc)
   (when emc-command-debug
-    (message "emc-save-keystrokes %s %s %s"
+    (message "EMC-SAVE-KEYSTROKES %s %s %s %s"
              flag
              (this-command-keys)
-             (this-command-keys-vector))))
+             (this-command-keys-vector)
+             evil-state))
+  (if (eq flag 'pre)
+      (emc-add-command-property
+       :evil-keys-save-pre
+       (listify-key-sequence (this-command-keys-vector)))
+    (emc-add-command-property
+     :evil-keys-save-post
+     (listify-key-sequence (this-command-keys-vector)))))
+
+(defun emc-save-motion (flag)
+  "Save the current command key sequence for motions."
+  (unless (memq evil-state '(insert replace))
+    (when emc-command-debug
+      (message "EMC-SAVE-MOTION %s %s %s %s"
+               flag
+               (this-command-keys)
+               (this-command-keys-vector)
+               evil-state))
+    (if (eq flag 'pre)
+        (emc-add-command-property
+         :evil-keys-save-pre
+         (listify-key-sequence (this-command-keys-vector)))
+      (emc-add-command-property
+       :evil-keys-save-post
+       (listify-key-sequence (this-command-keys-vector))))))
 
 (defun emc-save-key-sequence (prompt &optional continue-echo dont-downcase-last
                                      can-return-switch-frame cmd-loop)
@@ -224,33 +257,42 @@
         (post (emc-get-command-keys :keys-post))
         (raw (emc-get-command-keys :keys-post-raw))
         (last (emc-get-command-keys :last-input))
+        (evil-keys-pre (emc-get-command-keys :evil-keys-save-pre))
+        (evil-keys-post (emc-get-command-keys :evil-keys-save-post))
         (keys nil))
     (setq keys (or seq pre))
+    ;; TODO if any keys recorded from keystrokes use only those, otherwise use from motion
+    ;; (setq keys (append keys (or evil-keys-post evil-keys-pre)))
+    ;; TODO remove line below and uncomment above
     (unless (null seq)
-      (setq keys (append keys (or post (if (equal raw last)
-                                           last
-                                         (append raw last))))))
+      (setq keys (append keys (or post (cond ((equal raw last) last)
+                                             ((> (length raw) 1) raw)
+                                             (t (append raw last)))))))
     (emc-set-command-property :keys keys))
   (when emc-command-debug
-    (message "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
-             (emc-get-object-property emc-command :name)
-             (emc-get-command-keys-string :keys-pre)
-             (emc-get-command-keys-string :keys-seq)
-             (emc-get-command-keys-string :keys-post)
-             (emc-get-command-keys-string :keys-post-raw)
-             (emc-get-command-keys-string :last-input)
-             (emc-get-command-keys-string :keys))))
+    (message "< CMD-DONE %s pre %s post %s keys %s"
+             (emc-get-command-name)
+             (emc-get-command-keys-string :evil-keys-save-pre)
+             (emc-get-command-keys-string :evil-keys-save-post)
+             (emc-get-command-keys-string :keys))
+    ;; (message "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
+    ;;          (emc-get-object-property emc-command :name)
+    ;;          (emc-get-command-keys-string :keys-pre)
+    ;;          (emc-get-command-keys-string :keys-seq)
+    ;;          (emc-get-command-keys-string :keys-post)
+    ;;          (emc-get-command-keys-string :keys-post-raw)
+    ;;          (emc-get-command-keys-string :last-input)
+    ;;          (emc-get-command-keys-string :keys))
+    ))
 
 (defun emc-add-command-hooks ()
   "Add hooks used for saving the current command."
   (interactive)
-  (add-hook 'pre-command-hook 'emc-begin-command-save t t)
-
-  ;; this hook must run before evil-repeat post hook which clears the command keys
-  ;; after using emc-save-keystrokes this hook must be added at the end
+  (add-hook 'pre-command-hook 'emc-begin-command-save nil t)
   (add-hook 'post-command-hook 'emc-finish-command-save t t)
   (advice-add 'read-key-sequence :before #'emc-save-key-sequence)
-  (advice-add 'evil-repeat-keystrokes :before #'emc-save-keystrokes))
+  (advice-add 'evil-repeat-keystrokes :before #'emc-save-keystrokes)
+  (advice-add 'evil-repeat-motion :before #'emc-save-motion))
 
 (defun emc-remove-command-hooks ()
   "Remove hooks used for saving the current command."
@@ -258,8 +300,9 @@
   (remove-hook 'pre-command-hook 'emc-begin-command-save t)
   (remove-hook 'post-command-hook 'emc-finish-command-save t)
   (advice-remove 'read-key-sequence #'emc-save-key-sequence)
-  (advice-remove 'evil-repeat-keystrokes #'emc-save-keystrokes))
+  (advice-remove 'evil-repeat-keystrokes #'emc-save-keystrokes)
+  (advice-remove 'evil-repeat-motion #'emc-save-motion))
 
-(provide'emc-command-info)
+(provide 'emc-command-info)
 
 ;;; emc-command-info.el ends here
