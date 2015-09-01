@@ -150,36 +150,39 @@
   ;; TODO use this instead of `emc-save-key-sequence'
   ;;      also add all advices for other evil-repeat recording functions if appropriate
   ;;      must account for cases in which this does not fire (such as "ytd", etc)
-  (when emc-command-debug
-    (message "EMC-SAVE-KEYSTROKES %s %s %s %s"
-             flag
-             (this-command-keys)
-             (this-command-keys-vector)
-             evil-state))
-  (if (eq flag 'pre)
-      (emc-add-command-property
-       :keys1-pre
-       (listify-key-sequence (this-command-keys-vector)))
-    (emc-add-command-property
-     :keys1-post
-     (listify-key-sequence (this-command-keys-vector)))))
-
-(defun emc-save-motion (flag)
-  "Save the current command key sequence for motions."
-  (unless (memq evil-state '(insert replace))
+  (when (emc-command-recording-p)
     (when emc-command-debug
-      (message "EMC-SAVE-MOTION %s %s %s %s"
+      (message "EMC-SAVE-KEYSTROKES %s %s %s %s"
                flag
                (this-command-keys)
                (this-command-keys-vector)
                evil-state))
     (if (eq flag 'pre)
         (emc-add-command-property
-         :keys2-pre
+         :keys1-pre
          (listify-key-sequence (this-command-keys-vector)))
       (emc-add-command-property
-       :keys2-post
+       :keys1-post
        (listify-key-sequence (this-command-keys-vector))))))
+
+;; TODO rename to emc-save-operator and update description
+(defun emc-save-motion (flag)
+  "Save the current command key sequence for motions."
+  (when (emc-command-recording-p)
+    (when (memq evil-state '(operator))
+      (when emc-command-debug
+        (message "EMC-SAVE-MOTION %s %s %s %s"
+                 flag
+                 (this-command-keys)
+                 (this-command-keys-vector)
+                 evil-state))
+      (if (eq flag 'pre)
+          (emc-add-command-property
+           :keys2-pre
+           (listify-key-sequence (this-command-keys-vector)))
+        (emc-add-command-property
+         :keys2-post
+         (listify-key-sequence (this-command-keys-vector)))))))
 
 ;; TODO remove this after integrating emc-save-keystrokes and emc-save-motion
 ;; (defun emc-save-key-sequence (prompt &optional continue-echo dont-downcase-last
@@ -270,11 +273,7 @@
          (keys2 (or keys2-post keys2-pre))
          (keys nil))
     ;; TODO fix yy
-    (setq keys (or keys1 (append (if (or (equal pre keys2-pre)
-                                         (equal pre keys2-post))
-                                     nil
-                                   pre)
-                                 keys2)))
+    (setq keys (or keys1 (append pre keys2)))
     ;; TODO: if any keys recorded from keystrokes use only those, otherwise use from motion -
     ;; (setq keys (append keys (or evil-keys-post evil-keys-pre)))
     ;; TODO: TODOremove line below and uncomment above -
@@ -285,10 +284,12 @@
     (emc-set-command-property :keys keys))
   (when emc-command-debug
     ;; TODO add the relevant info here
-    (message "< CMD-DONE %s keys1 %s keys2 %s keys %s"
+    (message "< CMD-DONE %s keys1 %s keys2 %s post %s raw %s keys %s"
              (emc-get-command-name)
              (emc-get-command-keys-string :keys1-post)
              (emc-get-command-keys-string :keys2-post)
+             (emc-get-command-keys-string :keys-post)
+             (emc-get-command-keys-string :keys-post-raw)
              (emc-get-command-keys-string :keys))
     ;; (message "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
     ;;          (emc-get-object-property emc-command :name)
