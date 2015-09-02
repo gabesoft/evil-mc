@@ -221,17 +221,21 @@
 (defun emc-finalize-command ()
   "Makes the command data ready for use, after a save."
   (let ((keys-pre (emc-get-command-keys :keys-pre))
+        (keys-post (emc-get-command-keys :keys-post))
         (keys-motion-pre (emc-get-command-keys :keys-motion-pre))
         (keys-motion-post (emc-get-command-keys :keys-motion-post))
         (keys-operator-pre (emc-get-command-keys :keys-operator-pre))
         (keys-operator-post (emc-get-command-keys :keys-operator-post)))
     (emc-set-command-property
-     :keys (or (or keys-motion-post keys-motion-pre)
-               (append keys-pre (if (equal keys-operator-pre
-                                           keys-operator-post)
-                                    keys-operator-post
-                                  (append keys-operator-pre
-                                          keys-operator-post))))))
+     :keys (cond ((or keys-motion-pre keys-motion-post)
+                  (or keys-motion-post keys-motion-pre))
+                 ((or keys-operator-pre keys-operator-post)
+                  (append keys-pre (if (equal keys-operator-pre
+                                              keys-operator-post)
+                                       keys-operator-post
+                                     (append keys-operator-pre
+                                             keys-operator-post))))
+                 (t (or keys-post keys-pre)))))
   (when (emc-command-debug-p)
     (message "CMD-DONE %s pre %s keys-motion %s keys-operator %s keys %s"
              (emc-get-command-name)

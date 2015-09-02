@@ -236,4 +236,6 @@ CLOSED: [2015-08-29 Sat 17:37]
 *** slow commands for 10+ cursors
 - change "cw"
 - evil snipe "f-"
+** TODO Fix motions
+*** when there multiple cursors on the same line the jk motions causes some cursors to collapse at the same location on that line
 
