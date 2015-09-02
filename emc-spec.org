@@ -232,4 +232,8 @@ CLOSED: [2015-08-29 Sat 17:37]
 *** should cycle through completions
 ** TODO Determine how paste of a non line over a visual line should work
 *** all fake cursors and the real one should behave the same
+** TODO Improve performance
+*** slow commands for 10+ cursors
+- change "cw"
+- evil snipe "f-"
 

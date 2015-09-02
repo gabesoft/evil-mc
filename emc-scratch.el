@@ -781,6 +781,13 @@
            (evil-snipe-repeat)
            (setq region (emc-update-region region)))
 
+          ((or (eq cmd 'evil-find-char)
+               (eq cmd 'evil-find-char-to)
+               (eq cmd 'evil-find-char-backward)
+               (eq cmd 'evil-find-char-to-backward))
+           (evil-repeat-find-char)
+           (setq region (emc-update-region region)))
+
           ;; TODO add all text objects from ev
           ((or (eq cmd 'evil-inner-paren)
                (eq cmd 'evil-inner-word)
@@ -857,6 +864,7 @@ otherwise execute BODY."
           ((eq cmd 'yaml-electric-bar-and-angle) (yaml-electric-bar-and-angle 1))
           ((eq cmd 'org-self-insert-command) (self-insert-command 1))
           ((eq cmd 'transpose-chars-before-point) (transpose-chars-before-point 1))
+
 
           ((or (eq cmd 'evil-snipe-f)
                (eq cmd 'evil-snipe-F)
@@ -979,48 +987,6 @@ otherwise execute BODY."
                   (execute-kbd-macro "dd")))
            (when (eolp) (evil-end-of-line)))
 
-
-          ;; End of line behavior test
-          ;; cmd-null
-          ;; cmd-null
-          ;; cmd null
-          ;; (null 'a)
-          ;; (void-null 'b)
-          ;; (null)
-
-          ;;  "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
-          ;;  "< CMD-DONE cms pre cms seq cms post cms raw cms last cms -> %s"
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J2")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J2")
-          ;; (emc-get-command-property "test")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J3")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J3")
-          ;; (emc-get-command-property "test")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J4")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J4")
-          ;; (emc-get-command-property "test")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-9")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-9")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 1")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 1")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 2")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 2")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 3")
-          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 3")
-          ;; (eq cmd 'evil-upcase)
-          ;; (eq cmd 'evil-invert-char)
-          ;; (eq cmd 'evil-upcase)
-          ;; (eq cmd 'evil-change-line)
-          ;; (eq cmd 'evil-open-above)
-
           ((eq cmd 'evil-change)
            (evil-with-state normal
              (cond ((null region)
@@ -1034,6 +1000,47 @@ otherwise execute BODY."
                    ((emc-line-region-p region)
                     (evil-forward-char)
                     (execute-kbd-macro "cc")))))
+
+          ;; End of line behavior test
+          ;; cmd-null
+          ;; cmd-null
+          ;; cmd null
+          ;; (null 'a)
+          ;; (void-null 'b)
+          ;; (null)
+
+          ;;  "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
+          ;;  "< CMD-DONE cms pre cms seq cms post cms raw cms last cms -> %s"
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J2")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J2")
+          ;; (emc-get-command-property "test")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J3")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J3")
+          ;; (emc-get-command-property "test")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J4")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J4")
+          ;; (emc-get-command-property "test")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "f-9")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "f-9")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 1")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 1")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 2")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 2")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 3")
+          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 3")
+          ;; (eq cmd 'evil-upcase)
+          ;; (eq cmd 'evil-invert-char)
+          ;; (eq cmd 'evil-upcase)
+          ;; (eq cmd 'evil-change-line)
+          ;; (eq cmd 'evil-open-above)
 
           ;; TODO make this work
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))

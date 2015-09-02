@@ -32,11 +32,12 @@
 
 (defface emc-cursor-simple
   '((t (:background "#D13A82")))
+  "The face used for simple fake cursors."
   :group 'emc-multiple-cursors)
 
 (defface emc-cursor-inverse-face
   '((t (:inverse-video t :line-width 1)))
-  "The face used for fake cursors"
+  "The face used for fake cursors."
   :group 'emc-multiple-cursors)
 
 (defface emc-cursor-normal-state

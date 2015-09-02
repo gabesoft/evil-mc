@@ -15,6 +15,19 @@
   (setq emc-command nil)
   (setq emc-command-recording nil))
 
+(defun emc-listify-keys (value)
+  "Convert VALUE to a list of keys."
+  (listify-key-sequence (if (sequencep value) value (list value))))
+
+(defun emc-key-to-char (key)
+  "Converts KEY to a character if it is not one already."
+  (cond ((characterp key) key)
+        ((eq 'escape key) 27)
+        ((eq 'backspace key) 127)
+        ((and (stringp key) (string-equal key "escape")) 27)
+        ((and (stringp key) (string-equal key "backspace")) 127)
+        (t (message "Invalid key %s %s" key (type-of key)) 0)))
+
 (defun emc-supported-command-p (cmd)
   "Return true if CMD is supported for multiple cursors."
   (let ((repeat-type (evil-get-command-property cmd :repeat)))
@@ -85,36 +98,22 @@
         ((evil-operator-state-p) 'operator)
         ((evil-emacs-state-p) 'emacs)))
 
+(defun emc-get-command-property (name)
+  "Return the current command property with NAME."
+  (emc-get-object-property emc-command name))
+
 (defun emc-set-command-property (&rest properties)
   "Set one or more command PROPERTIES and their values into `emc-command'."
   (setq emc-command (apply 'emc-put-object-property
                            (cons emc-command properties))))
 
-(defun emc-get-command-property (name)
-  "Return the current command property with NAME."
-  (emc-get-object-property emc-command name))
-
-(defun emc-add-command-property (name value)
-  "Append VALUE to the property with NAME into `emc-command'."
-  (let ((existing (emc-get-command-property name)))
-    (emc-set-command-property name (nconc existing value))))
-
-(defun emc-add-command-keys (name value)
-  "Append VALUE of type keys to the property with NAME into `emc-command'."
-  (emc-add-command-property name (emc-listify-keys value)))
-
-(defun emc-listify-keys (value)
-  "Convert VALUE to a list of keys."
-  (listify-key-sequence (cond ((vectorp value) value)
-                              ((atom value) (list value))
-                              (t value))))
-
-(defun emc-set-command-keys (&rest keys)
-  "Set the command KEYS to the corresponding values."
-  (while keys
-    (let ((name (pop keys))
-          (value (pop keys)))
-      (emc-set-command-property name (emc-listify-keys value)))))
+(defun emc-add-command-property (&rest properties)
+  "Append to values of one or more PROPERTIES into `emc-command'."
+  (while properties
+    (let* ((name (pop properties))
+           (new-value (pop properties))
+           (old-value (emc-get-command-property name)))
+      (emc-set-command-property name (nconc old-value new-value)))))
 
 (defun emc-get-command-keys (&optional name)
   "Get the command keys, stored at the property with NAME, as a list."
@@ -132,14 +131,19 @@
            (keys-string (mapcar 'char-to-string keys)))
       (apply 'concat keys-string))))
 
-(defun emc-key-to-char (key)
-  "Converts KEY to a character if it is not one already."
-  (cond ((characterp key) key)
-        ((eq 'escape key) 27)
-        ((eq 'backspace key) 127)
-        ((and (stringp key) (string-equal key "escape")) 27)
-        ((and (stringp key) (string-equal key "backspace")) 127)
-        (t (message "Invalid key %s %s" key (type-of key)) 0)))
+(defun emc-set-command-keys (&rest keys)
+  "Set the command KEYS to the corresponding values into `emc-command'."
+  (while keys
+    (let ((name (pop keys))
+          (value (pop keys)))
+      (emc-set-command-property name (emc-listify-keys value)))))
+
+(defun emc-add-command-keys (&rest keys)
+  "Append to the values of KEYS into `emc-command'."
+  (while keys
+    (let ((name (pop keys))
+          (value (pop keys)))
+      (emc-add-command-property name (emc-listify-keys value)))))
 
 (defun emc-get-command-name ()
   "Return the current command name."
@@ -152,10 +156,10 @@
     (emc-get-command-property :evil-state-end)))
 
 (defun emc-save-keys (flag pre-name post-name keys)
-  "Add KEYS at PRE-NAME or POST-NAME according to FLAG."
-  (if (eq flag 'pre)
-      (emc-add-command-keys pre-name keys)
-    (emc-add-command-keys post-name keys)))
+  "Save KEYS at PRE-NAME or POST-NAME according to FLAG."
+  (cond ((eq flag 'pre) (emc-add-command-keys pre-name keys))
+        ((eq flag 'post) (emc-add-command-keys post-name keys))
+        (t (error (message "unknown flag %s" flag)))))
 
 (defun emc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
@@ -176,24 +180,24 @@
 (defun emc-save-keys-motion (flag)
   "Save the current evil motion key sequence."
   (when (emc-command-recording-p)
-    (when (emc-command-debug-p)
-      (message "CMD-MOTION %s %s %s %s"
-               flag (this-command-keys) (this-command-keys-vector) evil-state))
     (emc-save-keys flag
                    :keys-motion-pre
                    :keys-motion-post
-                   (this-command-keys-vector))))
+                   (this-command-keys-vector))
+    (when (emc-command-debug-p)
+      (message "CMD-MOTION %s %s %s %s"
+               flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun emc-save-keys-operator (flag)
   "Save the current evil operator key sequence."
   (when (and (emc-command-recording-p) (memq evil-state '(operator)))
-    (when (emc-command-debug-p)
-      (message "CMD-OPERATOR %s %s %s %s"
-               flag (this-command-keys) (this-command-keys-vector) evil-state))
     (emc-save-keys flag
                    :keys-operator-pre
                    :keys-operator-post
-                   (this-command-keys-vector))))
+                   (this-command-keys-vector))
+    (when (emc-command-debug-p)
+      (message "CMD-OPERATOR %s %s %s %s"
+               flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun emc-finish-command-save ()
   "Completes the save of a command."
@@ -221,11 +225,13 @@
         (keys-motion-post (emc-get-command-keys :keys-motion-post))
         (keys-operator-pre (emc-get-command-keys :keys-operator-pre))
         (keys-operator-post (emc-get-command-keys :keys-operator-post)))
-    (emc-set-command-property :keys (or (or keys-motion-post
-                                            keys-motion-pre)
-                                        (append keys-pre
-                                                (or keys-operator-post
-                                                    keys-operator-pre)))))
+    (emc-set-command-property
+     :keys (or (or keys-motion-post keys-motion-pre)
+               (append keys-pre (if (equal keys-operator-pre
+                                           keys-operator-post)
+                                    keys-operator-post
+                                  (append keys-operator-pre
+                                          keys-operator-post))))))
   (when (emc-command-debug-p)
     (message "CMD-DONE %s pre %s keys-motion %s keys-operator %s keys %s"
              (emc-get-command-name)
