@@ -50,17 +50,17 @@
 (defun emc-make-cursor-at-eol (pos)
   "Make a cursor overlay at POS assuming pos is at the end of line."
   (let ((overlay (make-overlay pos pos nil nil nil)))
-    (overlay-put overlay 'after-string (propertize " " 'face 'emc-cursor-normal-state))
+    (overlay-put overlay 'after-string (propertize " " 'face 'emc-cursor-simple))
     (overlay-put overlay 'type 'emc-fake-cursor)
-    (overlay-put overlay 'priority 98)
+    (overlay-put overlay 'priority 99)
     overlay))
 
 (defun emc-make-cursor-inline (pos)
   "Make a cursor at POS assuming pos is not at the end of line."
   (let ((overlay (make-overlay pos (1+ pos) nil nil nil)))
-    (overlay-put overlay 'face 'emc-cursor-normal-state)
+    (overlay-put overlay 'face 'emc-cursor-simple)
     (overlay-put overlay 'type 'emc-fake-cursor)
-    (overlay-put overlay 'priority 98)
+    (overlay-put overlay 'priority 99)
     overlay))
 
 (defun emc-remove-all-overlays ()
@@ -624,10 +624,6 @@
 
 ;; (evil-get-register ?-)
 
-(defun emc-running-command-p ()
-  "Return true when running a command for all fake cursors."
-  (eq emc-running-command t))
-
 ;; TODO: find motions interfere with the cursors commands (especially insert f)
 ;; TODO: abort command hooks functinality if (evil-emacs-state-p)
 
@@ -865,7 +861,14 @@ otherwise execute BODY."
           ((or (eq cmd 'evil-snipe-f)
                (eq cmd 'evil-snipe-F)
                (eq cmd 'evil-snipe-t)
-               (eq cmd 'evil-snipe-T)) (evil-snipe-repeat 1))
+               (eq cmd 'evil-snipe-T))
+           (evil-snipe-repeat 1))
+
+          ((or (eq cmd 'evil-find-char)
+               (eq cmd 'evil-find-char-to)
+               (eq cmd 'evil-find-char-backward)
+               (eq cmd 'evil-find-char-to-backward))
+           (evil-repeat-find-char))
 
           ((eq cmd 'evil-commentary)
            (emc-with-region region 'evil-commentary
@@ -987,27 +990,31 @@ otherwise execute BODY."
 
           ;;  "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
           ;;  "< CMD-DONE cms pre cms seq cms post cms raw cms last cms -> %s"
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "J2")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "J2")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J2")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J2")
           ;; (emc-get-command-property "test")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "J3")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "J3")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J3")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J3")
           ;; (emc-get-command-property "test")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "J4")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "J4")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J4")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "J4")
           ;; (emc-get-command-property "test")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "f-7")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "f-7")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "f-8")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "f-8")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "f-9")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "f-9")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "ft 1")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "ft 1")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "ft 2")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "ft 2")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "ft 3")
-          ;; ((sexecute-execute-execute-abc))(execute-kbd-macro "ft 3")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-8")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-8")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-8")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-8")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-9")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "f-9")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 1")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 1")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 2")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 2")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 3")
+          ;; (sexecute-kbd-execute--abc)(execute-kbd-macro "ft 3")
           ;; (eq cmd 'evil-upcase)
           ;; (eq cmd 'evil-invert-char)
           ;; (eq cmd 'evil-upcase)

@@ -30,6 +30,10 @@
   :version "21.1"
   :group 'basic-faces)
 
+(defface emc-cursor-simple
+  '((t (:background "#D13A82")))
+  :group 'emc-multiple-cursors)
+
 (defface emc-cursor-inverse-face
   '((t (:inverse-video t :line-width 1)))
   "The face used for fake cursors"
@@ -43,8 +47,8 @@
 
 (defface emc-cursor-insert-state
   '((((background dark))
-     (:underline (:line-width -1 :color "#D13A82") :height 1 :background "#0A3641"))
-    (t (:underline (:line-width -1 :color "#D13A82") :height 1 :background "gray90")))
+     (:underline (:line-width -1 :color "#D13A82") :height 1 :background "#D13A82"))
+    (t (:underline (:line-width -1 :color "#D13A82") :height 1 :background "#D13A82")))
   "The face used for fake cursors in insert state.")
 
 (defvar emc-running-command nil
@@ -52,10 +56,6 @@
 
 (defvar emc-cursor-command nil
   "True if the current command is an emc cursor command.")
-
-(defun emc-has-cursors-p ()
-  "True if there are any fake cursors."
-  (not (null emc-cursor-list)))
 
 (defface emc-region-face
   '((t :inherit region))
@@ -79,6 +79,36 @@
 
 (evil-define-local-var emc-debug nil
   "If true print debug information.")
+
+(defun emc-has-cursors-p ()
+  "True if there are any fake cursors."
+  (not (null emc-cursor-list)))
+
+(defun emc-command-recording-p ()
+  "True if recording a command."
+  (eq emc-command-recording t))
+
+(defun emc-running-command-p ()
+  "True when running a command for all fake cursors."
+  (eq emc-running-command t))
+
+(defun emc-command-p ()
+  "True if there is data saved for the current command."
+  (not (null emc-command)))
+
+(defun emc-command-debug-p ()
+  "True if debug for command recording is on."
+  (eq emc-command-debug t))
+
+(defun emc-command-debug-on ()
+  "Show debug messages about the current command being recorded."
+  (interactive)
+  (setq emc-command-debug t))
+
+(defun emc-command-debug-off ()
+  "Hide debug messages about the current command being recorded."
+  (interactive)
+  (setq emc-command-debug nil))
 
 (provide'emc-vars)
 
