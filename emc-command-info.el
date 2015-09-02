@@ -23,8 +23,10 @@
   "Converts KEY to a character if it is not one already."
   (cond ((characterp key) key)
         ((eq 'escape key) 27)
+        ((eq 'return key) 13)
         ((eq 'backspace key) 127)
         ((and (stringp key) (string-equal key "escape")) 27)
+        ((and (stringp key) (string-equal key "return")) 13)
         ((and (stringp key) (string-equal key "backspace")) 127)
         (t (message "Invalid key %s %s" key (type-of key)) 0)))
 
