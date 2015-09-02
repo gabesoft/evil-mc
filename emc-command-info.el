@@ -241,11 +241,12 @@
         (keys-operator-pre (emc-get-command-keys :keys-operator-pre))
         (keys-operator-post (emc-get-command-keys :keys-operator-post)))
     ;; TODO fix yy 3yy JJ 3ytd ytt yff yt-
-    ;; get the count and the first pre char separately
     (emc-set-command-property
      :keys (cond ((or keys-motion-pre keys-motion-post)
                   (or keys-motion-post keys-motion-pre))
                  ((or keys-operator-pre keys-operator-post)
+                  ;; get the count and the first pre char separately
+                  ;; compute all values in here
                   ;; TODO compare keys-pre to keys-operator-pre
                   (append keys-pre (if (equal keys-operator-pre
                                               keys-operator-post)
