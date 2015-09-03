@@ -28,13 +28,9 @@
           (dolist (row rows)
             (let ((key (nth 0 row))
                   (cmd (nth 1 row)))
-              (execute-kbd-macro key)
-              ;; (When "I insert \"%s\"" key)
-              ;; (Then "The recorded command name should be \"%s\"" cmd)
-              ;; (Then "The recorded command keys should be \"%s\"" key)
-              (should (equal (emc-get-command-keys-string :keys) key))
-              (should (equal (emc-get-command-name) (intern cmd)))
-              )))))
+              (When "I press \"%s\"" key)
+              (Then "The recorded command name should be \"%s\"" cmd)
+              (Then "The recorded command keys should be \"%s\"" key))))))
 
 (When "^These examples with undo should pass:$"
       (lambda (table)
