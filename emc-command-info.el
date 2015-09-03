@@ -222,42 +222,35 @@
   (setq emc-command-recording nil))
 (put 'emc-finish-command-save 'permanent-local-hook t)
 
-(defun emc-get-command-keys-pre ()
-  "Return the command keys recorded during the `pre-command-hook'."
-  (let* ((keys-pre (emc-get-command-keys :keys-pre))
-         (keys-vector (vconcat keys-pre))
-         (count-and-cmd (evil-extract-count keys-vector))
-         (prefix (nth 0 count-and-cmd)))
-    (listify-key-sequence (vconcat
-                           (when prefix (list (string-to-char (number-to-string prefix))))
-                           (nth 2 count-and-cmd)))))
-
 (defun emc-finalize-command ()
   "Makes the command data ready for use, after a save."
-  (let ((keys-pre (emc-get-command-keys :keys-pre))
-        (keys-post (emc-get-command-keys :keys-post))
-        (keys-motion-pre (emc-get-command-keys :keys-motion-pre))
-        (keys-motion-post (emc-get-command-keys :keys-motion-post))
-        (keys-operator-pre (emc-get-command-keys :keys-operator-pre))
-        (keys-operator-post (emc-get-command-keys :keys-operator-post)))
-    ;; TODO fix yy 3yy JJ 3ytd ytt yff yt-
+  (let* ((keys-pre (emc-get-command-keys :keys-pre))
+         (keys-pre-with-count (evil-extract-count (vconcat keys-pre)))
+         (keys-pre-count (nth 0 keys-pre-with-count))
+         (keys-pre-cmd (listify-key-sequence (vconcat (nth 2 keys-pre-with-count))))
+         (keys-post (emc-get-command-keys :keys-post))
+         (keys-motion-pre (emc-get-command-keys :keys-motion-pre))
+         (keys-motion-post (emc-get-command-keys :keys-motion-post))
+         (keys-operator-pre (emc-get-command-keys :keys-operator-pre))
+         (keys-operator-post (emc-get-command-keys :keys-operator-post)))
     (emc-set-command-property
      :keys (cond ((or keys-motion-pre keys-motion-post)
                   (or keys-motion-post keys-motion-pre))
                  ((or keys-operator-pre keys-operator-post)
-                  ;; get the count and the first pre char separately
-                  ;; compute all values in here
-                  ;; TODO compare keys-pre to keys-operator-pre
-                  (append keys-pre (if (equal keys-operator-pre
-                                              keys-operator-post)
-                                       keys-operator-post
-                                     (append keys-operator-pre
-                                             keys-operator-post))))
+                  (append (if keys-pre-count
+                              (cons (string-to-char (number-to-string keys-pre-count))
+                                    keys-pre-cmd)
+                            keys-pre-cmd)
+                          (if (equal keys-operator-pre
+                                     keys-pre-cmd)
+                              keys-operator-post
+                            (append keys-operator-pre
+                                    keys-operator-post))))
                  (t (or keys-post keys-pre)))))
   (when (emc-command-debug-p)
     (message "CMD-DONE %s pre %s post %s keys-motion %s keys-operator %s keys %s"
              (emc-get-command-name)
-             (emc-get-command-keys-pre)
+             (emc-get-command-keys-string :keys-pre)
              (emc-get-command-keys-string :keys-post)
              (emc-get-command-keys-string :keys-motion-post)
              (emc-get-command-keys-string :keys-operator-post)
