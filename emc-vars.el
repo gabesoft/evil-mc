@@ -66,6 +66,9 @@
 (evil-define-local-var emc-cursor-list nil
   "The list of current fake cursors")
 
+(evil-define-local-var emc-frozen nil
+  "If true the fake cursors are frozen.")
+
 (evil-define-local-var emc-pattern nil
   "The current pattern")
 
@@ -128,6 +131,19 @@
   (interactive)
   (message "%s" emc-command))
 
+(defun emc-frozen-p ()
+  "True if the fake cursors are frozen."
+  (eq emc-frozen t))
+
+(defun emc-freeze ()
+  "Freeze the fake cursors."
+  (interactive)
+  (setq emc-frozen t))
+
+(defun emc-unfreeze ()
+  "Unfreeze the fake cursors."
+  (interactive)
+  (setq emc-frozen nil))
 
 (provide'emc-vars)
 

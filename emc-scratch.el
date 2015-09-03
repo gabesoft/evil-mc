@@ -1078,7 +1078,9 @@ otherwise execute BODY."
 
 (defun emc-run-command-for-all-cursors ()
   "Runs the current command for all cursors."
-  (unless (or emc-running-command (not (emc-command-p)))
+  (unless (or (emc-running-command-p)
+              (emc-frozen-p)
+              (not (emc-command-p)))
     (let ((emc-running-command t))
       (evil-with-single-undo
         ;; (evil-with-transient-mark-mode)

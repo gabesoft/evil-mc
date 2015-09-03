@@ -36,6 +36,23 @@
               (should (equal (emc-get-command-name) (intern cmd)))
               )))))
 
+(When "^These examples with undo should pass:$"
+      (lambda (table)
+        (let ((header (car table))
+              (rows (cdr table)))
+          (dolist (row rows)
+            (let ((key (nth 0 row))
+                  (cmd (nth 1 row)))
+              (When "I press \"%s\"" key)
+              (Then "The recorded command name should be \"%s\"" cmd)
+              (Then "The recorded command keys should be \"%s\"" key)
+              (evil-force-normal-state)
+              (execute-kbd-macro "u"))))))
+
 (And "^I go to the beginning of buffer$"
      (lambda ()
        (goto-char (point-min))))
+
+(And "^The cursors are frozen$"
+     (lambda ()
+       (emc-freeze)))
