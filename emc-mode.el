@@ -10,11 +10,17 @@
 
 ;;; Commentary:
 
+(require 'evil)
+
+(require 'emc-vars)
+(require 'emc-common)
+(require 'emc-cursor-state)
+(require 'emc-command-info)
+(require 'emc-region)
+
+(eval-when-compile (require 'cl-lib))
 
 ;;; Code:
-
-(require 'evil)
-(eval-when-compile (require 'cl-lib))
 
 (defgroup evil-multiple-cursors nil
   "Multiple cursors implementation for evil mode."

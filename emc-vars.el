@@ -111,6 +111,24 @@
   (interactive)
   (setq emc-command-debug nil))
 
+(defun emc-print-pattern ()
+  "Print the curent pattern."
+  (interactive)
+  (message "%s" emc-pattern))
+
+(defun emc-print-cursor-list ()
+  "Return the cursor list."
+  (interactive)
+  (if emc-cursor-list
+      (message "%s: %s" (length emc-cursor-list) emc-cursor-list)
+    (message "No cursors found")))
+
+(defun emc-print-command ()
+  "Print the information saved for the current command."
+  (interactive)
+  (message "%s" emc-command))
+
+
 (provide'emc-vars)
 
 ;;; emc-vars.el ends here

@@ -11,7 +11,9 @@
 
 (add-to-list 'load-path evil-multiple-cursors-root-path)
 
-(require 'evil-multiple-cursors)
+(require 'evil)
+;; (require 'emc-mode)
+(require 'emc-scratch)
 (require 'espuds)
 (require 'ert)
 
@@ -20,11 +22,15 @@
  )
 
 (Before
- ;; Before each scenario is run
- )
+ (switch-to-buffer (get-buffer-create "*emc*"))
+ (evil-mode 1)
+ (emc-init-mode)
+ (erase-buffer)
+ (transient-mark-mode 1)
+ (deactivate-mark))
 
 (After
- ;; After each scenario is run
+ (emc-remove-hooks)
  )
 
 (Teardown

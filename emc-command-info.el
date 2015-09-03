@@ -40,6 +40,7 @@
 
         (eq cmd 'evil-commentary)
         (eq cmd 'org-self-insert-command)
+        (eq cmd 'orgtbl-self-insert-command)
         (eq cmd 'spacemacs/evil-numbers-increase)
         (eq cmd 'spacemacs/evil-numbers-decrease)
         (eq cmd 'transpose-chars-before-point)

@@ -1,6 +1,8 @@
 ;;; Code:
 
-(add-to-load-path (file-name-directory (buffer-file-name)))
+(when (fboundp 'add-to-load-path)
+  (add-to-load-path (file-name-directory (buffer-file-name))))
+
 ;; (load-file "emc-common.el")
 ;; (load-file "emc-cursor-state.el")
 ;; (load-file "emc-command-info.el")
@@ -11,12 +13,14 @@
 (require 'emc-command-info)
 (require 'emc-region)
 
+
 (evil-define-local-var emc-watch-buffers
   '("emc-common"
     "emc-cursor-state"
     "emc-command-info"
     "emc-region"
     "emc-scratch"))
+
 
 ;; (remove-hook 'auto-save-mode-hook (lambda () (message "ASMH")))
 ;; (remove-hook 'auto-save-hook (lambda () (message "ASH")))
@@ -97,13 +101,6 @@
 
 ;; (emc-make-region-overlay (point) (+ (point) 30))
 
-(defun emc-print-cursor-list ()
-  "Return the cursor list."
-  (interactive)
-  (if emc-cursor-list
-      (message "Cursors %s: %s" (length emc-cursor-list) emc-cursor-list)
-    (message "No cursors found")))
-
 ;; (defun emc-print-region-list ()
 ;;   "Return the region list."
 ;;   (interactive)
@@ -169,11 +166,6 @@
     (if (< (length pattern) 2)
         (error "At least 2 characters required for creating a cursor")
       (setq emc-pattern (cons pattern (cons end start))))))
-
-(defun emc-print-pattern ()
-  "Print the curent pattern."
-  (interactive)
-  (message "%s" emc-pattern))
 
 (defun emc-get-pattern ()
   "Get the current pattern if any."
@@ -863,13 +855,13 @@ otherwise execute BODY."
     (cond ((eq cmd 'yaml-electric-dash-and-dot) (yaml-electric-dash-and-dot 1))
           ((eq cmd 'yaml-electric-bar-and-angle) (yaml-electric-bar-and-angle 1))
           ((eq cmd 'org-self-insert-command) (self-insert-command 1))
+          ((eq cmd 'orgtbl-self-insert-command) (self-insert-command 1))
           ((eq cmd 'transpose-chars-before-point) (transpose-chars-before-point 1))
 
 
-          ((or (eq cmd 'evil-snipe-f)
-               (eq cmd 'evil-snipe-F)
-               (eq cmd 'evil-snipe-t)
-               (eq cmd 'evil-snipe-T))
+          ((or (eq cmd 'evil-snipe-f) (eq cmd 'evil-snipe-F)
+               (eq cmd 'evil-snipe-t) (eq cmd 'evil-snipe-T)
+               (eq cmd 'evil-snipe-s) (eq cmd 'evil-snipe-S))
            (evil-snipe-repeat 1))
 
           ((or (eq cmd 'evil-find-char)
@@ -1024,12 +1016,15 @@ otherwise execute BODY."
           ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
           ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
           ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
+          ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
           ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
-          ;; sexecute-kbd-macro "3cw")(execute(sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 3")
+          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (sexecute-kbd-macro "3cw")(execute(sexecute-kbd-macro "3cw")
           ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 4")
           ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 5")
           ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "f-9")
-          ;; sexecute-kbd-macro "3cw")(execute(sexecute-kbd-macro "3cw")(execute-kbd-macro "f-9")
+          ;; (sexecute-kbd-macro "3cw")(execute(sexecute-kbd-macro "3cw")
           ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 1")
           ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
           ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
@@ -1162,6 +1157,8 @@ otherwise execute BODY."
   "Print mark and point."
   (interactive)
   (message "Mark %s Point %s" (mark) (point)))
+
+(provide 'emc-scratch)
 
 ;; (defun emc-print-command-vars ()
 ;;   "Prints command variables."
