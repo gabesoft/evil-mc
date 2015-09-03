@@ -18,6 +18,8 @@ Feature: Record current command info
     | 3yt- | evil-yank |
     | ytt  | evil-yank |
     | yff  | evil-yank |
+    | 2ytt | evil-yank |
+    | 2yff | evil-yank |
 
   Scenario: Record commands to change lines
     When I insert:
@@ -41,6 +43,29 @@ Feature: Record current command info
     | 3ctt | evil-change |
     | 3cff | evil-change |
     | 3cc  | evil-change |
+
+  Scenario: Record commands to delete lines
+    When I insert:
+    """
+    This is the start of text -1 -1 -1 t t t f f f k k k
+    This is the second line -1 -1 -1 t t t f f f k k k
+    This is the third line -1 -1 -1 t t t f f f k k k
+    """
+    And I go to the beginning of buffer
+    Given I have at least one cursor
+    And The cursors are frozen
+    Then These examples with undo should pass:
+    | keys | command     |
+    | dd   | evil-delete |
+    | dtk  | evil-delete |
+    | dfk  | evil-delete |
+    | dtt  | evil-delete |
+    | dff  | evil-delete |
+    | 3dtk | evil-delete |
+    | 3dfk | evil-delete |
+    | 3dtt | evil-delete |
+    | 3dff | evil-delete |
+    | 3dd  | evil-delete |
 
   Scenario: Record the command to join two lines
     Given I have one cursor at "line" in "First line.\nSecond line."
