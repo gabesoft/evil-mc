@@ -242,8 +242,8 @@
                               (cons (string-to-char (number-to-string keys-pre-count))
                                     keys-pre-cmd)
                             keys-pre-cmd)
-                          (if (equal keys-operator-pre
-                                     keys-pre-cmd)
+                          (if (or (equal keys-operator-pre keys-pre-cmd)
+                                  (> (length keys-operator-pre) 1))
                               keys-operator-post
                             (append keys-operator-pre
                                     keys-operator-post))))

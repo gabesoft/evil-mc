@@ -12,6 +12,7 @@
 (add-to-list 'load-path evil-multiple-cursors-root-path)
 
 (require 'evil)
+(require 'evil-surround)
 ;; (require 'emc-mode)
 (require 'emc-scratch)
 (require 'espuds)
@@ -23,6 +24,7 @@
 
 (Before
  (switch-to-buffer (get-buffer-create "*emc*"))
+ (evil-surround-mode 1)
  (evil-mode 1)
  (emc-init-mode)
  (erase-buffer)

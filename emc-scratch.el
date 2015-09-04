@@ -21,9 +21,8 @@
     "emc-region"
     "emc-scratch"))
 
-
-;; (remove-hook 'auto-save-mode-hook (lambda () (message "ASMH")))
-;; (remove-hook 'auto-save-hook (lambda () (message "ASH")))
+;; (remove-hook 'auto-save-mode-hook (lambda () (message "auto-save-mode-hook")))
+;; (remove-hook 'auto-save-hook (lambda () (message "auto-save-hook")))
 
 (defun emc-eval-buffer-on-save ()
   (when (and (buffer-file-name)
@@ -1020,12 +1019,12 @@ otherwise execute BODY."
           ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
           ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
           ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-macro "3cw")(execute(sexecute-kbd-macro "3cw")
+          ;; (sexecute-kbd-macro "3cw")(execute(pexecute-kbd-macro "3cw")
           ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 4")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 5")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "f-9")
-          ;; (sexecute-kbd-macro "3cw")(execute(sexecute-kbd-macro "3cw")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 1")
+          ;; {sexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 5")
+          ;; {sexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute-kbd-macro "f-9")
+          ;; {sexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute(pexecute-kbd-macro "3cw")
+          ;; {sexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 1")
           ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
           ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
           ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")

@@ -1,7 +1,7 @@
 all: test
 
 test:
-		@cask exec ecukes --reporter dot
+		@cask exec ecukes --reporter magnars
 
 test-no-win:
 		@cask exec ecukes --no-win

@@ -67,6 +67,25 @@ Feature: Record current command info
     | 3dff | evil-delete |
     | 3dd  | evil-delete |
 
+  Scenario: Record commands to work with surrounding delimiters
+    Given I have one cursor at "inner" in "[external (outer (inner (center))]"
+    And The cursors are frozen
+    Then These examples with undo should pass:
+    | keys | command     |
+    | csbB | evil-change |
+    | cs[B | evil-change |
+    | csb{ | evil-change |
+    | dsb  | evil-delete |
+    | ds(  | evil-delete |
+    | cib  | evil-change |
+    | yib  | evil-yank   |
+
+  Scenario Record commands to select inside parentheses
+    Given I have one cursor at "inner" in "[external (outer (inner (center))]"
+    When I press "vib"
+    Then The recorded command name should be "evil-inner-paren"
+    And The recorded command keys should be "ib"
+
   Scenario: Record the command to join two lines
     Given I have one cursor at "line" in "First line.\nSecond line."
     When I press "J"
