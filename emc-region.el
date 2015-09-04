@@ -84,7 +84,7 @@ set to the specified values."
           ((< point mark) (cons mark point))
           (t (cons point (1+ (point)))))))
 
-(defun emc-make-region-overlay (start end)
+(defun emc-region-overlay (start end)
   "Make a visual region overlay from START to END."
   (let ((overlay (make-overlay start end nil nil nil)))
     (overlay-put overlay 'face 'emc-region-face)
@@ -95,7 +95,7 @@ set to the specified values."
   "Make an overlay for a visual region of type char from MARK to POINT."
   (let* ((start (if (< mark point) mark point))
          (end (if (< mark point) point mark))
-         (overlay (emc-make-region-overlay start end)))
+         (overlay (emc-region-overlay start end)))
     (overlay-put overlay 'mark mark)
     (overlay-put overlay 'point point)
     overlay))
@@ -108,7 +108,7 @@ set to the specified values."
          (end-line (line-number-at-pos end-pos))
          (start (emc-get-pos-at-bol start-pos))
          (end (1+ (emc-get-pos-at-eol end-pos)))
-         (overlay (emc-make-region-overlay start end)))
+         (overlay (emc-region-overlay start end)))
     (overlay-put overlay 'mark (if (< mark point) start end))
     (overlay-put overlay 'point (if (< mark point) end start))
     overlay))
