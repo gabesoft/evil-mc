@@ -80,7 +80,7 @@ Feature: Record current command info
     | cib  | evil-change |
     | yib  | evil-yank   |
 
-  Scenario Record commands to select inside parentheses
+  Scenario: Record commands to select inside parentheses
     Given I have one cursor at "inner" in "[external (outer (inner (center))]"
     When I press "vib"
     Then The recorded command name should be "evil-inner-paren"

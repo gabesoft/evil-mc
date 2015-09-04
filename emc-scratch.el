@@ -208,6 +208,11 @@
   (emc-delete-region-overlay (emc-get-cursor-region cursor))
   (emc-put-cursor-region cursor nil))
 
+(defun emc-make-cursor-here ()
+  "Create a cursor at point."
+  (interactive)
+  (emc-add-cursor (emc-draw-cursor-at-point)))
+
 (defun emc-make-cursor-and-goto-next-match ()
   "Create a cursor at point and go to next match if any."
   (let ((cursor (emc-draw-cursor-at-point)))
@@ -992,6 +997,22 @@ otherwise execute BODY."
                     (evil-forward-char)
                     (execute-kbd-macro "cc")))))
 
+          ;; TODO use the numeric prefix if any for line movements
+          ;;      keep the original column to adjust cursors after
+          ;;      shorter lines
+          ;;      the original column should reset after any non-line command
+          ((eq cmd 'evil-next-line)
+           (let ((col (column-number-at-pos (point))))
+             (forward-line 1)
+             (goto-char (min (+ (point) col)
+                             (point-at-eol)))))
+
+          ((eq cmd 'evil-previous-line)
+           (let ((col (column-number-at-pos (point))))
+             (forward-line -1)
+             (goto-char (min (+ (point) col)
+                             (point-at-eol)))))
+
           ;; End of line behavior test
           ;; cmd-null
           ;; cmd-null
@@ -1002,34 +1023,34 @@ otherwise execute BODY."
 
           ;;  "< CMD-DONE %s pre %s seq %s post %s raw %s last %s -> %s"
           ;;  "< CMD-DONE cms pre cms seq cms post cms raw cms last cms -> %s"
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J2")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J2")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "J2")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "J2")
           ;; (emc-get-command-property "test")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J3")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J3")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "J3")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "J3")
           ;; (emc-get-command-property "test")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J4")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "J4")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "J4")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "J4")
           ;; (emc-get-command-property "test")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
-          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-macro "3cw")(execute(pexecute-kbd-macro "3cw")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 4")
-          ;; {sexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 5")
-          ;; {sexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute-kbd-macro "f-9")
-          ;; {sexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute(pexecute-kbd-macro "3cw")
-          ;; {sexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 1")
-          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 3")
-          ;; (sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 3")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "f-7")
+          ;; (kexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
+          ;; (kexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
+          ;; (kexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
+          ;; (kexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
+          ;; (kexecute-kbd-macro "3fw")(execute-kbd-macro "f-7")
+          ;; (kexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (kexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (kexecute-kbd-macro "3cw")(execute(pexecute-kbd-macro "3cw")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "ft 4")
+          ;; {kexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 5")
+          ;; {kexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute-kbd-macro "f-9")
+          ;; {kexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute(pexecute-kbd-macro "3cw")
+          ;; {kexecute-kbd-macro "3cw"}(sexecute-kbd-macro "3cw")(execute-kbd-macro "ft 1")
+          ;; (kexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (kexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (kexecute-kbd-macro "4cw")(execute-kbd-macro "f-8")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "ft 3")
+          ;; (kexecute-kbd-macro "3cw")(execute-kbd-macro "ft 3")
           ;; (eq cmd 'evil-upcase)
           ;; (eq cmd 'evil-invert-char)
           ;; (eq cmd 'evil-upcase)
@@ -1131,6 +1152,11 @@ otherwise execute BODY."
   (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
   (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
   (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
+
+  (define-key evil-normal-state-local-map (kbd "C-k") 'emc-make-cursor-here)
+  (define-key evil-normal-state-local-map (kbd "C-m") 'emc-freeze)
+  (define-key evil-normal-state-local-map (kbd "C-l") 'emc-unfreeze)
+
   (define-key evil-normal-state-local-map (kbd "C-,") 'emc-destroy-all-cursors))
 
 ;; (emc-setup-key-maps)
