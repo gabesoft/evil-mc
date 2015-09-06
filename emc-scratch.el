@@ -854,8 +854,8 @@ otherwise execute BODY."
          (region (emc-get-cursor-region cursor))
          (kill-ring (emc-get-cursor-kill-ring cursor))
          (kill-ring-yank-pointer (emc-get-cursor-kill-ring-yank-pointer cursor))
-         (keys-string (emc-get-command-keys-string)))
-    (when emc-debug (message "CMD %s keys %s" cmd keys-string))
+         (keys-vector (emc-get-command-keys-vector)))
+    (when emc-debug (message "CMD %s keys %s" cmd keys-vector))
 
     (cond ((eq cmd 'yaml-electric-dash-and-dot) (yaml-electric-dash-and-dot 1))
           ((eq cmd 'yaml-electric-bar-and-angle) (yaml-electric-bar-and-angle 1))
@@ -877,7 +877,7 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-commentary)
            (emc-with-region region 'evil-commentary
-                            (execute-kbd-macro keys-string)))
+                            (execute-kbd-macro keys-vector)))
 
           ((eq cmd 'evil-find-char) (evil-repeat-find-char))
           ((eq cmd 'newline-and-indent) (newline-and-indent))
@@ -888,10 +888,10 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-delete-char)
            (emc-with-region region 'evil-delete-char
-                            (execute-kbd-macro keys-string)))
+                            (execute-kbd-macro keys-vector)))
 
-          ((eq cmd 'evil-delete-line) (execute-kbd-macro keys-string))
-          ((eq cmd 'evil-join) (execute-kbd-macro keys-string))
+          ((eq cmd 'evil-delete-line) (execute-kbd-macro keys-vector))
+          ((eq cmd 'evil-join) (execute-kbd-macro keys-vector))
 
           ((eq cmd 'evil-insert-line) (evil-insert-line 1))
           ((eq cmd 'evil-append-line) (evil-append-line 1))
@@ -950,9 +950,9 @@ otherwise execute BODY."
           ((eq cmd 'evil-open-below) (evil-insert-newline-below))
           ((eq cmd 'evil-open-above) (evil-insert-newline-above))
           ((eq cmd 'evil-change-line) (evil-delete-line (point) (1+ (point))))
-          ((eq cmd 'evil-invert-char) (execute-kbd-macro keys-string))
-          ((eq cmd 'evil-upcase) (execute-kbd-macro keys-string))
-          ((eq cmd 'evil-downcase) (execute-kbd-macro keys-string))
+          ((eq cmd 'evil-invert-char) (execute-kbd-macro keys-vector))
+          ((eq cmd 'evil-upcase) (execute-kbd-macro keys-vector))
+          ((eq cmd 'evil-downcase) (execute-kbd-macro keys-vector))
           ((eq cmd 'keyboard-quit) nil)
           ((eq cmd 'evil-visual-char) (evil-force-normal-state))
           ((eq cmd 'evil-visual-line) (evil-force-normal-state))
@@ -961,12 +961,13 @@ otherwise execute BODY."
            (emc-with-region
             region
             (lambda (start end)
+              ;; TODO convert last-input-event to char
               (evil-surround-region
-               start end nil (emc-get-command-key :last-input)))))
+               start end nil (emc-get-command-property :last-input)))))
 
           ((eq cmd 'evil-yank)
            (cond ((null region)
-                  (execute-kbd-macro keys-string))
+                  (execute-kbd-macro keys-vector))
                  ((emc-char-region-p region)
                   (emc-with-region region
                                    (lambda (start end)
@@ -977,7 +978,7 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-delete)
            (cond ((null region)
-                  (execute-kbd-macro keys-string))
+                  (execute-kbd-macro keys-vector))
                  ((emc-char-region-p region)
                   (emc-with-region region 'evil-delete))
                  ((emc-line-region-p region)
@@ -988,7 +989,7 @@ otherwise execute BODY."
            (evil-with-state normal
              (cond ((null region)
                     (evil-forward-char)
-                    (execute-kbd-macro keys-string))
+                    (execute-kbd-macro keys-vector))
                    ((emc-char-region-p region)
                     (emc-with-region region
                                      (lambda (start end)
@@ -1062,7 +1063,7 @@ otherwise execute BODY."
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))
           ;; evil-surround integration cs'" etc
 
-          (t (execute-kbd-macro keys-string)))
+          (t (execute-kbd-macro keys-vector)))
     (emc-put-object-property cursor
                              :kill-ring kill-ring
                              :kill-ring-yank-pointer kill-ring-yank-pointer

@@ -14,6 +14,7 @@ Feature: Record current command info
     | yy   | evil-yank |
     | 3yy  | evil-yank |
     | yw   | evil-yank |
+    | ye   | evil-yank |
     | 3yw  | evil-yank |
     | yt-  | evil-yank |
     | ytk  | evil-yank |

@@ -15,21 +15,6 @@
   (setq emc-command nil)
   (setq emc-command-recording nil))
 
-(defun emc-listify-keys (value)
-  "Convert VALUE to a list of keys."
-  (listify-key-sequence (if (sequencep value) value (list value))))
-
-(defun emc-key-to-char (key)
-  "Converts KEY to a character if it is not one already."
-  (cond ((characterp key) key)
-        ((eq 'escape key) 27)
-        ((eq 'return key) 13)
-        ((eq 'backspace key) 127)
-        ((and (stringp key) (string-equal key "escape")) 27)
-        ((and (stringp key) (string-equal key "return")) 13)
-        ((and (stringp key) (string-equal key "backspace")) 127)
-        (t (message "Invalid key %s %s" key (type-of key)) 0)))
-
 (defun emc-supported-command-p (cmd)
   "Return true if CMD is supported for multiple cursors."
   (let ((repeat-type (evil-get-command-property cmd :repeat)))
@@ -116,37 +101,27 @@
     (let* ((name (pop properties))
            (new-value (pop properties))
            (old-value (emc-get-command-property name)))
-      (emc-set-command-property name (nconc old-value new-value)))))
+      (cond ((null old-value)
+             (emc-set-command-property name new-value))
+            ((vectorp old-value)
+             (emc-set-command-property name (vconcat old-value new-value)))
+            ((sequencep old-value)
+             (emc-set-command-property name (nconc old-value new-value)))
+            (t
+             (error "Current value is not a sequence %s" old-value))))))
 
-(defun emc-get-command-keys (&optional name)
-  "Get the command keys, stored at the property with NAME, as a list."
-  (mapcar 'emc-key-to-char
-          (emc-get-command-property (or name :keys))))
-
-(defun emc-get-command-key (&optional name index)
-  "Get the command key, stored at the property with NAME, at INDEX."
-  (nth (or index 0) (emc-get-command-keys name)))
+(defun emc-get-command-keys-vector (&optional name)
+  "Get the command keys, stored at the property with NAME as a vector."
+  (emc-get-command-property (or name :keys)))
 
 (defun emc-get-command-keys-string (&optional name)
   "Get the command keys, stored at the property with NAME, as a string."
   (when emc-command
-    (let* ((keys (emc-get-command-keys (or name :keys)))
-           (keys-string (mapcar 'char-to-string keys)))
+    (let* ((keys (emc-get-command-property (or name :keys)))
+           (keys-string (mapcar (lambda (k) (if (characterp k)
+                                                (char-to-string k) ""))
+                                keys)))
       (apply 'concat keys-string))))
-
-(defun emc-set-command-keys (&rest keys)
-  "Set the command KEYS to the corresponding values into `emc-command'."
-  (while keys
-    (let ((name (pop keys))
-          (value (pop keys)))
-      (emc-set-command-property name (emc-listify-keys value)))))
-
-(defun emc-add-command-keys (&rest keys)
-  "Append to the values of KEYS into `emc-command'."
-  (while keys
-    (let ((name (pop keys))
-          (value (pop keys)))
-      (emc-add-command-property name (emc-listify-keys value)))))
 
 (defun emc-get-command-name ()
   "Return the current command name."
@@ -160,8 +135,8 @@
 
 (defun emc-save-keys (flag pre-name post-name keys)
   "Save KEYS at PRE-NAME or POST-NAME according to FLAG."
-  (cond ((eq flag 'pre) (emc-add-command-keys pre-name keys))
-        ((eq flag 'post) (emc-add-command-keys post-name keys))
+  (cond ((eq flag 'pre) (emc-add-command-property pre-name keys))
+        ((eq flag 'post) (emc-add-command-property post-name keys))
         (t (error (message "unknown flag %s" flag)))))
 
 (defun emc-begin-command-save ()
@@ -175,9 +150,8 @@
                (emc-supported-command-p this-command))
       (setq emc-command-recording t)
       (emc-set-command-property :name this-command
+                                :keys-pre (this-command-keys-vector)
                                 :evil-state-begin (emc-get-evil-state))
-      ;; (emc-set-command-keys :keys-pre (this-single-command-raw-keys))
-      (emc-set-command-keys :keys-pre (this-command-keys-vector))
       (when (emc-command-debug-p) (message "CMD-BEGIN %s" emc-command)))))
 (put 'emc-begin-command-save 'permanent-local-hook t)
 
@@ -207,10 +181,10 @@
 (defun emc-finish-command-save ()
   "Completes the save of a command."
   (when (emc-command-recording-p)
-    (emc-set-command-property :evil-state-end (emc-get-evil-state))
-    (emc-set-command-keys :last-input (emc-key-to-char last-input-event)
-                          :keys-post (this-command-keys-vector)
-                          :keys-post-raw (this-single-command-raw-keys))
+    (emc-set-command-property :evil-state-end (emc-get-evil-state)
+                              :last-input last-input-event
+                              :keys-post (this-command-keys-vector)
+                              :keys-post-raw (this-single-command-raw-keys))
     (when (emc-command-debug-p)
       (message "CMD-FINISH %s %s" emc-command this-command))
     (ignore-errors
@@ -225,34 +199,34 @@
 
 (defun emc-finalize-command ()
   "Makes the command data ready for use, after a save."
-  (let* ((keys-pre (emc-get-command-keys :keys-pre))
-         (keys-pre-with-count (evil-extract-count (vconcat (emc-get-command-property
-                                                            :keys-pre))))
+  (let* ((keys-pre (emc-get-command-property :keys-pre))
+         (keys-pre-with-count (evil-extract-count keys-pre))
          (keys-pre-count (nth 0 keys-pre-with-count))
-         (keys-pre-cmd (listify-key-sequence (vconcat (nth 2 keys-pre-with-count))))
-         (keys-post (emc-get-command-keys :keys-post))
-         (keys-motion-pre (emc-get-command-keys :keys-motion-pre))
-         (keys-motion-post (emc-get-command-keys :keys-motion-post))
-         (keys-operator-pre (emc-get-command-keys :keys-operator-pre))
-         (keys-operator-post (emc-get-command-keys :keys-operator-post)))
+         (keys-pre-cmd (vconcat (nth 2 keys-pre-with-count)))
+         (keys-post (emc-get-command-property :keys-post))
+         (keys-motion-pre (emc-get-command-property :keys-motion-pre))
+         (keys-motion-post (emc-get-command-property :keys-motion-post))
+         (keys-operator-pre (emc-get-command-property :keys-operator-pre))
+         (keys-operator-post (emc-get-command-property :keys-operator-post)))
     (emc-set-command-property
-     :keys (cond ((or keys-motion-pre keys-motion-post)
+     :keys (cond ((or keys-motion-post keys-motion-pre)
                   (or keys-motion-post keys-motion-pre))
                  ((or keys-operator-pre keys-operator-post)
-                  (append (if keys-pre-count
-                              (cons (string-to-char (number-to-string keys-pre-count))
-                                    keys-pre-cmd)
-                            keys-pre-cmd)
-                          (if (or (equal keys-operator-pre keys-pre-cmd)
-                                  (and (equal keys-operator-pre
-                                              keys-operator-post)
-                                       (not (or
-                                             (equal keys-operator-pre '(116))
-                                             (equal keys-operator-pre '(102)))))
-                                  (> (length keys-operator-pre) 1))
-                              keys-operator-post
-                            (append keys-operator-pre
-                                    keys-operator-post))))
+                  (vconcat (if keys-pre-count
+                               (vconcat (vector (string-to-char (number-to-string
+                                                                 keys-pre-count)))
+                                        keys-pre-cmd)
+                             keys-pre-cmd)
+                           (if (or (equal keys-operator-pre keys-pre-cmd)
+                                   (and (equal keys-operator-pre
+                                               keys-operator-post)
+                                        (not (or
+                                              (equal keys-operator-pre [116])
+                                              (equal keys-operator-pre [102]))))
+                                   (> (length keys-operator-pre) 1))
+                               keys-operator-post
+                             (vconcat keys-operator-pre
+                                      keys-operator-post))))
                  (t (or keys-post keys-pre)))))
   (when (emc-command-debug-p)
     (message "CMD-DONE %s pre %s post %s keys-motion %s keys-operator %s keys %s"
