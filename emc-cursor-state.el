@@ -43,11 +43,13 @@ set to the specified values."
 
 (defun emc-get-cursor-kill-ring-yank-pointer (cursor)
   "Get the `kill-ring-yank-pointer' for CURSOR."
-  (emc-get-cursor-property cursor :kill-ring-yank-pointer))
+  (emc-get-cursor-property
+   cursor :kill-ring-yank-pointer))
 
 (defun emc-put-cursor-kill-ring-yank-pointer (cursor kill-ring-yank-pointer)
   "Set the `kill-ring-yank-pointer' for CURSOR to KILL-RING-YANK-POINTER."
-  (emc-put-cursor-property cursor :kill-ring-yank-pointer kill-ring-yank-pointer))
+  (emc-put-cursor-property
+   cursor :kill-ring-yank-pointer kill-ring-yank-pointer))
 
 (defun emc-get-cursor-column (cursor)
   "Get the column position for CURSOR."
@@ -56,6 +58,22 @@ set to the specified values."
 (defun emc-put-cursor-column (cursor column)
   "Set the column position for CURSOR to COLUMN."
   (emc-put-cursor-property cursor :column column))
+
+(defun emc-get-cursor-start (cursor)
+  "Get the CURSOR overlay start."
+  (when cursor
+    (overlay-start (emc-get-cursor-overlay cursor))))
+
+(defun emc-get-cursor-end (cursor)
+  "Get the CURSOR overlay end."
+  (when cursor
+    (overlay-end (emc-get-cursor-overlay cursor))))
+
+(defun emc-delete-cursor-overlay (cursor)
+  "Deletes the overlay associated with CURSOR."
+  (when cursor
+    (let ((overlay (emc-get-cursor-overlay cursor)))
+      (when overlay (delete-overlay overlay)))))
 
 (provide 'emc-cursor-state)
 

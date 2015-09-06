@@ -278,7 +278,7 @@
 ;; TODO should allow moving to the prev match or to the prev cursor
 ;; maybe C-p : emc-goto-prev-match
 ;; maybe C-P : emc-undo-prev-cursor
-(evil-define-command emc-undo-prev-cursor ()
+(evil-define-command emc-undo-prev-cursor-old ()
   "Move point to the prev match and remove the cursor if any."
   :repeat ignore
   (interactive)
@@ -1151,8 +1151,8 @@ otherwise execute BODY."
   (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor)
   (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
   (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
-  (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
-  (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor)
+  (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
+  (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
 
   (define-key evil-normal-state-local-map (kbd "C-k") 'emc-make-cursor-here)
   (define-key evil-normal-state-local-map (kbd "C-m") 'emc-freeze)

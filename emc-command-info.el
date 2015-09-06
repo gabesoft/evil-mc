@@ -226,7 +226,8 @@
 (defun emc-finalize-command ()
   "Makes the command data ready for use, after a save."
   (let* ((keys-pre (emc-get-command-keys :keys-pre))
-         (keys-pre-with-count (evil-extract-count (vconcat keys-pre)))
+         (keys-pre-with-count (evil-extract-count (vconcat (emc-get-command-property
+                                                            :keys-pre))))
          (keys-pre-count (nth 0 keys-pre-with-count))
          (keys-pre-cmd (listify-key-sequence (vconcat (nth 2 keys-pre-with-count))))
          (keys-post (emc-get-command-keys :keys-post))
@@ -243,6 +244,11 @@
                                     keys-pre-cmd)
                             keys-pre-cmd)
                           (if (or (equal keys-operator-pre keys-pre-cmd)
+                                  (and (equal keys-operator-pre
+                                              keys-operator-post)
+                                       (not (or
+                                             (equal keys-operator-pre '(116))
+                                             (equal keys-operator-pre '(102)))))
                                   (> (length keys-operator-pre) 1))
                               keys-operator-post
                             (append keys-operator-pre

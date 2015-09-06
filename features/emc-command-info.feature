@@ -13,6 +13,8 @@ Feature: Record current command info
     | keys | command   |
     | yy   | evil-yank |
     | 3yy  | evil-yank |
+    | yw   | evil-yank |
+    | 3yw  | evil-yank |
     | yt-  | evil-yank |
     | ytk  | evil-yank |
     | 3yt- | evil-yank |
@@ -20,7 +22,7 @@ Feature: Record current command info
     | yff  | evil-yank |
     | 2ytt | evil-yank |
     | 2yff | evil-yank |
-
+    
   Scenario: Record commands to change lines
     When I insert:
     """
