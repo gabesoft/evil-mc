@@ -107,20 +107,11 @@
   (interactive)
   (setq emc-frozen nil))
 
-(defun emc-set-pattern (start end)
-  "Set `emc-pattern' to the text given by START and END."
-  (if (and (<= (point-min) start)
-           (>= (point-max) end)
-           (< start end))
-      (setq emc-pattern (cons (buffer-substring-no-properties start end)
-                              (cons start end)))
-    (error "Invalid bounds %s %s" start end)))
-
 (defun emc-clear-pattern ()
   "Remove the currently saved pattern."
   (setq emc-pattern nil))
 
-(defun emc-get-pattern-text ()
+(defun emc-get-pattern ()
   "Return the current pattern text."
   (when emc-pattern (car emc-pattern)))
 
@@ -131,6 +122,15 @@
 (defun emc-get-pattern-end ()
   "Return the current pattern end position."
   (when emc-pattern (cdr (cdr emc-pattern))))
+
+(defun emc-get-pattern-length ()
+  "Return the current pattern length."
+  (when emc-pattern
+    (- (emc-get-pattern-end) (emc-get-pattern-start))))
+
+(defun emc-pattern-p ()
+  "True if there is a saved pattern."
+  (not (null emc-pattern)))
 
 (provide'emc-vars)
 

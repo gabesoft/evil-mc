@@ -212,11 +212,7 @@
      :keys (cond ((or keys-motion-post keys-motion-pre)
                   (or keys-motion-post keys-motion-pre))
                  ((or keys-operator-pre keys-operator-post)
-                  (vconcat (if keys-pre-count
-                               (vconcat (vector (string-to-char (number-to-string
-                                                                 keys-pre-count)))
-                                        keys-pre-cmd)
-                             keys-pre-cmd)
+                  (vconcat (if keys-pre-count keys-pre keys-pre-cmd)
                            (if (or (equal keys-operator-pre keys-pre-cmd)
                                    (and (equal keys-operator-pre
                                                keys-operator-post)
