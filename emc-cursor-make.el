@@ -231,29 +231,17 @@ and optionally CREATE a cursor at point."
   (when (emc-has-pattern-p)
     (let ((point (point))
           (found (evil-ex-find-next (emc-get-pattern) direction nil)))
-      (message "Len %s" (emc-get-pattern-length))
       (cond ((eq (emc-get-pattern-length) 1)
-             (when (eq direction 'forward)
-               (setq found (evil-ex-find-next (emc-get-pattern) direction nil))
-               (goto-char (1- (point))))
-             (when (eq direction 'backward)
-               (setq found (evil-ex-find-next (emc-get-pattern) 'forward nil))
-               (goto-char (1- (point)))))
-
-            ;; (ecase direction
-            ;;   (forward (goto-char (1- (point))))
-            ;;   (backward (goto-char (1+ (point))))))
+             (ecase direction
+               (forward
+                (setq found (evil-ex-find-next (emc-get-pattern) direction nil)))
+               (backward
+                (setq found (evil-ex-find-next (emc-get-pattern) 'forward nil)))))
             (t
              (when (and found (eq direction 'backward))
                (setq found (evil-ex-find-next (emc-get-pattern) direction nil))
-               (setq found (evil-ex-find-next (emc-get-pattern) 'forward nil)))
-             (goto-char (1- (point)))))
-      ;; (when (and found (eq direction 'forward) (eq (emc-get-pattern-length) 1))
-      ;;   (setq found (evil-ex-find-next (emc-get-pattern) direction nil)))
-      ;; (when (and found (eq direction 'backward))
-      ;;   (setq found (evil-ex-find-next (emc-get-pattern) direction nil))
-      ;;   (setq found (evil-ex-find-next (emc-get-pattern) 'forward nil)))
-
+               (setq found (evil-ex-find-next (emc-get-pattern) 'forward nil)))))
+      (goto-char (1- (point)))
       (when (and found create (/= point (point)))
         (emc-make-cursor-at-pos point))
       (emc-undo-cursor-at-pos))
