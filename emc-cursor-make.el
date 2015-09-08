@@ -58,20 +58,20 @@
   "Make an overlay for a cursor from START to END."
   (let ((overlay (make-overlay start end nil nil nil)))
     (overlay-put overlay 'type 'emc-cursor)
-    (overlay-put overlay 'priority 99)
+    (overlay-put overlay 'priority emc-cursor-overlay-priority)
     overlay))
 
 (defun emc-cursor-overlay-at-eol (pos)
   "Make a cursor overlay at POS assuming pos is at the end of line."
   (let ((overlay (emc-cursor-overlay pos pos))
-        (face (or emc-cursor-current-face '(emc-cursor-default-face))))
+        (face (emc-get-cursor-face)))
     (overlay-put overlay 'after-string (propertize " " 'face face))
     overlay))
 
 (defun emc-cursor-overlay-inline (pos)
   "Make a cursor overlay at POS assuming pos is not at the end of line."
   (let ((overlay (emc-cursor-overlay pos (1+ pos)))
-        (face (or emc-cursor-current-face '(emc-cursor-default-face))))
+        (face (emc-get-cursor-face)))
     (overlay-put overlay 'face face)
     overlay))
 
@@ -178,6 +178,44 @@ the cursors are ordered by the cursor overlay start position."
   "Delete the cursor closest to POS when searching forwards."
   (emc-undo-cursor (emc-find-next-cursor pos)))
 
+(defun emc-make-pattern (text whole-word)
+  "Make a search pattern for TEXT, that optionally matches only WHOLE-WORDs."
+  (evil-ex-make-search-pattern (if whole-word
+                                   (concat "\\_<" text "\\_>")
+                                 text)))
+
+(defun emc-set-pattern-for-range (range whole-word)
+  "Set `emc-pattern' to the text given by RANGE, optionally matching only WHOLE-WORDs."
+  (let ((start (car range)) (end (cadr range)))
+    (if (and (<= (point-min) start)
+             (>= (point-max) end)
+             (< start end))
+        (setq emc-pattern
+              (cons (emc-make-pattern (buffer-substring-no-properties start end)
+                                      whole-word)
+                    range))
+      (error "Invalid range %s" range))))
+
+(defun emc-set-pattern ()
+  "Set `emc-pattern' to the selected text."
+  (let ((whole-word (not (evil-visual-state-p))))
+    (unless (evil-visual-state-p)
+      (let ((range (evil-inner-symbol)))
+        (evil-visual-char (car range) (1- (cadr range)))))
+    (setq emc-pattern nil)
+    (emc-set-pattern-for-range (evil-visual-range) whole-word)))
+
+(defun emc-make-cursors-for-all ()
+  "Make a cursor for all matches of `emc-pattern'."
+  (when (emc-has-pattern-p)
+    (let ((point (point)))
+      (save-excursion
+        (goto-char (point-min))
+        (while (eq (evil-ex-find-next (emc-get-pattern) 'forward t) t)
+          (goto-char (1- (point)))
+          (when (/= point (point)) (emc-make-cursor-at-pos))
+          (goto-char (1+ (point))))))))
+
 (defun emc-goto-cursor (cursor create)
   "Move point to CURSOR and optionally CREATE a cursor at point."
   (let ((start (emc-get-cursor-start cursor))
@@ -187,18 +225,44 @@ the cursors are ordered by the cursor overlay start position."
       (when create (emc-make-cursor-at-pos point))
       (emc-undo-cursor cursor))))
 
-(evil-define-command emc-goto-prev-cursor ()
-  "Move point to the cursor closest to it when searching backwards."
-  (interactive)
-  (emc-goto-cursor (emc-find-prev-cursor) t))
+(defun emc-goto-match (direction create)
+  "Move point to the next match according to DIRECTION
+and optionally CREATE a cursor at point."
+  (when (emc-has-pattern-p)
+    (let ((point (point))
+          (found (evil-ex-find-next (emc-get-pattern) direction nil)))
+      (message "Len %s" (emc-get-pattern-length))
+      (cond ((eq (emc-get-pattern-length) 1)
+             (when (eq direction 'forward)
+               (setq found (evil-ex-find-next (emc-get-pattern) direction nil))
+               (goto-char (1- (point))))
+             (when (eq direction 'backward)
+               (setq found (evil-ex-find-next (emc-get-pattern) 'forward nil))
+               (goto-char (1- (point)))))
 
-(evil-define-command emc-goto-next-cursor ()
-  "Move point to the cursor closest to it when searching forwards."
-  (interactive)
-  (emc-goto-cursor (emc-find-next-cursor) t))
+            ;; (ecase direction
+            ;;   (forward (goto-char (1- (point))))
+            ;;   (backward (goto-char (1+ (point))))))
+            (t
+             (when (and found (eq direction 'backward))
+               (setq found (evil-ex-find-next (emc-get-pattern) direction nil))
+               (setq found (evil-ex-find-next (emc-get-pattern) 'forward nil)))
+             (goto-char (1- (point)))))
+      ;; (when (and found (eq direction 'forward) (eq (emc-get-pattern-length) 1))
+      ;;   (setq found (evil-ex-find-next (emc-get-pattern) direction nil)))
+      ;; (when (and found (eq direction 'backward))
+      ;;   (setq found (evil-ex-find-next (emc-get-pattern) direction nil))
+      ;;   (setq found (evil-ex-find-next (emc-get-pattern) 'forward nil)))
 
-(evil-define-command emc-goto-first-cursor ()
-  "Move point to the cursor with the lowest position."
+      (when (and found create (/= point (point)))
+        (emc-make-cursor-at-pos point))
+      (emc-undo-cursor-at-pos))
+    (message "%s cursors for \"%s\""
+             (1+ (length emc-cursor-list))
+             (emc-get-pattern-text))))
+
+(evil-define-command emc-make-and-goto-first-cursor ()
+  "Make a cursor at point and move point to the cursor with the lowest position."
   :repeat ignore
   (interactive)
   (let* ((cursor (emc-find-first-cursor))
@@ -206,14 +270,65 @@ the cursors are ordered by the cursor overlay start position."
     (when (and cursor (> (point ) start))
       (emc-goto-cursor cursor t))))
 
-(evil-define-command emc-goto-last-cursor ()
-  "Move point to the cursor with the last position."
+(evil-define-command emc-make-and-goto-last-cursor ()
+  "Make a cursor at point and move point to the cursor with the last position."
   :repeat ignore
   (interactive)
   (let* ((cursor (emc-find-last-cursor))
          (start (emc-get-cursor-start cursor)))
     (when (and cursor (< (point) start))
       (emc-goto-cursor cursor t))))
+
+(evil-define-command emc-make-and-goto-prev-cursor ()
+  "Make a cursor at point and move point to the cursor
+closest to it when searching backwards."
+  (interactive)
+  (emc-goto-cursor (emc-find-prev-cursor) t))
+
+(evil-define-command emc-make-and-goto-next-cursor ()
+  "Make a cursor at point and move point to the cursor
+closest to it when searching forwards."
+  (interactive)
+  (emc-goto-cursor (emc-find-next-cursor) t))
+
+(evil-define-command emc-skip-and-goto-prev-cursor ()
+  "Move point to the cursor closest to it when searching backwards."
+  (interactive)
+  (emc-goto-cursor (emc-find-prev-cursor) nil))
+
+(evil-define-command emc-skip-and-goto-next-cursor ()
+  "Move point to the cursor closest to it when searching forwards."
+  (interactive)
+  (emc-goto-cursor (emc-find-next-cursor) nil))
+
+;; TODO refactor 4 methods below
+(evil-define-command emc-skip-cursor-and-goto-next-match ()
+  "Initialize `emc-pattern' and go to the next match."
+  (interactive)
+  (unless (emc-has-pattern-p) (emc-set-pattern))
+  (evil-exit-visual-state)
+  (emc-goto-match 'forward nil))
+
+(evil-define-command emc-skip-cursor-and-goto-prev-match ()
+  "Initialize `emc-pattern' and go to the previous match."
+  (interactive)
+  (unless (emc-has-pattern-p) (emc-set-pattern))
+  (evil-exit-visual-state)
+  (emc-goto-match 'backward nil))
+
+(evil-define-command emc-make-cursor-and-goto-next-match ()
+  "Initialize `emc-pattern', make a cursor at point, and go to the next match."
+  (interactive)
+  (unless (emc-has-pattern-p) (emc-set-pattern))
+  (evil-exit-visual-state)
+  (emc-goto-match 'forward t))
+
+(evil-define-command emc-make-cursor-and-goto-prev-match ()
+  "Initialize `emc-pattern', make a cursor at point, and go to the previous match."
+  (interactive)
+  (unless (emc-has-pattern-p) (emc-set-pattern))
+  (evil-exit-visual-state)
+  (emc-goto-match 'backward t))
 
 (evil-define-command emc-undo-all-cursors ()
   "Delete all cursors and remove them from `emc-cursor-list'."
@@ -223,82 +338,46 @@ the cursors are ordered by the cursor overlay start position."
   (setq emc-cursor-list nil)
   (setq emc-pattern nil))
 
-(defun emc-make-pattern (text whole-word)
-  "Make a search pattern for TEXT. If WHOLE-WORD is not nil
-then the pattern will only match whole words."
-  (evil-ex-make-search-pattern (if whole-word
-                                   (concat "\\_<" text "\\_>")
-                                 text)))
-
-(defun emc-set-pattern (start end whole-word)
-  "Set `emc-pattern' to the text given by START and END. If WHOLE-WORD
-is not nil the pattern will only match whole words."
-  (if (and (<= (point-min) start)
-           (>= (point-max) end)
-           (< start end))
-      (setq emc-pattern
-            (cons (emc-make-pattern (buffer-substring-no-properties start end)
-                                    whole-word)
-                  (cons start end)))
-    (error "Invalid bounds %s %s" start end)))
-
-(defun emc-set-pattern-from-selection ()
-  "Set `emc-pattern' to the selected text."
-  (let ((whole-word (not (evil-visual-state-p))))
-    (unless (evil-visual-state-p)
-      (let ((range (evil-inner-symbol)))
-        (evil-visual-char (car range) (1- (cadr range)))))
-    (setq emc-pattern nil)
-    (let ((range (evil-visual-range)))
-      (emc-set-pattern (car range) (cadr range) whole-word)))
-  (message "pattern %s" emc-pattern))
-
-(defun emc-make-cursor-for-all-matches ()
-  "Make a cursor for all matches of `emc-pattern'."
-  (when (and (emc-pattern-p)
-             (not (emc-has-cursors-p)))
-    (let ((point (point)))
-      (save-excursion
-        (goto-char (point-min))
-        (while (eq (evil-ex-find-next (emc-get-pattern) 'forward t) t)
-          (goto-char (1- (point)))
-          (when (/= point (point)) (emc-make-cursor-at-pos))
-          (goto-char (1+ (point))))))))
-
-(evil-define-command emc-set-pattern-and-make-cursors ()
-  "Set `emc-pattern' and make cursors for all matches."
+(evil-define-command emc-make-cursors-for-all-matches ()
+  "Initialize `emc-pattern' and make cursors for all matches."
   :repeat ignore
   (interactive)
-  (emc-set-pattern-from-selection)
-  (evil-exit-visual-state)
-  (emc-make-cursor-for-all-matches)
-  (message "%s cursors created at %s"
-           (length emc-cursor-list)
-           (mapcar 'emc-get-cursor-start emc-cursor-list)))
+  (if (emc-has-cursors-p) (error "Cursors already exist.")
+    (emc-set-pattern)
+    (evil-exit-visual-state)
+    (emc-make-cursors-for-all)
+    (message "%s matches for \"%s\""
+             (1+ (length emc-cursor-list))
+             (emc-get-pattern-text))))
 
 (defun emc-setup-cursor-key-maps ()
   "Set up key maps for cursor operations."
   (interactive)
-  (define-key evil-normal-state-map (kbd "grm") 'emc-set-pattern-and-make-cursors)
-  (define-key evil-visual-state-map (kbd "grm") 'emc-set-pattern-and-make-cursors)
+  (define-key evil-normal-state-map (kbd "grm") 'emc-make-cursors-for-all-matches)
+  (define-key evil-visual-state-map (kbd "grm") 'emc-make-cursors-for-all-matches)
 
-  (define-key evil-normal-state-map (kbd "grn") 'emc-goto-next-cursor)
-  (define-key evil-normal-state-map (kbd "grp") 'emc-goto-prev-cursor)
-  (define-key evil-normal-state-map (kbd "grf") 'emc-goto-first-cursor)
-  (define-key evil-normal-state-map (kbd "grl") 'emc-goto-last-cursor)
+  (define-key evil-normal-state-map (kbd "grn") 'emc-make-and-goto-next-cursor)
+  (define-key evil-normal-state-map (kbd "grp") 'emc-make-and-goto-prev-cursor)
+  (define-key evil-normal-state-map (kbd "grf") 'emc-make-and-goto-first-cursor)
+  (define-key evil-normal-state-map (kbd "grl") 'emc-make-and-goto-last-cursor)
+
+  (define-key evil-normal-state-map (kbd "gpn") 'emc-make-cursor-and-goto-next-match)
+  (define-key evil-normal-state-map (kbd "gpp") 'emc-make-cursor-and-goto-prev-match)
+  (define-key evil-normal-state-map (kbd "gsn") 'emc-skip-cursor-and-goto-next-match)
+  (define-key evil-normal-state-map (kbd "gsp") 'emc-skip-cursor-and-goto-prev-match)
   )
 
 ;; TODO implement make/skip next prev based on pattern
 ;; - emc-make-for-all-matches
 ;;    - the cursor must not move
-;; - emc-make-for-next-match
-;; - emc-make-for-prev-match
+;; - emc-make-for-next-match (must wrap)
+;; - emc-make-for-prev-match (must wrap)
 ;; - emc-skip-for-next-match
 ;; - emc-skip-for-prev-match
 
-;; (emc-make-cursor-for-all-matches)
+;; (emc-make-cursors-for-all)
 ;; (setq emc-pattern '("emc" nil))
-;; (emc-set-pattern-from-selection)
+;; (emc-set-pattern)
 ;; (emc-find-next 'forward nil)
 ;; (emc-set-cursor-face '(emc-region-face))
 ;; (emc-set-cursor-face nil)

@@ -9,12 +9,22 @@
 (defface emc-cursor-default-face
   '((t (:background "#D13A82")))
   "The face used for simple fake cursors."
-  :group 'evil-multiple-cursors)
+  :group 'emc)
 
 (defface emc-region-face
   '((t :inherit region))
   "The face used for fake regions"
-  :group 'evil-multiple-cursors)
+  :group 'emc)
+
+(defcustom emc-cursor-overlay-priority 201
+  "The priority of the fake cursors overlay."
+  :type 'integer
+  :group 'emc)
+
+(defcustom emc-region-overlay-priority 99
+  "The priority of the fake regions overlay."
+  :type 'integer
+  :group 'emc)
 
 (evil-define-local-var emc-running-command nil
   "True when running a command for all cursors.")
@@ -112,23 +122,27 @@
   (setq emc-pattern nil))
 
 (defun emc-get-pattern ()
-  "Return the current pattern text."
+  "Return the current pattern."
   (when emc-pattern (car emc-pattern)))
+
+(defun emc-get-pattern-text ()
+  "Return the current pattern text."
+  (when emc-pattern (car (emc-get-pattern))))
 
 (defun emc-get-pattern-start ()
   "Return the current pattern start position."
-  (when emc-pattern (car (cdr emc-pattern))))
+  (when emc-pattern (nth 1 emc-pattern)))
 
 (defun emc-get-pattern-end ()
   "Return the current pattern end position."
-  (when emc-pattern (cdr (cdr emc-pattern))))
+  (when emc-pattern (nth 2 emc-pattern)))
 
 (defun emc-get-pattern-length ()
   "Return the current pattern length."
   (when emc-pattern
     (- (emc-get-pattern-end) (emc-get-pattern-start))))
 
-(defun emc-pattern-p ()
+(defun emc-has-pattern-p ()
   "True if there is a saved pattern."
   (not (null emc-pattern)))
 

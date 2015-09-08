@@ -190,19 +190,19 @@
 
 ;; (emc-goto-next-match (emc-get-pattern))
 
-(defun emc-goto-next ()
-  "Go to next pattern given by `emc-get-pattern'."
-  (interactive)
-  (when (emc-get-pattern)
-    (emc-goto-next-match (emc-get-pattern))))
+;; (defun emc-goto-next ()
+;;   "Go to next pattern given by `emc-get-pattern'."
+;;   (interactive)
+;;   (when (emc-get-pattern)
+;;     (emc-goto-next-match (emc-get-pattern))))
 
-(defun emc-goto-prev ()
-  "Go to prev pattern given by `emc-get-pattern'."
-  (interactive)
-  (when (emc-get-pattern)
-    (emc-goto-next-match (emc-get-pattern) 'backward)
-    (emc-goto-next-match (emc-get-pattern) 'backward)
-    (emc-goto-next-match (emc-get-pattern) 'forward)))
+;; (defun emc-goto-prev ()
+;;   "Go to prev pattern given by `emc-get-pattern'."
+;;   (interactive)
+;;   (when (emc-get-pattern)
+;;     (emc-goto-next-match (emc-get-pattern) 'backward)
+;;     (emc-goto-next-match (emc-get-pattern) 'backward)
+;;     (emc-goto-next-match (emc-get-pattern) 'forward)))
 
 (defun emc-remove-cursor-region (cursor)
   "Deletes CURSOR's region and returns a new cursor with the region removed."
@@ -214,7 +214,7 @@
   (interactive)
   (emc-add-cursor (emc-draw-cursor-at-point)))
 
-(defun emc-make-cursor-and-goto-next-match ()
+(defun emc-make-cursor-and-goto-next-match-old ()
   "Create a cursor at point and go to next match if any."
   (let ((cursor (emc-draw-cursor-at-point)))
     (setq emc-cursor-list
@@ -225,7 +225,7 @@
       (delete-overlay cursor)
       (error "No more matches found"))))
 
-(defun emc-goto-prev-match-and-undo-cursor ()
+(defun emc-goto-prev-match-and-undo-cursor-old ()
   "Move point to a previous match and undo the cursor there if any."
   (if (and (emc-goto-next-match (emc-get-pattern) 'backward)
            (emc-goto-next-match (emc-get-pattern) 'backward))
@@ -235,13 +235,13 @@
         (when (null emc-cursor-list) (setq emc-pattern nil)))
     (error "No more matches found")))
 
-(defun emc-skip-cursor-and-goto-next-match ()
+(defun emc-skip-cursor-and-goto-next-match-old ()
   "Skip making a cursor at point and go to next match if any."
   (evil-exit-visual-state)
   (unless (emc-goto-next-match (emc-get-pattern) 'forward) ;; TODO support wrap
     (error "No more matches found")))
 
-(evil-define-command emc-make-next-cursor ()
+(evil-define-command emc-make-next-cursor-old ()
   "Make the next cursor."
   :repeat ignore
   (interactive)
@@ -254,16 +254,16 @@
       (when (< (point) (mark)) (evil-exchange-point-and-mark))
       (goto-char (1- (point))))
     (if (emc-get-pattern)
-        (emc-make-cursor-and-goto-next-match)
+        (emc-make-cursor-and-goto-next-match-old)
       (error "No more matches or no visual selection found"))))
 
 ;; (cond ((evil-visual-state-p)
 ;;        (emc-set-pattern-from-visual-selection)
-;;        (emc-make-cursor-and-goto-next-match))
-;;       ((emc-get-pattern) (emc-make-cursor-and-goto-next-match))
+;;        (emc-make-cursor-and-goto-next-match-old))
+;;       ((emc-get-pattern) (emc-make-cursor-and-goto-next-match-old))
 ;;       (t (error "No more matches or no visual selection found")))))
 
-(evil-define-command emc-skip-next-cursor ()
+(evil-define-command emc-skip-next-cursor-old ()
   "Skip the next cursor."
   :repeat ignore
   (interactive)
@@ -271,8 +271,8 @@
     (emc-command-reset)
     (cond ((evil-visual-state-p)
            (emc-set-pattern-from-visual-selection)
-           (emc-skip-cursor-and-goto-next-match))
-          ((emc-get-pattern) (emc-skip-cursor-and-goto-next-match))
+           (emc-skip-cursor-and-goto-next-match-old))
+          ((emc-get-pattern) (emc-skip-cursor-and-goto-next-match-old))
           (t (error "No more matches or no visual selection found")))))
 
 ;; TODO should allow moving to the prev match or to the prev cursor
@@ -286,8 +286,8 @@
     (emc-command-reset)
     (cond ((evil-visual-state-p)
            (emc-set-pattern-from-visual-selection)
-           (emc-goto-prev-match-and-undo-cursor))
-          ((emc-get-pattern) (emc-goto-prev-match-and-undo-cursor))
+           (emc-goto-prev-match-and-undo-cursor-old))
+          ((emc-get-pattern) (emc-goto-prev-match-and-undo-cursor-old))
           (t (error "No more matches or no visual selection found")))))
 
 ;; (defun emc-delete-all-overlays (overlays)
@@ -785,7 +785,12 @@
            (evil-repeat-find-char)
            (setq region (emc-update-region region)))
 
+          ((eq cmd 'evil-digit-argument-or-evil-beginning-of-line)
+           (funcall cmd)
+           (setq region (emc-update-region region)))
+
           ;; TODO add all text objects from ev
+          ;;      or determine whether a cmd is a text object
           ((or (eq cmd 'evil-inner-paren)
                (eq cmd 'evil-inner-word)
                (eq cmd 'evil-inner-WORD)
@@ -940,6 +945,10 @@ otherwise execute BODY."
           ((eq cmd 'move-text-down) (move-text-down 1))
           ((eq cmd 'move-text-up) (move-text-up 1))
 
+          ;; TODO implement
+          ;; - evil-goto-mark
+          ;; - evil-goto-mark-line
+          ;; - restore cursor position after undo
 
           ((eq cmd 'evil-normal-state)
            (evil-insert 1)
@@ -961,7 +970,6 @@ otherwise execute BODY."
            (emc-with-region
             region
             (lambda (start end)
-              ;; TODO convert last-input-event to char
               (evil-surround-region
                start end nil (emc-get-command-property :last-input)))))
 
@@ -986,18 +994,20 @@ otherwise execute BODY."
            (when (eolp) (evil-end-of-line)))
 
           ((eq cmd 'evil-change)
-           (evil-with-state normal
-             (cond ((null region)
-                    (evil-forward-char)
-                    (execute-kbd-macro keys-vector))
-                   ((emc-char-region-p region)
-                    (emc-with-region region
-                                     (lambda (start end)
-                                       (evil-forward-char)
-                                       (evil-delete start end))))
-                   ((emc-line-region-p region)
-                    (evil-forward-char)
-                    (execute-kbd-macro "cc")))))
+           (let ((point (point)))
+             (evil-with-state normal
+               (cond ((null region)
+                      (unless (eq point (point-at-bol))
+                        (evil-forward-char))
+                      (execute-kbd-macro keys-vector))
+                     ((emc-char-region-p region)
+                      (emc-with-region region
+                                       (lambda (start end)
+                                         (evil-forward-char)
+                                         (evil-delete start end))))
+                     ((emc-line-region-p region)
+                      (evil-forward-char)
+                      (execute-kbd-macro "cc"))))))
 
           ;; TODO use the numeric prefix if any for line movements
           ;;      keep the original column to adjust cursors after
@@ -1141,8 +1151,9 @@ otherwise execute BODY."
                   (setq cursor-list (cons new-cursor cursor-list)))))
 
             ;; TODO the cursor-list must be sorted by the start position
+            ;;      instead of reverse just use emc-insert-cursor above
             (setq emc-cursor-list (nreverse cursor-list)))
-          (message "cursors %s" (mapcar 'emc-get-cursor-start emc-cursor-list))
+          ;; (message "cursors %s" (mapcar 'emc-get-cursor-start emc-cursor-list))
           ;; (emc-command-reset)
           ;; (message "AFTER-VISUAL %s" (evil-visual-state-p))
           )))))
@@ -1150,10 +1161,10 @@ otherwise execute BODY."
 (defun emc-setup-key-maps ()
   "Sets up all key bindings for working with multiple cursors."
   (interactive)
-  (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-next-cursor)
-  (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor)
-  (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
-  (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor)
+  (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-next-cursor-old)
+  (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor-old)
+  (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
+  (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
   (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
   (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
 

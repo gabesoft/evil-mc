@@ -51,6 +51,9 @@ set to the specified values."
   (emc-put-cursor-property
    cursor :kill-ring-yank-pointer kill-ring-yank-pointer))
 
+;; TODO add mark and mark-line
+;;      add undo position
+
 (defun emc-get-cursor-column (cursor)
   "Get the column position for CURSOR."
   (emc-get-cursor-property cursor :column))

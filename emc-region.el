@@ -88,7 +88,7 @@ set to the specified values."
   "Make a visual region overlay from START to END."
   (let ((overlay (make-overlay start end nil nil nil)))
     (overlay-put overlay 'face 'emc-region-face)
-    (overlay-put overlay 'priority 99)
+    (overlay-put overlay 'priority emc-region-overlay-priority)
     overlay))
 
 (defun emc-char-region-overlay (mark point)

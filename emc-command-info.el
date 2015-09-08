@@ -135,9 +135,12 @@
 
 (defun emc-save-keys (flag pre-name post-name keys)
   "Save KEYS at PRE-NAME or POST-NAME according to FLAG."
-  (cond ((eq flag 'pre) (emc-add-command-property pre-name keys))
-        ((eq flag 'post) (emc-add-command-property post-name keys))
-        (t (error (message "unknown flag %s" flag)))))
+  (ecase flag
+    (pre (emc-add-command-property pre-name keys))
+    (post (emc-add-command-property post-name keys))))
+  ;; (cond ((eq flag 'pre) (emc-add-command-property pre-name keys))
+  ;;       ((eq flag 'post) (emc-add-command-property post-name keys))
+  ;;       (t (error (message "unknown flag %s" flag)))))
 
 (defun emc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
