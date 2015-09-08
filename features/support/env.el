@@ -11,6 +11,7 @@
 
 (add-to-list 'load-path evil-multiple-cursors-root-path)
 
+(require 'cl)
 (require 'evil)
 (require 'evil-surround)
 ;; (require 'emc-mode)
