@@ -1158,21 +1158,21 @@ otherwise execute BODY."
           ;; (message "AFTER-VISUAL %s" (evil-visual-state-p))
           )))))
 
-(defun emc-setup-key-maps ()
-  "Sets up all key bindings for working with multiple cursors."
-  (interactive)
-  (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-next-cursor-old)
-  (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor-old)
-  (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
-  (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
-  (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
-  (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
+;; (defun emc-setup-key-maps ()
+;;   "Sets up all key bindings for working with multiple cursors."
+;;   (interactive)
+;;   (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-next-cursor-old)
+;;   (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor-old)
+;;   (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
+;;   (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
+;;   (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
+;;   (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
 
-  (define-key evil-normal-state-local-map (kbd "C-k") 'emc-make-cursor-here-old)
-  (define-key evil-normal-state-local-map (kbd "C-m") 'emc-freeze)
-  (define-key evil-normal-state-local-map (kbd "C-l") 'emc-unfreeze)
+;;   (define-key evil-normal-state-local-map (kbd "C-k") 'emc-make-cursor-here-old)
+;;   (define-key evil-normal-state-local-map (kbd "C-m") 'emc-freeze)
+;;   (define-key evil-normal-state-local-map (kbd "C-l") 'emc-unfreeze)
 
-  (define-key evil-normal-state-local-map (kbd "C-,") 'emc-destroy-all-cursors))
+;;   (define-key evil-normal-state-local-map (kbd "C-,") 'emc-destroy-all-cursors))
 
 ;; (emc-setup-key-maps)
 
