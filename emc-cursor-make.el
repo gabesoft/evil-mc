@@ -18,27 +18,6 @@
 ;; - fake cursors should reflect the current evil state
 ;; - the real cursor should be visible in relation to the fake ones
 
-;; Implementation:
-;; - use `emc-cursor-state' to create cursors and add to `emc-cursor-list'
-;; - cursor navigation using `emc-pattern'
-;;    - the pattern should contain the text as well as type
-;;      region, word, WORD if necessary
-;;
-;; - goto-next
-;; - goto-prev
-;; - goto-first
-;; - goto-last
-;; - make-next
-;; - make-prev
-;; - undo-next
-;; - undo-prev
-;; - skip-next
-;; - skip-prev
-;; - make-here
-;; - undo-here
-;; - make-all
-;; - undo-all
-
 (require 'emc-common)
 (require 'emc-vars)
 (require 'emc-cursor-state)
@@ -249,6 +228,36 @@ and optionally CREATE a cursor at point."
              (1+ (length emc-cursor-list))
              (emc-get-pattern-text))))
 
+;; All interactive cursor commands should
+;; - (emc-command-reset)
+;; - set pattern if necessary
+;; - if visual-state and (emc-has-cursors-p)
+;;   - if point < mark (evil-exchange-point-and-mark for all)
+;;   - delete all regions
+;; - exit visual mode
+
+;; (defmacro emc-define-cursor-command (command documentation &rest body)
+;;   "Define a cursor COMMAND documented by DOCUMENTATION that executes BODY."
+;;   `(evil-define-command ,command ()
+;;      'documentation
+;;      :repeat ignore
+;;      (interactive)
+;;      ,@body))
+
+;; TODO make this a macro
+(defun emc-initialize-cursors
+    "Sets up cursors state before an interactive command."
+  (emc-command-reset)
+  (unless (emc-has-pattern-p) (emc-set-pattern))
+  (when (and (evil-visual-state-p) (emc-has-cursors-p))
+    (when (< (point) (mark)) (evil-exchange-point-and-mark))
+    (dolist (cursor emc-cursor-list)
+      (emc-delete-region-overlay cursor)
+      ;; TODO remove the region from cursor
+      ;; (emc-put-object-property cursor :region nil)
+      ))
+  (evil-exit-visual-state))
+
 (evil-define-command emc-make-and-goto-first-cursor ()
   "Make a cursor at point and move point to the cursor with the lowest position."
   :repeat ignore
@@ -323,6 +332,7 @@ closest to it when searching forwards."
   :repeat ignore
   (interactive)
   (mapc 'emc-delete-cursor emc-cursor-list)
+  (evil-exit-visual-state)
   (setq emc-cursor-list nil)
   (setq emc-pattern nil))
 
@@ -344,6 +354,10 @@ closest to it when searching forwards."
   (define-key evil-normal-state-map (kbd "grm") 'emc-make-cursors-for-all-matches)
   (define-key evil-visual-state-map (kbd "grm") 'emc-make-cursors-for-all-matches)
 
+  ;; TODO should escape with ESC or C-g
+  (define-key evil-normal-state-map (kbd "grc") 'emc-undo-all-cursors)
+  (define-key evil-visual-state-map (kbd "grc") 'emc-undo-all-cursors)
+
   (define-key evil-normal-state-map (kbd "grn") 'emc-make-and-goto-next-cursor)
   (define-key evil-normal-state-map (kbd "grp") 'emc-make-and-goto-prev-cursor)
   (define-key evil-normal-state-map (kbd "grf") 'emc-make-and-goto-first-cursor)
@@ -355,22 +369,7 @@ closest to it when searching forwards."
   (define-key evil-normal-state-map (kbd "gsp") 'emc-skip-cursor-and-goto-prev-match)
   )
 
-;; TODO implement make/skip next prev based on pattern
-;; - emc-make-for-all-matches
-;;    - the cursor must not move
-;; - emc-make-for-next-match (must wrap)
-;; - emc-make-for-prev-match (must wrap)
-;; - emc-skip-for-next-match
-;; - emc-skip-for-prev-match
-
-;; (emc-make-cursors-for-all)
-;; (setq emc-pattern '("emc" nil))
-;; (emc-set-pattern)
-;; (emc-find-next 'forward nil)
-;; (emc-set-cursor-face '(emc-region-face))
-;; (emc-set-cursor-face nil)
-;; (emc-cursor-overlay-at-eol (point))
-;; (emc-cursor-overlay-inline (point))
+;; TODO handle visual
 
 (provide 'emc-cursor-make)
 
