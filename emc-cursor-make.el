@@ -33,6 +33,13 @@
   "Set the current cursor FACE."
   (setq emc-cursor-current-face face))
 
+(defun emc-print-cursors-info (&optional msg)
+  "Prints information about the current cursors preceded by MSG."
+  (message "%s %s cursors matching \"%s\""
+           (or msg "There are")
+           (1+ (length emc-cursor-list))
+           (emc-get-pattern-text)))
+
 (defun emc-cursor-overlay (start end)
   "Make an overlay for a cursor from START to END."
   (let ((overlay (make-overlay start end nil nil nil)))
@@ -230,10 +237,7 @@ and optionally CREATE a cursor at point."
       (goto-char (1- (point)))
       (when (and found create (/= point (point)))
         (emc-make-cursor-at-pos point))
-      (emc-undo-cursor-at-pos))
-    (message "%s cursors for \"%s\""
-             (1+ (length emc-cursor-list))
-             (emc-get-pattern-text))))
+      (emc-undo-cursor-at-pos))))
 
 (defun emc-find-and-goto-cursor (find create)
   "FIND a cursor, go to it, and optionally CREATE a cursor at point."
@@ -247,13 +251,15 @@ and optionally CREATE a cursor at point."
               ((eq find 'emc-find-last-cursor)
                (when (< (point) start) (emc-goto-cursor cursor create)))
               (t
-               (emc-goto-cursor cursor create)))))))
+               (emc-goto-cursor cursor create))))))
+  (emc-print-cursors-info))
 
 (defun emc-find-and-goto-match (direction create)
   "Find the next match in DIRECTION and optionally CREATE a cursor at point."
   (unless (emc-has-pattern-p) (emc-set-pattern))
   (emc-delete-all-regions)
-  (emc-goto-match direction create))
+  (emc-goto-match direction create)
+  (emc-print-cursors-info))
 
 (evil-define-command emc-make-cursor-here ()
   "Create a cursor at point."
@@ -318,7 +324,8 @@ closest to it when searching forwards."
   (mapc 'emc-delete-cursor emc-cursor-list)
   (evil-exit-visual-state)
   (setq emc-cursor-list nil)
-  (setq emc-pattern nil))
+  (setq emc-pattern nil)
+  (message "All cursors cleared"))
 
 (evil-define-command emc-make-all-cursors ()
   "Initialize `emc-pattern' and make cursors for all matches."
@@ -327,9 +334,7 @@ closest to it when searching forwards."
     (emc-set-pattern)
     (evil-exit-visual-state)
     (emc-make-cursors-for-all)
-    (message "%s matches for \"%s\""
-             (1+ (length emc-cursor-list))
-             (emc-get-pattern-text))))
+    (emc-print-cursors-info "Created")))
 
 (defun emc-setup-cursor-key-maps ()
   "Set up key maps for cursor operations."
@@ -363,6 +368,8 @@ closest to it when searching forwards."
   (define-key evil-visual-state-map (kbd "C-n") 'emc-make-and-goto-next-match)
   (define-key evil-normal-state-map (kbd ",n") 'emc-skip-and-goto-next-match)
   (define-key evil-visual-state-map (kbd ",n") 'emc-skip-and-goto-next-match)
+  (define-key evil-normal-state-map (kbd "C-t") 'emc-skip-and-goto-next-match)
+  (define-key evil-visual-state-map (kbd "C-t") 'emc-skip-and-goto-next-match)
   (define-key evil-normal-state-map (kbd "C-p") 'emc-make-and-goto-prev-match)
   (define-key evil-visual-state-map (kbd "C-p") 'emc-make-and-goto-prev-match)
   (define-key evil-normal-state-map (kbd ",p") 'emc-skip-and-goto-prev-match)
