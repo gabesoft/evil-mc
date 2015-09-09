@@ -93,6 +93,13 @@ the cursors are ordered by the cursor overlay start position."
   (emc-delete-cursor-overlay cursor)
   (emc-delete-region-overlay (emc-get-cursor-region cursor)))
 
+(defun emc-delete-all-regions ()
+  "Clear all visual regions and exit visual state."
+  (when (evil-visual-state-p)
+    (dolist (cursor emc-cursor-list)
+      (emc-delete-region-overlay (emc-get-cursor-region cursor)))
+    (evil-exit-visual-state)))
+
 (defun emc-undo-cursor (cursor)
   "Delete CURSOR and remove it from `emc-cursor-list'."
   (when cursor
@@ -228,119 +235,95 @@ and optionally CREATE a cursor at point."
              (1+ (length emc-cursor-list))
              (emc-get-pattern-text))))
 
-;; All interactive cursor commands should
-;; - (emc-command-reset)
-;; - set pattern if necessary
-;; - if visual-state and (emc-has-cursors-p)
-;;   - if point < mark (evil-exchange-point-and-mark for all)
-;;   - delete all regions
-;; - exit visual mode
+(defun emc-find-and-goto-cursor (find create)
+  "FIND a cursor, go to it, and optionally CREATE a cursor at point."
+  (when (emc-has-cursors-p)
+    (emc-delete-all-regions)
+    (let* ((cursor (funcall find))
+           (start (emc-get-cursor-start cursor)))
+      (when cursor
+        (cond ((eq find 'emc-find-first-cursor)
+               (when (> (point) start) (emc-goto-cursor cursor create)))
+              ((eq find 'emc-find-last-cursor)
+               (when (< (point) start) (emc-goto-cursor cursor create)))
+              (t
+               (emc-goto-cursor cursor create)))))))
 
-;; (defmacro emc-define-cursor-command (command documentation &rest body)
-;;   "Define a cursor COMMAND documented by DOCUMENTATION that executes BODY."
-;;   `(evil-define-command ,command ()
-;;      'documentation
-;;      :repeat ignore
-;;      (interactive)
-;;      ,@body))
-
-;; TODO make this a macro
-(defun emc-initialize-cursors
-    "Sets up cursors state before an interactive command."
-  (emc-command-reset)
+(defun emc-find-and-goto-match (direction create)
+  "Find the next match in DIRECTION and optionally CREATE a cursor at point."
   (unless (emc-has-pattern-p) (emc-set-pattern))
-  (when (and (evil-visual-state-p) (emc-has-cursors-p))
-    (when (< (point) (mark)) (evil-exchange-point-and-mark))
-    (dolist (cursor emc-cursor-list)
-      (emc-delete-region-overlay cursor)
-      ;; TODO remove the region from cursor
-      ;; (emc-put-object-property cursor :region nil)
-      ))
-  (evil-exit-visual-state))
+  (emc-delete-all-regions)
+  (emc-goto-match direction create))
+
+(evil-define-command emc-make-cursor-here ()
+  "Create a cursor at point."
+  :repeat ignore
+  (emc-make-cursor-at-pos))
 
 (evil-define-command emc-make-and-goto-first-cursor ()
   "Make a cursor at point and move point to the cursor with the lowest position."
   :repeat ignore
-  (interactive)
-  (let* ((cursor (emc-find-first-cursor))
-         (start (emc-get-cursor-start cursor)))
-    (when (and cursor (> (point ) start))
-      (emc-goto-cursor cursor t))))
+  (emc-find-and-goto-cursor 'emc-find-first-cursor t))
 
 (evil-define-command emc-make-and-goto-last-cursor ()
   "Make a cursor at point and move point to the cursor with the last position."
   :repeat ignore
-  (interactive)
-  (let* ((cursor (emc-find-last-cursor))
-         (start (emc-get-cursor-start cursor)))
-    (when (and cursor (< (point) start))
-      (emc-goto-cursor cursor t))))
+  (emc-find-and-goto-cursor 'emc-find-last-cursor t))
 
 (evil-define-command emc-make-and-goto-prev-cursor ()
   "Make a cursor at point and move point to the cursor
 closest to it when searching backwards."
-  (interactive)
-  (emc-goto-cursor (emc-find-prev-cursor) t))
+  :repeat ignore
+  (emc-find-and-goto-cursor 'emc-find-prev-cursor t))
 
 (evil-define-command emc-make-and-goto-next-cursor ()
   "Make a cursor at point and move point to the cursor
 closest to it when searching forwards."
-  (interactive)
-  (emc-goto-cursor (emc-find-next-cursor) t))
+  :repeat ignore
+  (emc-find-and-goto-cursor 'emc-find-next-cursor t))
 
 (evil-define-command emc-skip-and-goto-prev-cursor ()
   "Move point to the cursor closest to it when searching backwards."
-  (interactive)
-  (emc-goto-cursor (emc-find-prev-cursor) nil))
+  :repeat ignore
+  (emc-find-and-goto-cursor 'emc-find-prev-cursor nil))
 
 (evil-define-command emc-skip-and-goto-next-cursor ()
   "Move point to the cursor closest to it when searching forwards."
-  (interactive)
-  (emc-goto-cursor (emc-find-next-cursor) nil))
+  :repeat ignore
+  (emc-find-and-goto-cursor 'emc-find-next-cursor nil))
 
-;; TODO refactor 4 methods below
-(evil-define-command emc-skip-cursor-and-goto-next-match ()
+(evil-define-command emc-skip-and-goto-next-match ()
   "Initialize `emc-pattern' and go to the next match."
-  (interactive)
-  (unless (emc-has-pattern-p) (emc-set-pattern))
-  (evil-exit-visual-state)
-  (emc-goto-match 'forward nil))
+  :repeat ignore
+  (emc-find-and-goto-match 'forward nil))
 
-(evil-define-command emc-skip-cursor-and-goto-prev-match ()
+(evil-define-command emc-skip-and-goto-prev-match ()
   "Initialize `emc-pattern' and go to the previous match."
-  (interactive)
-  (unless (emc-has-pattern-p) (emc-set-pattern))
-  (evil-exit-visual-state)
-  (emc-goto-match 'backward nil))
+  :repeat ignore
+  (emc-find-and-goto-match 'backward nil))
 
-(evil-define-command emc-make-cursor-and-goto-next-match ()
+(evil-define-command emc-make-and-goto-next-match ()
   "Initialize `emc-pattern', make a cursor at point, and go to the next match."
-  (interactive)
-  (unless (emc-has-pattern-p) (emc-set-pattern))
-  (evil-exit-visual-state)
-  (emc-goto-match 'forward t))
+  :repeat ignore
+  (emc-find-and-goto-match 'forward t))
 
-(evil-define-command emc-make-cursor-and-goto-prev-match ()
+(evil-define-command emc-make-and-goto-prev-match ()
   "Initialize `emc-pattern', make a cursor at point, and go to the previous match."
-  (interactive)
-  (unless (emc-has-pattern-p) (emc-set-pattern))
-  (evil-exit-visual-state)
-  (emc-goto-match 'backward t))
+  :repeat ignore
+  (emc-find-and-goto-match 'backward t))
 
 (evil-define-command emc-undo-all-cursors ()
   "Delete all cursors and remove them from `emc-cursor-list'."
   :repeat ignore
-  (interactive)
   (mapc 'emc-delete-cursor emc-cursor-list)
   (evil-exit-visual-state)
   (setq emc-cursor-list nil)
   (setq emc-pattern nil))
 
-(evil-define-command emc-make-cursors-for-all-matches ()
+(evil-define-command emc-make-all-cursors ()
   "Initialize `emc-pattern' and make cursors for all matches."
   :repeat ignore
-  (interactive)
-  (if (emc-has-cursors-p) (error "Cursors already exist.")
+  (if (emc-has-cursors-p) (user-error "Cursors already exist.")
     (emc-set-pattern)
     (evil-exit-visual-state)
     (emc-make-cursors-for-all)
@@ -351,25 +334,39 @@ closest to it when searching forwards."
 (defun emc-setup-cursor-key-maps ()
   "Set up key maps for cursor operations."
   (interactive)
-  (define-key evil-normal-state-map (kbd "grm") 'emc-make-cursors-for-all-matches)
-  (define-key evil-visual-state-map (kbd "grm") 'emc-make-cursors-for-all-matches)
 
-  ;; TODO should escape with ESC or C-g
-  (define-key evil-normal-state-map (kbd "grc") 'emc-undo-all-cursors)
-  (define-key evil-visual-state-map (kbd "grc") 'emc-undo-all-cursors)
+  (define-key evil-normal-state-map (kbd "grm") 'emc-make-all-cursors)
+  (define-key evil-visual-state-map (kbd "grm") 'emc-make-all-cursors)
+  (define-key evil-normal-state-map (kbd "gru") 'emc-undo-all-cursors)
+  (define-key evil-visual-state-map (kbd "gru") 'emc-undo-all-cursors)
+  (define-key evil-normal-state-map (kbd "grs") 'emc-stop-cursors)
+  (define-key evil-visual-state-map (kbd "grs") 'emc-stop-cursors)
+  (define-key evil-normal-state-map (kbd "grt") 'emc-thaw-cursors)
+  (define-key evil-visual-state-map (kbd "grt") 'emc-thaw-cursors)
 
-  (define-key evil-normal-state-map (kbd "grn") 'emc-make-and-goto-next-cursor)
-  (define-key evil-normal-state-map (kbd "grp") 'emc-make-and-goto-prev-cursor)
   (define-key evil-normal-state-map (kbd "grf") 'emc-make-and-goto-first-cursor)
+  (define-key evil-visual-state-map (kbd "grf") 'emc-make-and-goto-first-cursor)
   (define-key evil-normal-state-map (kbd "grl") 'emc-make-and-goto-last-cursor)
+  (define-key evil-visual-state-map (kbd "grl") 'emc-make-and-goto-last-cursor)
+  (define-key evil-normal-state-map (kbd "grh") 'emc-make-cursor-here)
+  (define-key evil-visual-state-map (kbd "grh") 'emc-make-cursor-here)
 
-  (define-key evil-normal-state-map (kbd "gpn") 'emc-make-cursor-and-goto-next-match)
-  (define-key evil-normal-state-map (kbd "gpp") 'emc-make-cursor-and-goto-prev-match)
-  (define-key evil-normal-state-map (kbd "gsn") 'emc-skip-cursor-and-goto-next-match)
-  (define-key evil-normal-state-map (kbd "gsp") 'emc-skip-cursor-and-goto-prev-match)
-  )
-
-;; TODO handle visual
+  (define-key evil-normal-state-map (kbd "C-m") 'emc-make-and-goto-next-cursor)
+  (define-key evil-visual-state-map (kbd "C-m") 'emc-make-and-goto-next-cursor)
+  (define-key evil-normal-state-map (kbd ",m") 'emc-skip-and-goto-next-cursor)
+  (define-key evil-visual-state-map (kbd ",m") 'emc-skip-and-goto-next-cursor)
+  (define-key evil-normal-state-map (kbd "C-l") 'emc-make-and-goto-prev-cursor)
+  (define-key evil-visual-state-map (kbd "C-l") 'emc-make-and-goto-prev-cursor)
+  (define-key evil-normal-state-map (kbd ",l") 'emc-skip-and-goto-prev-cursor)
+  (define-key evil-visual-state-map (kbd ",l") 'emc-skip-and-goto-prev-cursor)
+  (define-key evil-normal-state-map (kbd "C-n") 'emc-make-and-goto-next-match)
+  (define-key evil-visual-state-map (kbd "C-n") 'emc-make-and-goto-next-match)
+  (define-key evil-normal-state-map (kbd ",n") 'emc-skip-and-goto-next-match)
+  (define-key evil-visual-state-map (kbd ",n") 'emc-skip-and-goto-next-match)
+  (define-key evil-normal-state-map (kbd "C-p") 'emc-make-and-goto-prev-match)
+  (define-key evil-visual-state-map (kbd "C-p") 'emc-make-and-goto-prev-match)
+  (define-key evil-normal-state-map (kbd ",p") 'emc-skip-and-goto-prev-match)
+  (define-key evil-visual-state-map (kbd ",p") 'emc-skip-and-goto-prev-match))
 
 (provide 'emc-cursor-make)
 

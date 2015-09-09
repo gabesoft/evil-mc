@@ -209,7 +209,7 @@
   (emc-delete-region-overlay (emc-get-cursor-region cursor))
   (emc-put-cursor-region cursor nil))
 
-(defun emc-make-cursor-here ()
+(defun emc-make-cursor-here-old ()
   "Create a cursor at point."
   (interactive)
   (emc-add-cursor (emc-draw-cursor-at-point)))
@@ -1168,7 +1168,7 @@ otherwise execute BODY."
   (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
   (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
 
-  (define-key evil-normal-state-local-map (kbd "C-k") 'emc-make-cursor-here)
+  (define-key evil-normal-state-local-map (kbd "C-k") 'emc-make-cursor-here-old)
   (define-key evil-normal-state-local-map (kbd "C-m") 'emc-freeze)
   (define-key evil-normal-state-local-map (kbd "C-l") 'emc-unfreeze)
 
@@ -1192,7 +1192,7 @@ otherwise execute BODY."
 (defun emc-init-mode ()
   "Initialize the evil-multiple-cursors mode."
   (interactive)
-  (emc-setup-key-maps)
+  (emc-setup-cursor-key-maps)
   (emc-add-hooks))
 
 (defun emc-print-mark-and-point ()

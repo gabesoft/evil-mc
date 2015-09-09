@@ -105,7 +105,7 @@
              (emc-set-command-property name new-value))
             ((vectorp old-value)
              (emc-set-command-property name (vconcat old-value new-value)))
-            ((sequencep old-value)
+            ((listp old-value)
              (emc-set-command-property name (nconc old-value new-value)))
             (t
              (error "Current value is not a sequence %s" old-value))))))

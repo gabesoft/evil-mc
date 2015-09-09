@@ -107,12 +107,12 @@
   "True if the fake cursors are frozen."
   (eq emc-frozen t))
 
-(defun emc-freeze ()
+(defun emc-stop-cursors ()
   "Freeze the fake cursors."
   (interactive)
   (setq emc-frozen t))
 
-(defun emc-unfreeze ()
+(defun emc-thaw-cursors ()
   "Unfreeze the fake cursors."
   (interactive)
   (setq emc-frozen nil))
