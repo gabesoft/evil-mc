@@ -67,6 +67,14 @@ set to the specified values."
   "Set the markers-alist for CURSOR to MARKERS-ALIST."
   (emc-put-cursor-property cursor :markers-alist markers-alist))
 
+(defun emc-get-cursor-jump-list (cursor)
+  "Get the jump-list for CURSOR."
+  (emc-get-cursor-property cursor :jump-list))
+
+(defun emc-put-cursor-jump-list (cursor jump-list)
+  "Set the jump-list for CURSOR to JUMP-LIST."
+  (emc-put-cursor-property cursor :jump-list jump-list))
+
 (defun emc-get-cursor-start (cursor)
   "Get the CURSOR overlay start."
   (when cursor

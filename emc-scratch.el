@@ -113,6 +113,11 @@
   (interactive)
   (message "%s" (mapcar 'emc-get-cursor-markers-alist emc-cursor-list)))
 
+(defun emc-print-cursors-jump-list ()
+  "Print the cursors jump-list."
+  (interactive)
+  (message "%s" (mapcar 'emc-get-cursor-jump-list emc-cursor-list)))
+
 (defun emc-draw-cursor-at-point-old ()
   "Create a cursor overlay at point"
   (interactive)
@@ -866,7 +871,8 @@ otherwise execute BODY."
          (prev-column (or (emc-get-cursor-column cursor)
                           (column-number-at-pos (point))))
          (next-column nil)
-         (markers-alist (emc-get-cursor-markers-alist cursor))
+         (evil-markers-alist (emc-get-cursor-markers-alist cursor))
+         (evil-jump-list (emc-get-cursor-jump-list cursor))
          (kill-ring (emc-get-cursor-kill-ring cursor))
          (kill-ring-yank-pointer (emc-get-cursor-kill-ring-yank-pointer cursor))
          (keys-vector (emc-get-command-keys-vector)))
@@ -948,28 +954,16 @@ otherwise execute BODY."
           ((eq cmd 'paste-before-current-line) (paste-before-current-line 1))
           ((eq cmd 'paste-after-current-line) (paste-after-current-line 1))
 
-          ;; TODO this depends on the cursor order
+          ;; TODO: this depends on the cursor order
           ;;      moving up or down have to be done in order of cursor positions
           ;;      but the real cursor always happens first which may break the others
           ;;      determine if this is worth supporting
           ((eq cmd 'move-text-down) (move-text-down 1))
           ((eq cmd 'move-text-up) (move-text-up 1))
 
-          ((eq cmd 'evil-set-marker)
-           (let ((evil-markers-alist markers-alist))
-             (evil-set-marker last-input)
-             (setq markers-alist evil-markers-alist)))
-
-          ((eq cmd 'evil-goto-mark)
-           (let ((evil-markers-alist markers-alist))
-             (evil-goto-mark last-input)
-             (setq markers-alist evil-markers-alist)))
-
-          ((eq cmd 'evil-goto-mark-line)
-           (let ((evil-markers-alist markers-alist))
-             (evil-goto-mark-line last-input)
-             (setq markers-alist evil-markers-alist)))
-
+          ((eq cmd 'evil-set-marker) (evil-set-marker last-input))
+          ((eq cmd 'evil-goto-mark) (evil-goto-mark last-input))
+          ((eq cmd 'evil-goto-mark-line) (evil-goto-mark-line last-input))
 
           ;; TODO implement undo position
           ;; - after undo all cursors should go to their original positions
@@ -1051,7 +1045,8 @@ otherwise execute BODY."
           (t (execute-kbd-macro keys-vector)))
     (emc-put-object-property cursor
                              :column next-column
-                             :markers-alist markers-alist
+                             :markers-alist evil-markers-alist
+                             :jump-list evil-jump-list
                              :kill-ring kill-ring
                              :kill-ring-yank-pointer kill-ring-yank-pointer
                              :region nil)))
@@ -1140,11 +1135,11 @@ otherwise execute BODY."
 ;; (defun emc-setup-key-maps ()
 ;;   "Sets up all key bindings for working with multiple cursors."
 ;;   (interactive)
-;;   (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-next-cursor-old)
-;;   (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-next-cursor-old)
-;;   (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
-;;   (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
-;;   (define-key evil-visual-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
+;;   (define-key holy-visual-evil-local-map (kbd "C-n") 'emc-make-next-cursor-old)
+;;   (define-key holy-normal-evil-local-map (kbd "C-n") 'emc-make-next-cursor-old)
+;;   (define-key holy-visual-evil-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
+;;   (define-key holy-normal-evil-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
+;;   (define-key holy-visual-evil-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
 ;;   (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
 
 ;;   (define-key evil-normal-state-local-map (kbd "C-k") 'emc-make-cursor-here-old)

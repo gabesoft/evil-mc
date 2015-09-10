@@ -103,13 +103,19 @@ the cursors are ordered by the cursor overlay start position."
 
 (defun emc-make-cursor-at-pos (&optional pos)
   "Make a cursor at POS and add it to `emc-cursor-list'."
-  (emc-insert-cursor (emc-put-cursor-property
-                      nil
-                      :overlay (emc-cursor-overlay-at-pos pos)
-                      :column (column-number-at-pos (or pos (point)))
-                      :markers-alist (default-value 'evil-markers-alist)
-                      :kill-ring (copy-sequence kill-ring)
-                      :kill-ring-yank-pointer nil)))
+  (let ((jump-list nil)
+        (pos (or pos (point)))
+        (marker (make-marker)))
+    (move-marker marker pos)
+    (add-to-list 'jump-list marker)
+    (emc-insert-cursor (emc-put-cursor-property
+                        nil
+                        :overlay (emc-cursor-overlay-at-pos pos)
+                        :column (column-number-at-pos pos)
+                        :jump-list jump-list
+                        :markers-alist (default-value 'evil-markers-alist)
+                        :kill-ring (copy-sequence kill-ring)
+                        :kill-ring-yank-pointer nil))))
 
 (defun emc-undo-cursor-at-pos (&optional pos)
   "Delete the cursor at POS from `emc-cursor-list' and remove its overlay."
