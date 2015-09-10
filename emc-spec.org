@@ -197,20 +197,29 @@ CLOSED: [2015-08-29 Sat 17:36]
 - start out in normal mode
 - draw the visual selection for each cursor
 - add tests
-** TODO Implement cursor creation 
-*** TODO create all cursors matching the word/WORD/symbol at cursor
-*** TODO next should wrap
+** DONE Implement cursor creation 
+CLOSED: [2015-09-09 Wed 19:43]
+*** DONE create all cursors matching the word/WORD/symbol at cursor
+CLOSED: [2015-09-09 Wed 19:42]
+*** DONE next should wrap
+CLOSED: [2015-09-09 Wed 19:42]
 *** DONE skip
-CLOSED: [2015-08-29 Sat 17:56]
+CLOSED: [2015-09-09 Wed 19:42]
 *** DONE undo a cursor
 CLOSED: [2015-08-29 Sat 17:56]
-*** TODO create a cursor at point even if it doesn't match the current pattern
-*** TODO delete the cursor at point
-*** TODO navigate through cursors
-*** TODO create/delete at point, as well as navigating through cursors will require a way to freeze the cursors temporarily
+*** DONE create a cursor at point even if it doesn't match the current pattern
+CLOSED: [2015-09-09 Wed 19:42]
+*** DONE delete the cursor at point
+CLOSED: [2015-09-09 Wed 19:42]
+*** DONE navigate through cursors
+CLOSED: [2015-09-09 Wed 19:42]
+*** DONE create/delete at point, as well as navigating through cursors will require a way to freeze the cursors temporarily
+CLOSED: [2015-09-09 Wed 19:42]
 ** DONE Handle the insert mode
 CLOSED: [2015-08-29 Sat 17:37]
 - all operations performed in insert state should happen for all cursors
+** TODO Fix cursor faces 
+*** should be able to customize faces per evil state
 ** TODO Implement undo for fake cursors
 *** should work with undo-tree as well as Emacs undo
 *** after undo position the cursors in the proper places
@@ -236,6 +245,12 @@ CLOSED: [2015-08-29 Sat 17:37]
 *** slow commands for 10+ cursors
 - change "cw"
 - evil snipe "f-"
+- (execute-kbd-macro)
 ** TODO Fix motions
 *** when there multiple cursors on the same line the jk motions causes some cursors to collapse at the same location on that line
+** TODO Fix evil-repeat
+*** currently only works for some commands
+** TODO Fix smartchr commands
+** TODO Fix yasnippet commands
+*** something in pre-command-hook causes an error
 

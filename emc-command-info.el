@@ -5,6 +5,7 @@
 ;; This file contains functions for storing and interacting with
 ;; the currently running command info
 
+(require 'cl)
 (require 'evil)
 (require 'emc-common)
 
@@ -32,11 +33,22 @@
         (eq cmd 'yaml-electric-dash-and-dot)
         (eq cmd 'yaml-electric-bar-and-angle)
 
-        ;; core evil + emacs commands
+        ;; emacs commands
 
         (eq cmd 'backward-delete-char-untabify)
         (eq cmd 'copy-to-the-end-of-line)
         (eq cmd 'delete-backward-char)
+        (eq cmd 'keyboard-quit)
+        (eq cmd 'move-text-down)
+        (eq cmd 'move-text-up)
+        (eq cmd 'newline-and-indent)
+        (eq cmd 'paste-after-current-line)
+        (eq cmd 'paste-before-current-line)
+        (eq cmd 'self-insert-command)
+        (eq cmd 'yank)
+
+        ;; evil commands
+
         (eq cmd 'evil-append)
         (eq cmd 'evil-append-line)
         (eq cmd 'evil-change)
@@ -49,6 +61,8 @@
         (eq cmd 'evil-delete-line)
         (eq cmd 'evil-digit-argument-or-evil-beginning-of-line)
         (eq cmd 'evil-downcase)
+        (eq cmd 'evil-goto-mark)
+        (eq cmd 'evil-goto-mark-line)
         (eq cmd 'evil-insert-line)
         (eq cmd 'evil-invert-char)
         (eq cmd 'evil-join)
@@ -59,20 +73,13 @@
         (eq cmd 'evil-paste-before)
         (eq cmd 'evil-repeat)
         (eq cmd 'evil-replace)
+        (eq cmd 'evil-set-marker)
         (eq cmd 'evil-surround-region)
         (eq cmd 'evil-upcase)
+        (eq cmd 'evil-visual-block)
         (eq cmd 'evil-visual-char)
         (eq cmd 'evil-visual-line)
-        (eq cmd 'evil-visual-block)
         (eq cmd 'evil-yank)
-        (eq cmd 'keyboard-quit)
-        (eq cmd 'move-text-down)
-        (eq cmd 'move-text-up)
-        (eq cmd 'newline-and-indent)
-        (eq cmd 'paste-after-current-line)
-        (eq cmd 'paste-before-current-line)
-        (eq cmd 'self-insert-command)
-        (eq cmd 'yank)
 
         )))
 
@@ -133,14 +140,16 @@
   (when emc-command
     (emc-get-command-property :evil-state-end)))
 
+(defun emc-get-command-last-input ()
+  "Return the last input for the current command."
+  (when emc-command
+    (emc-get-command-property :last-input)))
+
 (defun emc-save-keys (flag pre-name post-name keys)
   "Save KEYS at PRE-NAME or POST-NAME according to FLAG."
   (ecase flag
     (pre (emc-add-command-property pre-name keys))
     (post (emc-add-command-property post-name keys))))
-  ;; (cond ((eq flag 'pre) (emc-add-command-property pre-name keys))
-  ;;       ((eq flag 'post) (emc-add-command-property post-name keys))
-  ;;       (t (error (message "unknown flag %s" flag)))))
 
 (defun emc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
@@ -201,7 +210,7 @@
 (put 'emc-finish-command-save 'permanent-local-hook t)
 
 (defun emc-finalize-command ()
-  "Makes the command data ready for use, after a save."
+  "Make the command data ready for use, after a save."
   (let* ((keys-pre (emc-get-command-property :keys-pre))
          (keys-pre-with-count (evil-extract-count keys-pre))
          (keys-pre-count (nth 0 keys-pre-with-count))
@@ -211,6 +220,7 @@
          (keys-motion-post (emc-get-command-property :keys-motion-post))
          (keys-operator-pre (emc-get-command-property :keys-operator-pre))
          (keys-operator-post (emc-get-command-property :keys-operator-post)))
+    (emc-set-command-property :keys-count (or keys-pre-count 1))
     (emc-set-command-property
      :keys (cond ((or keys-motion-post keys-motion-pre)
                   (or keys-motion-post keys-motion-pre))

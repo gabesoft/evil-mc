@@ -4,20 +4,6 @@
 
 ;; This file contains functions for creating and deleting fake cursors
 
-;; Functionality:
-;; - allow cursors for one letter
-;; - don't create cursors next to each other unless on the same letter
-;; - next/prev should wrap around
-;; - create/undo on next as well as prev
-;; - create for all word/WORD/selection at cursor
-;; - skip functionality
-;; - create a cursor at an arbitrary point (not related to a pattern)
-;; - navigate through cursors
-;; - delete a cursor at point
-;; - temporarily freeze all fake cursors
-;; - fake cursors should reflect the current evil state
-;; - the real cursor should be visible in relation to the fake ones
-
 (require 'emc-common)
 (require 'emc-vars)
 (require 'emc-cursor-state)
@@ -116,10 +102,12 @@ the cursors are ordered by the cursor overlay start position."
       start)))
 
 (defun emc-make-cursor-at-pos (&optional pos)
-  "Makes a cursor at POS and adds it to `emc-cursor-list'."
+  "Make a cursor at POS and add it to `emc-cursor-list'."
   (emc-insert-cursor (emc-put-cursor-property
                       nil
                       :overlay (emc-cursor-overlay-at-pos pos)
+                      :column (column-number-at-pos (or pos (point)))
+                      :markers-alist (default-value 'evil-markers-alist)
                       :kill-ring (copy-sequence kill-ring)
                       :kill-ring-yank-pointer nil)))
 
@@ -335,45 +323,6 @@ closest to it when searching forwards."
     (evil-exit-visual-state)
     (emc-make-cursors-for-all)
     (emc-print-cursors-info "Created")))
-
-(defun emc-setup-cursor-key-maps ()
-  "Set up key maps for cursor operations."
-  (interactive)
-
-  (define-key evil-normal-state-local-map (kbd "grm") 'emc-make-all-cursors)
-  (define-key evil-visual-state-local-map (kbd "grm") 'emc-make-all-cursors)
-  (define-key evil-normal-state-local-map (kbd "gru") 'emc-undo-all-cursors)
-  (define-key evil-visual-state-local-map (kbd "gru") 'emc-undo-all-cursors)
-  (define-key evil-normal-state-local-map (kbd "grs") 'emc-stop-cursors)
-  (define-key evil-visual-state-local-map (kbd "grs") 'emc-stop-cursors)
-  (define-key evil-normal-state-local-map (kbd "grt") 'emc-thaw-cursors)
-  (define-key evil-visual-state-local-map (kbd "grt") 'emc-thaw-cursors)
-
-  (define-key evil-normal-state-local-map (kbd "grf") 'emc-make-and-goto-first-cursor)
-  (define-key evil-visual-state-local-map (kbd "grf") 'emc-make-and-goto-first-cursor)
-  (define-key evil-normal-state-local-map (kbd "grl") 'emc-make-and-goto-last-cursor)
-  (define-key evil-visual-state-local-map (kbd "grl") 'emc-make-and-goto-last-cursor)
-  (define-key evil-normal-state-local-map (kbd "grh") 'emc-make-cursor-here)
-  (define-key evil-visual-state-local-map (kbd "grh") 'emc-make-cursor-here)
-
-  (define-key evil-normal-state-local-map (kbd "C-m") 'emc-make-and-goto-next-cursor)
-  (define-key evil-visual-state-local-map (kbd "C-m") 'emc-make-and-goto-next-cursor)
-  (define-key evil-normal-state-local-map (kbd ",m") 'emc-skip-and-goto-next-cursor)
-  (define-key evil-visual-state-local-map (kbd ",m") 'emc-skip-and-goto-next-cursor)
-  (define-key evil-normal-state-local-map (kbd "C-l") 'emc-make-and-goto-prev-cursor)
-  (define-key evil-visual-state-local-map (kbd "C-l") 'emc-make-and-goto-prev-cursor)
-  (define-key evil-normal-state-local-map (kbd ",l") 'emc-skip-and-goto-prev-cursor)
-  (define-key evil-visual-state-local-map (kbd ",l") 'emc-skip-and-goto-prev-cursor)
-  (define-key evil-normal-state-local-map (kbd "C-n") 'emc-make-and-goto-next-match)
-  (define-key evil-visual-state-local-map (kbd "C-n") 'emc-make-and-goto-next-match)
-  (define-key evil-normal-state-local-map (kbd ",n") 'emc-skip-and-goto-next-match)
-  (define-key evil-visual-state-local-map (kbd ",n") 'emc-skip-and-goto-next-match)
-  (define-key evil-normal-state-local-map (kbd "C-t") 'emc-skip-and-goto-next-match)
-  (define-key evil-visual-state-local-map (kbd "C-t") 'emc-skip-and-goto-next-match)
-  (define-key evil-normal-state-local-map (kbd "C-p") 'emc-make-and-goto-prev-match)
-  (define-key evil-visual-state-local-map (kbd "C-p") 'emc-make-and-goto-prev-match)
-  (define-key evil-normal-state-local-map (kbd ",p") 'emc-skip-and-goto-prev-match)
-  (define-key evil-visual-state-local-map (kbd ",p") 'emc-skip-and-goto-prev-match))
 
 (provide 'emc-cursor-make)
 
