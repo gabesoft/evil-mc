@@ -103,17 +103,19 @@ the cursors are ordered by the cursor overlay start position."
 
 (defun emc-make-cursor-at-pos (&optional pos)
   "Make a cursor at POS and add it to `emc-cursor-list'."
-  (let ((jump-list nil)
+  (let ((evil-jump-list nil)
         (pos (or pos (point)))
+        (mark-ring nil)
         (marker (make-marker)))
     (move-marker marker pos)
-    (add-to-list 'jump-list marker)
+    (evil-set-jump pos)
     (emc-insert-cursor (emc-put-cursor-property
                         nil
                         :overlay (emc-cursor-overlay-at-pos pos)
                         :column (emc-column-number pos)
-                        :jump-list jump-list
-                        :markers-alist (default-value 'evil-markers-alist)
+                        :evil-jump-list evil-jump-list
+                        :evil-markers-alist (default-value 'evil-markers-alist)
+                        :mark-ring mark-ring
                         :kill-ring (copy-sequence kill-ring)
                         :kill-ring-yank-pointer nil))))
 

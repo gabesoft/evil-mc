@@ -59,21 +59,37 @@ set to the specified values."
   "Set the column for CURSOR to COLUMN."
   (emc-put-cursor-property cursor :column column))
 
-(defun emc-get-cursor-markers-alist (cursor)
-  "Get the markers-alist for CURSOR."
-  (emc-get-cursor-property cursor :markers-alist))
+(defun emc-get-cursor-evil-markers-alist (cursor)
+  "Get the evil-markers-alist for CURSOR."
+  (emc-get-cursor-property cursor :evil-markers-alist))
 
-(defun emc-put-cursor-markers-alist (cursor markers-alist)
-  "Set the markers-alist for CURSOR to MARKERS-ALIST."
-  (emc-put-cursor-property cursor :markers-alist markers-alist))
+(defun emc-put-cursor-evil-markers-alist (cursor evil-markers-alist)
+  "Set the evil-markers-alist for CURSOR to EVIL-MARKERS-ALIST."
+  (emc-put-cursor-property cursor :evil-markers-alist evil-markers-alist))
 
-(defun emc-get-cursor-jump-list (cursor)
-  "Get the jump-list for CURSOR."
-  (emc-get-cursor-property cursor :jump-list))
+(defun emc-get-cursor-evil-jump-list (cursor)
+  "Get the evil-jump-list for CURSOR."
+  (emc-get-cursor-property cursor :evil-jump-list))
 
-(defun emc-put-cursor-jump-list (cursor jump-list)
-  "Set the jump-list for CURSOR to JUMP-LIST."
-  (emc-put-cursor-property cursor :jump-list jump-list))
+(defun emc-put-cursor-evil-jump-list (cursor evil-jump-list)
+  "Set the evil-jump-list for CURSOR to EVIL-JUMP-LIST."
+  (emc-put-cursor-property cursor :evil-jump-list evil-jump-list))
+
+(defun emc-get-cursor-mark-ring (cursor)
+  "Get the mark-ring for CURSOR."
+  (emc-get-cursor-property cursor :mark-ring))
+
+(defun emc-put-cursor-mark-ring (cursor mark-ring)
+  "Set the mark-ring for CURSOR to MARK-RING."
+  (emc-put-cursor-property cursor :mark-ring mark-ring))
+
+(defun emc-get-cursor-mark-active (cursor)
+  "Get the mark-active for CURSOR."
+  (emc-get-cursor-property cursor :mark-active))
+
+(defun emc-put-cursor-mark-active (cursor mark-active)
+  "Set the mark-active for CURSOR to MARK-active."
+  (emc-put-cursor-property cursor :mark-active mark-active))
 
 (defun emc-get-cursor-start (cursor)
   "Get the CURSOR overlay start."

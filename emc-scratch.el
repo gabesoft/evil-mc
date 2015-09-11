@@ -118,6 +118,11 @@
   (interactive)
   (message "%s" (mapcar 'emc-get-cursor-jump-list emc-cursor-list)))
 
+(defun emc-print-cursors-mark-ring ()
+  "Print the cursors mark-ring."
+  (interactive)
+  (message "%s" (mapcar 'emc-get-cursor-mark-ring emc-cursor-list)))
+
 (defun emc-draw-cursor-at-point-old ()
   "Create a cursor overlay at point"
   (interactive)
@@ -871,12 +876,17 @@ otherwise execute BODY."
          (prev-column (or (emc-get-cursor-column cursor)
                           (emc-column-number (point))))
          (next-column nil)
-         (evil-markers-alist (emc-get-cursor-markers-alist cursor))
-         (evil-jump-list (emc-get-cursor-jump-list cursor))
+         (evil-markers-alist (emc-get-cursor-evil-markers-alist cursor))
+         (evil-jump-list (emc-get-cursor-evil-jump-list cursor))
+         (mark-ring (emc-get-cursor-mark-ring cursor))
+         (mark-active (emc-get-cursor-mark-active cursor))
          (kill-ring (emc-get-cursor-kill-ring cursor))
          (kill-ring-yank-pointer (emc-get-cursor-kill-ring-yank-pointer cursor))
          (keys-vector (emc-get-command-keys-vector)))
     (when emc-debug (message "CMD %s keys %s" cmd keys-vector))
+    ;; (message "evil-jump-list %s" evil-jump-list)
+    ;; (message "evil-markers-alist %s" evil-markers-alist)
+    ;; (message "mark-ring %s" mark-ring)
 
     (cond ((eq cmd 'yaml-electric-dash-and-dot) (yaml-electric-dash-and-dot 1))
           ((eq cmd 'yaml-electric-bar-and-angle) (yaml-electric-bar-and-angle 1))
@@ -958,12 +968,14 @@ otherwise execute BODY."
           ;;      moving up or down have to be done in order of cursor positions
           ;;      but the real cursor always happens first which may break the others
           ;;      determine if this is worth supporting
-          ((eq cmd 'move-text-down) (move-text-down 1))
-          ((eq cmd 'move-text-up) (move-text-up 1))
+          ;; ((eq cmd 'move-text-up) (move-text-up 1))
+          ;; ((eq cmd 'move-text-down) (move-text-down 1))
 
-          ((eq cmd 'evil-set-marker) (evil-set-marker last-input))
-          ((eq cmd 'evil-goto-mark) (evil-goto-mark last-input))
-          ((eq cmd 'evil-goto-mark-line) (evil-goto-mark-line last-input))
+          ;; see evil-jump-backward/evil-jump-forward
+          ;; - disable evil-jumper-mode
+          ;; ((eq cmd 'evil-set-marker) (evil-set-marker last-input))
+          ;; ((eq cmd 'evil-goto-mark) (evil-goto-mark last-input))
+          ;; ((eq cmd 'evil-goto-mark-line) (evil-goto-mark-line last-input))
 
           ;; TODO implement undo position
           ;; - after undo all cursors should go to their original positions
@@ -1049,8 +1061,10 @@ otherwise execute BODY."
           (t (execute-kbd-macro keys-vector)))
     (emc-put-object-property cursor
                              :column next-column
-                             :markers-alist evil-markers-alist
-                             :jump-list evil-jump-list
+                             :evil-markers-alist evil-markers-alist
+                             :evil-jump-list evil-jump-list
+                             :mark-ring mark-ring
+                             :mark-active mark-active
                              :kill-ring kill-ring
                              :kill-ring-yank-pointer kill-ring-yank-pointer
                              :region nil)))
