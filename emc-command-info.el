@@ -56,6 +56,7 @@
         (eq cmd 'evil-complete-next)
         (eq cmd 'evil-delete)
         (eq cmd 'evil-delete-backward-char-and-join)
+        (eq cmd 'evil-paste-from-register)
         (eq cmd 'evil-delete-backward-word)
         (eq cmd 'evil-delete-char)
         (eq cmd 'evil-delete-line)

@@ -21,6 +21,12 @@
                                          (pop properties))))
     obj))
 
+(defun emc-column-number (pos)
+  "Return the column number at POS."
+  (save-excursion
+    (goto-char pos)
+    (current-column)))
+
 (provide 'emc-common)
 
 ;;; emc-common.el ends here

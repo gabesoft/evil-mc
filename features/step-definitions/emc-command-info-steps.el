@@ -12,14 +12,14 @@
 
 (Given "^I have at least one cursor$"
        (lambda ()
-         (emc-add-cursor (emc-draw-cursor-at-point))))
+         (emc-make-cursor-at-pos)))
 
 (Given "^I have one cursor at \"\\([^\"]+\\)\" in \"\\([^\"]+\\)\"$"
        (lambda (pattern text)
          (insert text)
          (goto-char (point-min))
          (search-forward pattern)
-         (emc-add-cursor (emc-draw-cursor-at-point))))
+         (emc-make-cursor-at-pos)))
 
 (When "^These examples should pass:$"
       (lambda (table) (run-and-verify table)))
@@ -31,7 +31,7 @@
      (lambda () (goto-char (point-min))))
 
 (And "^The cursors are frozen$"
-     (lambda () (emc-freeze)))
+     (lambda () (emc-stop-cursors)))
 
 (defun run-and-verify (table &optional undo)
   "Runs all the key sequences in TABLE and verifies them,

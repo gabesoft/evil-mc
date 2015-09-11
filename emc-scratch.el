@@ -214,58 +214,58 @@
 ;;     (emc-goto-next-match-old (emc-get-pattern-old) 'backward)
 ;;     (emc-goto-next-match-old (emc-get-pattern-old) 'forward)))
 
-(defun emc-remove-cursor-region (cursor)
-  "Deletes CURSOR's region and returns a new cursor with the region removed."
-  (emc-delete-region-overlay (emc-get-cursor-region cursor))
-  (emc-put-cursor-region cursor nil))
+;; (defun emc-remove-cursor-region (cursor)
+;;   "Deletes CURSOR's region and returns a new cursor with the region removed."
+;;   (emc-delete-region-overlay (emc-get-cursor-region cursor))
+;;   (emc-put-cursor-region cursor nil))
 
-(defun emc-make-cursor-here-old ()
-  "Create a cursor at point."
-  (interactive)
-  (emc-add-cursor-old (emc-draw-cursor-at-point-old)))
+;; (defun emc-make-cursor-here-old ()
+;;   "Create a cursor at point."
+;;   (interactive)
+;;   (emc-add-cursor-old (emc-draw-cursor-at-point-old)))
 
-(defun emc-make-cursor-and-goto-next-match-old ()
-  "Create a cursor at point and go to next match if any."
-  (let ((cursor (emc-draw-cursor-at-point-old)))
-    (setq emc-cursor-list
-          (mapcar 'emc-remove-cursor-region emc-cursor-list))
-    (evil-exit-visual-state)
-    (if (emc-goto-next-match-old (emc-get-pattern-old) 'forward)
-        (emc-add-cursor-old cursor)
-      (delete-overlay cursor)
-      (error "No more matches found"))))
+;; (defun emc-make-cursor-and-goto-next-match-old ()
+;;   "Create a cursor at point and go to next match if any."
+;;   (let ((cursor (emc-draw-cursor-at-point-old)))
+;;     (setq emc-cursor-list
+;;           (mapcar 'emc-remove-cursor-region emc-cursor-list))
+;;     (evil-exit-visual-state)
+;;     (if (emc-goto-next-match-old (emc-get-pattern-old) 'forward)
+;;         (emc-add-cursor-old cursor)
+;;       (delete-overlay cursor)
+;;       (error "No more matches found"))))
 
-(defun emc-goto-prev-match-and-undo-cursor-old ()
-  "Move point to a previous match and undo the cursor there if any."
-  (if (and (emc-goto-next-match-old (emc-get-pattern-old) 'backward)
-           (emc-goto-next-match-old (emc-get-pattern-old) 'backward))
-      (progn
-        (emc-goto-next-match-old (emc-get-pattern-old) 'forward)
-        (emc-remove-overlay-at-point)
-        (when (null emc-cursor-list) (setq emc-pattern nil)))
-    (error "No more matches found")))
+;; (defun emc-goto-prev-match-and-undo-cursor-old ()
+;;   "Move point to a previous match and undo the cursor there if any."
+;;   (if (and (emc-goto-next-match-old (emc-get-pattern-old) 'backward)
+;;            (emc-goto-next-match-old (emc-get-pattern-old) 'backward))
+;;       (progn
+;;         (emc-goto-next-match-old (emc-get-pattern-old) 'forward)
+;;         (emc-remove-overlay-at-point)
+;;         (when (null emc-cursor-list) (setq emc-pattern nil)))
+;;     (error "No more matches found")))
 
-(defun emc-skip-cursor-and-goto-next-match-old ()
-  "Skip making a cursor at point and go to next match if any."
-  (evil-exit-visual-state)
-  (unless (emc-goto-next-match-old (emc-get-pattern-old) 'forward) ;; TODO support wrap
-    (error "No more matches found")))
+;; (defun emc-skip-cursor-and-goto-next-match-old ()
+;;   "Skip making a cursor at point and go to next match if any."
+;;   (evil-exit-visual-state)
+;;   (unless (emc-goto-next-match-old (emc-get-pattern-old) 'forward) ;; TODO support wrap
+;;     (error "No more matches found")))
 
-(evil-define-command emc-make-next-cursor-old ()
-  "Make the next cursor."
-  :repeat ignore
-  (interactive)
-  (let ((emc-cursor-command t)) ;; TODO: this is no longer needed, but need to ensure that no commands are recorded during cursors creation
-    (emc-command-reset)
-    (when (and (evil-visual-state-p)
-               (null (emc-get-pattern-old)))
-      (emc-set-pattern-from-visual-selection-old))
-    (when (evil-visual-state-p)
-      (when (< (point) (mark)) (evil-exchange-point-and-mark))
-      (goto-char (1- (point))))
-    (if (emc-get-pattern-old)
-        (emc-make-cursor-and-goto-next-match-old)
-      (error "No more matches or no visual selection found"))))
+;; (evil-define-command emc-make-next-cursor-old ()
+;;   "Make the next cursor."
+;;   :repeat ignore
+;;   (interactive)
+;;   (let ((emc-cursor-command t)) ;; TODO: this is no longer needed, but need to ensure that no commands are recorded during cursors creation
+;;     (emc-command-reset)
+;;     (when (and (evil-visual-state-p)
+;;                (null (emc-get-pattern-old)))
+;;       (emc-set-pattern-from-visual-selection-old))
+;;     (when (evil-visual-state-p)
+;;       (when (< (point) (mark)) (evil-exchange-point-and-mark))
+;;       (goto-char (1- (point))))
+;;     (if (emc-get-pattern-old)
+;;         (emc-make-cursor-and-goto-next-match-old)
+;;       (error "No more matches or no visual selection found"))))
 
 ;; (cond ((evil-visual-state-p)
 ;;        (emc-set-pattern-from-visual-selection-old)
@@ -273,32 +273,32 @@
 ;;       ((emc-get-pattern-old) (emc-make-cursor-and-goto-next-match-old))
 ;;       (t (error "No more matches or no visual selection found")))))
 
-(evil-define-command emc-skip-next-cursor-old ()
-  "Skip the next cursor."
-  :repeat ignore
-  (interactive)
-  (let ((emc-cursor-command t))
-    (emc-command-reset)
-    (cond ((evil-visual-state-p)
-           (emc-set-pattern-from-visual-selection-old)
-           (emc-skip-cursor-and-goto-next-match-old))
-          ((emc-get-pattern-old) (emc-skip-cursor-and-goto-next-match-old))
-          (t (error "No more matches or no visual selection found")))))
+;; (evil-define-command emc-skip-next-cursor-old ()
+;;   "Skip the next cursor."
+;;   :repeat ignore
+;;   (interactive)
+;;   (let ((emc-cursor-command t))
+;;     (emc-command-reset)
+;;     (cond ((evil-visual-state-p)
+;;            (emc-set-pattern-from-visual-selection-old)
+;;            (emc-skip-cursor-and-goto-next-match-old))
+;;           ((emc-get-pattern-old) (emc-skip-cursor-and-goto-next-match-old))
+;;           (t (error "No more matches or no visual selection found")))))
 
 ;; TODO should allow moving to the prev match or to the prev cursor
 ;; maybe C-p : emc-goto-prev-match
 ;; maybe C-P : emc-undo-prev-cursor
-(evil-define-command emc-undo-prev-cursor-old ()
-  "Move point to the prev match and remove the cursor if any."
-  :repeat ignore
-  (interactive)
-  (let ((emc-cursor-command t))
-    (emc-command-reset)
-    (cond ((evil-visual-state-p)
-           (emc-set-pattern-from-visual-selection-old)
-           (emc-goto-prev-match-and-undo-cursor-old))
-          ((emc-get-pattern-old) (emc-goto-prev-match-and-undo-cursor-old))
-          (t (error "No more matches or no visual selection found")))))
+;; (evil-define-command emc-undo-prev-cursor-old ()
+;;   "Move point to the prev match and remove the cursor if any."
+;;   :repeat ignore
+;;   (interactive)
+;;   (let ((emc-cursor-command t))
+;;     (emc-command-reset)
+;;     (cond ((evil-visual-state-p)
+;;            (emc-set-pattern-from-visual-selection-old)
+;;            (emc-goto-prev-match-and-undo-cursor-old))
+;;           ((emc-get-pattern-old) (emc-goto-prev-match-and-undo-cursor-old))
+;;           (t (error "No more matches or no visual selection found")))))
 
 ;; (defun emc-delete-all-overlays (overlays)
 ;;   "Delete all OVERLAYS."
@@ -316,17 +316,17 @@
 ;;   (emc-delete-all-overlays emc-region-list)
 ;;   (setq emc-region-list nil))
 
-(evil-define-command emc-destroy-all-cursors ()
-  "Destroy all cursor overlays and any related regions."
-  :repeat ignore
-  (interactive)
-  (dolist (cursor emc-cursor-list)
-    (let ((overlay (emc-get-cursor-overlay cursor))
-          (region (emc-get-cursor-region cursor)))
-      (when overlay (delete-overlay overlay))
-      (emc-delete-region-overlay region)))
-  (setq emc-cursor-list nil)
-  (setq emc-pattern nil))
+;; (evil-define-command emc-destroy-all-cursors ()
+;;   "Destroy all cursor overlays and any related regions."
+;;   :repeat ignore
+;;   (interactive)
+;;   (dolist (cursor emc-cursor-list)
+;;     (let ((overlay (emc-get-cursor-overlay cursor))
+;;           (region (emc-get-cursor-region cursor)))
+;;       (when overlay (delete-overlay overlay))
+;;       (emc-delete-region-overlay region)))
+;;   (setq emc-cursor-list nil)
+;;   (setq emc-pattern nil))
 
 ;; (remove-overlays)
 ;; (setq emc-pattern nil)
@@ -869,7 +869,7 @@ otherwise execute BODY."
          (last-input (emc-get-command-last-input))
          (region (emc-get-cursor-region cursor))
          (prev-column (or (emc-get-cursor-column cursor)
-                          (column-number-at-pos (point))))
+                          (emc-column-number (point))))
          (next-column nil)
          (evil-markers-alist (emc-get-cursor-markers-alist cursor))
          (evil-jump-list (emc-get-cursor-jump-list cursor))
@@ -1038,6 +1038,10 @@ otherwise execute BODY."
            (goto-char (min (+ (point) prev-column)
                            (point-at-eol))))
 
+          ;; TODO only pick the first character
+          ;; ((eq cmd 'self-insert-command)
+          ;;  (execute-kbd-macro (emc-get-command-property :keys-post-raw)))
+
           ;; TODO make this work
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))
           ;; evil-surround integration cs'" etc
@@ -1060,6 +1064,7 @@ otherwise execute BODY."
 ;;     (list (if (overlayp cursor) cursor (emc-draw-cursor-at-point-old))
 ;;           (if (overlayp region) region nil))))
 
+;; TODO run the pre/post command hooks
 (defun emc-run-command (cursor)
   "Executes the command stored in `emc-command' for CURSOR."
   (when (and (emc-command-p) (not emc-cursor-command))
@@ -1067,9 +1072,13 @@ otherwise execute BODY."
       (message "Executing %s command" (emc-get-command-name)))
     (ignore-errors
       (condition-case error
-          (if (eq 'visual (emc-get-command-state))
-              (emc-run-last-command-visual cursor)
-            (emc-run-last-command cursor))
+          (progn
+            ;; (run-hooks 'pre-command-hook)
+            (if (eq 'visual (emc-get-command-state))
+                (emc-run-last-command-visual cursor)
+              (emc-run-last-command cursor))
+            ;; (run-hooks 'post-command-hook)
+            )
         (error (message "Running command %s failed with %s"
                         (emc-get-command-name)
                         (error-message-string error))

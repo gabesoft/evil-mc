@@ -253,4 +253,7 @@ CLOSED: [2015-08-29 Sat 17:37]
 ** TODO Fix smartchr commands
 ** TODO Fix yasnippet commands
 *** something in pre-command-hook causes an error
+** TODO Run pre/post command hooks when running commands for fake cursors
+** TODO Fix insertion js2 mode 
+*** when in an error state some characters are recorded twice
 
