@@ -116,7 +116,7 @@
 (defun emc-print-cursors-jump-list ()
   "Print the cursors jump-list."
   (interactive)
-  (message "%s" (mapcar 'emc-get-cursor-jump-list emc-cursor-list)))
+  (message "%s" (mapcar 'emc-get-cursor-evil-jump-list emc-cursor-list)))
 
 (defun emc-print-cursors-mark-ring ()
   "Print the cursors mark-ring."
@@ -957,13 +957,14 @@ otherwise execute BODY."
           ((eq cmd 'paste-before-current-line) (paste-before-current-line 1))
           ((eq cmd 'paste-after-current-line) (paste-after-current-line 1))
 
-          ;; TODO: this depends on the cursor order
+          ;; TODO this depends on the cursor order
           ;;      moving up or down have to be done in order of cursor positions
           ;;      but the real cursor always happens first which may break the others
           ;;      determine if this is worth supporting
           ;; ((eq cmd 'move-text-up) (move-text-up 1))
           ;; ((eq cmd 'move-text-down) (move-text-down 1))
 
+          ;; (evil-set-jump (point))
           ;; see evil-jump-backward/evil-jump-forward
           ;; - disable evil-jumper-mode
           ;; ((eq cmd 'evil-set-marker) (evil-set-marker last-input))
@@ -1057,7 +1058,7 @@ otherwise execute BODY."
                              :evil-markers-alist evil-markers-alist
                              :evil-jump-list evil-jump-list
                              :mark-ring mark-ring
-                             :mark-active mark-active
+                             :mark-evil-active mark-active
                              :kill-ring kill-ring
                              :kill-ring-yank-pointer kill-ring-yank-pointer
                              :region nil)))
@@ -1081,6 +1082,7 @@ otherwise execute BODY."
       (condition-case error
           (progn
             ;; (run-hooks 'pre-command-hook)
+            ;; (run-hooks 'evil-jump-hook)
             (if (eq 'visual (emc-get-command-state))
                 (emc-run-last-command-visual cursor)
               (emc-run-last-command cursor))
@@ -1121,6 +1123,9 @@ otherwise execute BODY."
                   ;; (message "cmd %s" emc-command-info)
                   ;; (message "cursor %s -> %s" cursor new-cursor)
 
+                  ;; (evil-set-marker 0)
+                  ;; (evil-set-jump (point))
+                  ;; (test)
 
                   (goto-char (overlay-start overlay))
                   (setq new-cursor (emc-run-command cursor))
