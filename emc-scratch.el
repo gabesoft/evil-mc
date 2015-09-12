@@ -1215,13 +1215,26 @@ otherwise execute BODY."
   (interactive)
   (emc-command-reset)
   (emc-add-command-hooks)
-  (add-hook 'post-command-hook 'emc-run-command-for-all-cursors t t))
+  (add-hook 'post-command-hook 'emc-run-command-for-all-cursors t t)
+  (add-hook 'emc-after-cursors-deleted 'emc-after-cursors-teardown-hook)
+  (add-hook 'emc-before-cursors-created 'emc-before-cursors-setup-hook))
 
 (defun emc-remove-hooks ()
   "Removes all emc related hooks."
   (interactive)
   (emc-remove-command-hooks)
-  (remove-hook 'post-command-hook 'emc-run-command-for-all-cursors t))
+  (remove-hook 'post-command-hook 'emc-run-command-for-all-cursors t)
+  (remove-hook 'emc-after-cursors-deleted 'emc-after-cursors-teardown-hook)
+  (remove-hook 'emc-before-cursors-created 'emc-before-cursors-setup-hook))
+
+(defun emc-before-cursors-setup-hook ()
+  "Hook to run before any cursor is created."
+  (message "before cursors hook"))
+
+(defun emc-after-cursors-teardown-hook ()
+  "Hook to run after all cursors are deleted."
+  (message "after cursors hook"))
+
 
 (defun emc-init-mode ()
   "Initialize the evil-multiple-cursors mode."
@@ -1241,8 +1254,8 @@ otherwise execute BODY."
 ;;   (interactive)
 ;;   (prin1 (cons emc-command-info emc-running-command)))
 
-;; (defun emc-record-command (info)
-;;   (setq emc-command-info info))
+;; (defun emc-record-command (info)(emc-command-info)
+;;   (setq emc-command-info info))(emc-pre-command-hook)
 
 ;; (defun emc-pre-command-hook ()
 ;;   (message "REGISTER %s" evil-this-register)

@@ -95,16 +95,20 @@ the cursors are ordered by the cursor overlay start position."
 
 (defun emc-undo-cursor (cursor)
   "Delete CURSOR and remove it from `emc-cursor-list'."
-  (when cursor
+  (when (and cursor (emc-has-cursors-p))
     (let ((start (emc-get-cursor-start cursor)))
       (emc-delete-cursor cursor)
       (setq emc-cursor-list (delq cursor emc-cursor-list))
-      start)))
+      start)
+    (when (not (emc-has-cursors-p))
+      (run-hooks 'emc-after-cursors-deleted))))
 
 (defun emc-make-cursor-at-pos (&optional pos)
   "Make a cursor at POS and add it to `emc-cursor-list'."
   (let ((evil-jump-list nil)
+        (first-cursor (not (emc-has-cursors-p)))
         (pos (or pos (point))))
+    (when first-cursor (run-hooks 'emc-before-cursors-created))
     (emc-insert-cursor (emc-put-cursor-property
                         nil
                         :overlay (emc-cursor-overlay-at-pos pos)
@@ -206,13 +210,15 @@ the cursors are ordered by the cursor overlay start position."
     (when (and cursor (/= start point))
       (goto-char start)
       (when create (emc-make-cursor-at-pos point))
-      (emc-undo-cursor cursor))))
+      (emc-undo-cursor cursor)
+      (unless (emc-has-cursors-p) (run-hooks 'emc-after-cursors-deleted)))))
 
 (defun emc-goto-match (direction create)
   "Move point to the next match according to DIRECTION
 and optionally CREATE a cursor at point."
   (when (emc-has-pattern-p)
     (let ((point (point))
+          (had-cursors (emc-has-cursors-p))
           (found (evil-ex-find-next (emc-get-pattern) direction nil)))
       (cond ((eq (emc-get-pattern-length) 1)
              (ecase direction
@@ -227,7 +233,9 @@ and optionally CREATE a cursor at point."
       (goto-char (1- (point)))
       (when (and found create (/= point (point)))
         (emc-make-cursor-at-pos point))
-      (emc-undo-cursor-at-pos))))
+      (emc-undo-cursor-at-pos)
+      (when (and had-cursors (not (emc-has-cursors-p)))
+        (run-hooks 'emc-after-cursors-deleted)))))
 
 (defun emc-find-and-goto-cursor (find create)
   "FIND a cursor, go to it, and optionally CREATE a cursor at point."
@@ -244,6 +252,8 @@ and optionally CREATE a cursor at point."
                (emc-goto-cursor cursor create))))))
   (emc-print-cursors-info))
 
+;; TODO starting to create cursors by going to a previous match creates
+;; the first cursor in an invalid position
 (defun emc-find-and-goto-match (direction create)
   "Find the next match in DIRECTION and optionally CREATE a cursor at point."
   (unless (emc-has-pattern-p) (emc-set-pattern))
@@ -311,11 +321,13 @@ closest to it when searching forwards."
 (evil-define-command emc-undo-all-cursors ()
   "Delete all cursors and remove them from `emc-cursor-list'."
   :repeat ignore
-  (mapc 'emc-delete-cursor emc-cursor-list)
-  (evil-exit-visual-state)
-  (setq emc-cursor-list nil)
-  (setq emc-pattern nil)
-  (message "All cursors cleared"))
+  (when (emc-has-cursors-p)
+    (mapc 'emc-delete-cursor emc-cursor-list)
+    (evil-exit-visual-state)
+    (setq emc-cursor-list nil)
+    (setq emc-pattern nil)
+    (run-hooks 'emc-after-cursors-deleted)
+    (message "All cursors cleared")))
 
 (evil-define-command emc-make-all-cursors ()
   "Initialize `emc-pattern' and make cursors for all matches."
