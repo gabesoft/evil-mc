@@ -1044,10 +1044,6 @@ otherwise execute BODY."
            (goto-char (min (+ (point) prev-column)
                            (point-at-eol))))
 
-          ;; TODO only pick the first character
-          ;; ((eq cmd 'self-insert-command)
-          ;;  (execute-kbd-macro (emc-get-command-property :keys-post-raw)))
-
           ;; TODO make this work
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))
           ;; evil-surround integration cs'" etc
@@ -1123,10 +1119,6 @@ otherwise execute BODY."
                   ;; (message "cmd %s" emc-command-info)
                   ;; (message "cursor %s -> %s" cursor new-cursor)
 
-                  ;; (evil-set-marker 0)
-                  ;; (evil-set-jump (point))
-                  ;; (test)
-
                   (goto-char (overlay-start overlay))
                   (setq new-cursor (emc-run-command cursor))
 
@@ -1135,9 +1127,8 @@ otherwise execute BODY."
 
                   ;; (message "OLD CURSOR %s NEW CURSOR %s" cursor new-cursor)
 
-                  (when overlay (delete-overlay overlay))
+                  (emc-delete-cursor-overlay cursor)
                   (emc-delete-region-overlay region)
-                  ;; (when region (delete-overlay (emc-get-region-overlay region)))
 
                   (setq new-cursor
                         (emc-put-cursor-overlay
@@ -1145,14 +1136,6 @@ otherwise execute BODY."
                   (setq cursor-list
                         (emc-insert-cursor-into-list
                          new-cursor cursor-list)))))
-
-
-            ;; (setq new-cursor (emc-put-cursor-overlay
-            ;;                   new-cursor (emc-draw-cursor-at-point-old)))
-            ;; (setq cursor-list (cons new-cursor cursor-list)))))
-
-            ;; TODO the cursor-list must be sorted by the start position
-            ;;      instead of reverse just use emc-insert-cursor above
             (setq emc-cursor-list cursor-list))
           ;; (message "cursors %s" (mapcar 'emc-get-cursor-start emc-cursor-list))
           ;; (emc-command-reset)
@@ -1235,12 +1218,13 @@ otherwise execute BODY."
 
 (defun emc-before-cursors-setup-hook ()
   "Hook to run before any cursor is created."
-  (message "before cursors hook"))
+  (message "before cursors hook")
+  (evil-jumper-mode 0))
 
 (defun emc-after-cursors-teardown-hook ()
   "Hook to run after all cursors are deleted."
-  (message "after cursors hook"))
-
+  (message "after cursors hook")
+  (evil-jumper-mode t))
 
 (defun emc-init-mode ()
   "Initialize the evil-multiple-cursors mode."
