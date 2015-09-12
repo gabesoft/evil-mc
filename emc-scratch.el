@@ -123,37 +123,37 @@
   (interactive)
   (message "%s" (mapcar 'emc-get-cursor-mark-ring emc-cursor-list)))
 
-(defun emc-draw-cursor-at-point-old ()
-  "Create a cursor overlay at point"
-  (interactive)
-  (if (eolp)
-      (emc-make-cursor-at-eol (point))
-    (emc-make-cursor-inline (point))))
+;; (defun emc-draw-cursor-at-point-old ()
+;;   "Create a cursor overlay at point"
+;;   (interactive)
+;;   (if (eolp)
+;;       (emc-make-cursor-at-eol (point))
+;;     (emc-make-cursor-inline (point))))
 
-(defun emc-remove-overlay-at-point ()
-  "Remove the overlay at point."
-  (interactive)
-  (when emc-cursor-list
-    (setq emc-cursor-list
-          (remove-if (lambda (cursor)
-                       (let ((overlay (emc-get-cursor-overlay cursor)))
-                         (eq (overlay-start overlay) (point))))
-                     emc-cursor-list)))
-  (remove-overlays (point) (1+ (point))))
+;; (defun emc-remove-overlay-at-point ()
+;;   "Remove the overlay at point."
+;;   (interactive)
+;;   (when emc-cursor-list
+;;     (setq emc-cursor-list
+;;           (remove-if (lambda (cursor)
+;;                        (let ((overlay (emc-get-cursor-overlay cursor)))
+;;                          (eq (overlay-start overlay) (point))))
+;;                      emc-cursor-list)))
+;;   (remove-overlays (point) (1+ (point))))
 
 ;; (defun emc-remove-cursor-at-point ()
 ;;   "Remove the cursor at point."
 ;;   (emc-remove-overlay-at-point))
 
-(defun emc-goto-next-match-old (pattern &optional direction)
-  "Go to the next match of PATTERN optionally in DIRECTION or 'forward. The search does not wrap."
-  (let ((pat (evil-ex-make-search-pattern pattern))
-        (dir (or direction 'forward)))
-    (setq evil-ex-search-pattern pat)
-    (setq evil-ex-search-direction dir)
-    (let ((next (evil-ex-find-next pat dir t)))
-      (when (eq next t) (goto-char (1- (point))))
-      next)))
+;; (defun emc-goto-next-match-old (pattern &optional direction)
+;;   "Go to the next match of PATTERN optionally in DIRECTION or 'forward. The search does not wrap."
+;;   (let ((pat (evil-ex-make-search-pattern pattern))
+;;         (dir (or direction 'forward)))
+;;     (setq evil-ex-search-pattern pat)
+;;     (setq evil-ex-search-direction dir)
+;;     (let ((next (evil-ex-find-next pat dir t)))
+;;       (when (eq next t) (goto-char (1- (point))))
+;;       next)))
 
 ;; (defun emc-get-visual-selection ()
 ;;   "Gets the current visual selection"
@@ -1139,15 +1139,21 @@ otherwise execute BODY."
                   (emc-delete-region-overlay region)
                   ;; (when region (delete-overlay (emc-get-region-overlay region)))
 
-                  ;; TODO use the new cursor methods
-                  ;; comment out the old ones
-                  (setq new-cursor (emc-put-cursor-overlay
-                                    new-cursor (emc-draw-cursor-at-point-old)))
-                  (setq cursor-list (cons new-cursor cursor-list)))))
+                  (setq new-cursor
+                        (emc-put-cursor-overlay
+                         new-cursor (emc-cursor-overlay-at-pos)))
+                  (setq cursor-list
+                        (emc-insert-cursor-into-list
+                         new-cursor cursor-list)))))
+
+
+            ;; (setq new-cursor (emc-put-cursor-overlay
+            ;;                   new-cursor (emc-draw-cursor-at-point-old)))
+            ;; (setq cursor-list (cons new-cursor cursor-list)))))
 
             ;; TODO the cursor-list must be sorted by the start position
             ;;      instead of reverse just use emc-insert-cursor above
-            (setq emc-cursor-list (nreverse cursor-list)))
+            (setq emc-cursor-list cursor-list))
           ;; (message "cursors %s" (mapcar 'emc-get-cursor-start emc-cursor-list))
           ;; (emc-command-reset)
           ;; (message "AFTER-VISUAL %s" (evil-visual-state-p))

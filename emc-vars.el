@@ -118,8 +118,12 @@
   (setq emc-frozen nil))
 
 (defun emc-clear-pattern ()
-  "Remove the currently saved pattern."
+  "Clear the currently saved pattern."
   (setq emc-pattern nil))
+
+(defun emc-clear-cursors ()
+  "Clear the cursor list."
+  (setq emc-cursor-list nil))
 
 (defun emc-get-pattern ()
   "Return the current pattern."

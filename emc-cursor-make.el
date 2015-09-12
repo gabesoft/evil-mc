@@ -21,10 +21,11 @@
 
 (defun emc-print-cursors-info (&optional msg)
   "Prints information about the current cursors preceded by MSG."
-  (message "%s %s cursors matching \"%s\""
-           (or msg "There are")
-           (1+ (length emc-cursor-list))
-           (emc-get-pattern-text)))
+  (when (emc-has-cursors-p)
+    (message "%s %s cursors matching \"%s\""
+             (or msg "There are")
+             (1+ (length emc-cursor-list))
+             (emc-get-pattern-text))))
 
 (defun emc-cursor-overlay (start end)
   "Make an overlay for a cursor from START to END."
@@ -49,7 +50,6 @@
 
 (defun emc-cursor-overlay-at-pos (&optional pos)
   "Make a cursor overlay at POS."
-  (interactive)
   (let ((pos (or pos (point))))
     (save-excursion
       (goto-char pos)
@@ -65,21 +65,28 @@
                 (< (emc-get-cursor-start x)
                    (emc-get-cursor-start y))))))
 
-(defun emc-insert-cursor (cursor)
-  "Insert CURSOR into `emc-cursor-list' at the correct location so that
+(defun emc-insert-cursor-into-list (cursor cursor-list)
+  "Insert CURSOR into CURSOR-LIST at the correct location so that
 the cursors are ordered by the cursor overlay start position."
-  (cond ((null emc-cursor-list)
-         (setq emc-cursor-list (list cursor)))
-        ((> (emc-get-cursor-start (car emc-cursor-list))
+  (cond ((null cursor-list)
+         (setq cursor-list (list cursor)))
+        ((> (emc-get-cursor-start (car cursor-list))
             (emc-get-cursor-start cursor))
-         (setq emc-cursor-list (cons cursor emc-cursor-list)))
+         (setq cursor-list (cons cursor cursor-list)))
         (t (let ((start (emc-get-cursor-start cursor))
-                 (list emc-cursor-list))
+                 (list cursor-list))
              (while (and (cdr list)
                          (> start (emc-get-cursor-start (cadr list))))
                (setq list (cdr list)))
              (setcdr list (cons cursor (cdr list))))))
-  emc-cursor-list)
+  cursor-list)
+
+(defun emc-insert-cursor (cursor)
+  "Insert CURSOR into `emc-cursor-list' at the correct location so that
+the cursors are ordered by the cursor overlay start position."
+  (setq emc-cursor-list (emc-insert-cursor-into-list
+                         cursor
+                         emc-cursor-list)))
 
 (defun emc-delete-cursor (cursor)
   "Delete all overlays associated with CURSOR."
@@ -99,16 +106,14 @@ the cursors are ordered by the cursor overlay start position."
     (let ((start (emc-get-cursor-start cursor)))
       (emc-delete-cursor cursor)
       (setq emc-cursor-list (delq cursor emc-cursor-list))
-      start)
-    (when (not (emc-has-cursors-p))
-      (run-hooks 'emc-after-cursors-deleted))))
+      start)))
 
 (defun emc-make-cursor-at-pos (&optional pos)
   "Make a cursor at POS and add it to `emc-cursor-list'."
   (let ((evil-jump-list nil)
         (first-cursor (not (emc-has-cursors-p)))
         (pos (or pos (point))))
-    (when first-cursor (run-hooks 'emc-before-cursors-created))
+    (when first-cursor (emc-cursors-before))
     (emc-insert-cursor (emc-put-cursor-property
                         nil
                         :overlay (emc-cursor-overlay-at-pos pos)
@@ -157,14 +162,6 @@ the cursors are ordered by the cursor overlay start position."
   "Return the cursor with the highest position."
   (car (last emc-cursor-list)))
 
-(defun emc-undo-prev-cursor (&optional pos)
-  "Delete the cursor closest to POS when searching backwards."
-  (emc-undo-cursor (emc-find-prev-cursor pos)))
-
-(defun emc-undo-next-cursor (&optional pos)
-  "Delete the cursor closest to POS when searching forwards."
-  (emc-undo-cursor (emc-find-next-cursor pos)))
-
 (defun emc-make-pattern (text whole-word)
   "Make a search pattern for TEXT, that optionally matches only WHOLE-WORDs."
   (evil-ex-make-search-pattern (if whole-word
@@ -205,13 +202,14 @@ the cursors are ordered by the cursor overlay start position."
 
 (defun emc-goto-cursor (cursor create)
   "Move point to CURSOR and optionally CREATE a cursor at point."
-  (let ((start (emc-get-cursor-start cursor))
-        (point (point)))
-    (when (and cursor (/= start point))
-      (goto-char start)
-      (when create (emc-make-cursor-at-pos point))
-      (emc-undo-cursor cursor)
-      (unless (emc-has-cursors-p) (run-hooks 'emc-after-cursors-deleted)))))
+  (when (emc-has-cursors-p)
+    (let ((start (emc-get-cursor-start cursor))
+          (point (point)))
+      (when (and cursor (/= start point))
+        (goto-char start)
+        (when create (emc-make-cursor-at-pos point))
+        (emc-undo-cursor cursor)
+        (unless (emc-has-cursors-p) (emc-cursors-after))))))
 
 (defun emc-goto-match (direction create)
   "Move point to the next match according to DIRECTION
@@ -234,8 +232,8 @@ and optionally CREATE a cursor at point."
       (when (and found create (/= point (point)))
         (emc-make-cursor-at-pos point))
       (emc-undo-cursor-at-pos)
-      (when (and had-cursors (not (emc-has-cursors-p)))
-        (run-hooks 'emc-after-cursors-deleted)))))
+      (unless (emc-has-cursors-p) (emc-clear-pattern))
+      (when (and had-cursors (not (emc-has-cursors-p))) (emc-cursors-after)))))
 
 (defun emc-find-and-goto-cursor (find create)
   "FIND a cursor, go to it, and optionally CREATE a cursor at point."
@@ -252,8 +250,6 @@ and optionally CREATE a cursor at point."
                (emc-goto-cursor cursor create))))))
   (emc-print-cursors-info))
 
-;; TODO starting to create cursors by going to a previous match creates
-;; the first cursor in an invalid position
 (defun emc-find-and-goto-match (direction create)
   "Find the next match in DIRECTION and optionally CREATE a cursor at point."
   (unless (emc-has-pattern-p) (emc-set-pattern))
@@ -318,16 +314,24 @@ closest to it when searching forwards."
   :repeat ignore
   (emc-find-and-goto-match 'backward t))
 
+(defun emc-cursors-before ()
+  "Actions to be executed before any cursors are created."
+  (run-hooks 'emc-before-cursors-created))
+
+(defun emc-cursors-after ()
+  "Actions to be executed after all cursors are deleted."
+  (emc-clear-pattern)
+  (emc-clear-cursors)
+  (run-hooks 'emc-after-cursors-deleted)
+  (message "All cursors cleared"))
+
 (evil-define-command emc-undo-all-cursors ()
   "Delete all cursors and remove them from `emc-cursor-list'."
   :repeat ignore
   (when (emc-has-cursors-p)
     (mapc 'emc-delete-cursor emc-cursor-list)
     (evil-exit-visual-state)
-    (setq emc-cursor-list nil)
-    (setq emc-pattern nil)
-    (run-hooks 'emc-after-cursors-deleted)
-    (message "All cursors cleared")))
+    (emc-cursors-after)))
 
 (evil-define-command emc-make-all-cursors ()
   "Initialize `emc-pattern' and make cursors for all matches."
