@@ -47,6 +47,8 @@
         (eq cmd 'self-insert-command)
         (eq cmd 'yank)
 
+        ;; (eq cmd 'undo-tree-undo)
+
         ;; evil commands
 
         (eq cmd 'evil-append)
@@ -54,6 +56,7 @@
         (eq cmd 'evil-change)
         (eq cmd 'evil-change-line)
         (eq cmd 'evil-complete-next)
+        (eq cmd 'evil-complete-next-line)
         (eq cmd 'evil-delete)
         (eq cmd 'evil-delete-backward-char-and-join)
         (eq cmd 'evil-delete-backward-word)
@@ -123,6 +126,10 @@
 (defun emc-get-command-keys-vector (&optional name)
   "Get the command keys, stored at the property with NAME as a vector."
   (emc-get-command-property (or name :keys)))
+
+(defun emc-get-command-keys-count ()
+  "Get the current command numeric prefix."
+  (emc-get-command-property :keys-count))
 
 (defun emc-get-command-keys-string (&optional name)
   "Get the command keys, stored at the property with NAME, as a string."

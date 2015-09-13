@@ -776,7 +776,9 @@
   (let* ((cmd (emc-get-command-name))
          (region (emc-get-cursor-region cursor))
          (region-type (emc-get-region-type region))
-         (repeat-type (evil-get-command-property cmd :repeat)))
+         (repeat-type (evil-get-command-property cmd :repeat))
+         (keys-count (emc-get-command-keys-count))
+         (keys-vector (emc-get-command-keys-vector)))
     (when emc-debug (message "CMD-VISUAL %s" cmd))
     (cond ((or (eq cmd 'exchange-point-and-mark)
                (eq cmd 'evil-exchange-point-and-mark))
@@ -824,7 +826,8 @@
           ((eq repeat-type 'motion)
            (ignore-errors
              (condition-case error
-                 (funcall cmd)
+                 ;; (execute-kbd-macro keys-vector)
+                 (funcall cmd keys-count)
                (error (message "%s failed with %s" cmd
                                (error-message-string error)))))
            (setq region (emc-update-region region)))
@@ -865,6 +868,7 @@ otherwise execute BODY."
   "Run the last stored command for CURSOR."
   (let* ((cmd (emc-get-command-name))
          (last-input (emc-get-command-last-input))
+         (keys-count (emc-get-command-keys-count))
          (region (emc-get-cursor-region cursor))
          (prev-column (or (emc-get-cursor-column cursor)
                           (emc-column-number (point))))
@@ -909,6 +913,7 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-delete-backward-char-and-join) (evil-delete-backward-char-and-join 1))
           ((eq cmd 'evil-complete-next) (evil-complete-next))
+          ((eq cmd 'evil-complete-next-line) (evil-complete-next-line))
 
           ((eq cmd 'evil-delete-char)
            (emc-with-region region 'evil-delete-char
@@ -929,7 +934,7 @@ otherwise execute BODY."
           ((or (eq cmd 'evil-paste-after)
                (eq cmd 'evil-paste-before))
 
-           (cond ((null region) (funcall cmd 1))
+           (cond ((null region) (execute-kbd-macro keys-vector))
                  ((emc-char-region-p region)
                   (let (new-kill-ring new-kill-ring-yank-pointer)
                     (let ((kill-ring (copy-sequence kill-ring))
@@ -940,7 +945,7 @@ otherwise execute BODY."
                       (setq new-kill-ring-yank-pointer kill-ring-yank-pointer))
 
                     ;; execute paste with the old key ring
-                    (evil-paste-before 1)
+                    (evil-paste-before keys-count)
 
                     ;; update the kill ring with the overwritten text
                     (setq kill-ring new-kill-ring)
@@ -951,7 +956,7 @@ otherwise execute BODY."
                         (end (emc-get-region-end region)))
                     (unless (emc-ends-with-newline-p text)
                       (evil-insert-newline-below))
-                    (evil-paste-after 1)
+                    (evil-paste-after keys-count)
                     (save-excursion (evil-delete start end 'line))))))
 
           ((eq cmd 'paste-before-current-line) (paste-before-current-line 1))
@@ -971,8 +976,22 @@ otherwise execute BODY."
           ;; ((eq cmd 'evil-goto-mark) (evil-goto-mark last-input))
           ;; ((eq cmd 'evil-goto-mark-line) (evil-goto-mark-line last-input))
 
+          ;; (emc-get-cursor-evil-markers-alist)
+          ;; (emc-get-region-property)
+          ;; (emc-get-cursor-overlay)
+
           ;; TODO implement undo position
           ;; - after undo all cursors should go to their original positions
+          ;; - inspect the last item in the undo list and record the cursor
+          ;;   position if necessary according to the last entry
+          ;; - how do we deal with the original cursor which sometimes moves as well
+          ;; - store point for cursor on
+          ;;   - undo-tree-undo
+          ;;   - undo-tree-redo
+          ;;   - undo-buffer-list changed
+          ;; - pop point for cursor on
+          ;;   - undo-tree-undo
+          ;;   - undo-tree-redo
 
           ((eq cmd 'evil-normal-state)
            (evil-insert 1)
@@ -1034,15 +1053,21 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-next-line)
            (setq next-column prev-column)
-           (forward-line (emc-get-command-property :keys-count))
+           (forward-line keys-count)
            (goto-char (min (+ (point) prev-column)
                            (point-at-eol))))
 
           ((eq cmd 'evil-previous-line)
            (setq next-column prev-column)
-           (forward-line (- (emc-get-command-property :keys-count)))
+           (forward-line (- keys-count))
            (goto-char (min (+ (point) prev-column)
                            (point-at-eol))))
+
+          ;; TODO restore cursors position here
+          ;; ((eq cmd 'undo-tree-undo)
+          ;;  (message "undo %s %s" (point) (pop undo-pos-list))
+          ;;  (goto-char (pop undo-pos-list))
+          ;;  )
 
           ;; TODO make this work
           ;; ((eq cmd 'evil-repeat) (evil-repeat 1))
@@ -1100,6 +1125,31 @@ otherwise execute BODY."
               (emc-frozen-p)
               (not (emc-command-p)))
     (let ((emc-running-command t))
+      ;; (evil-start-undo-step t)
+
+      ;; NOTE the logic below removes the undo marker for
+      ;; paste commands (and others)
+      ;; so that the changes at all cursors are undone as one unit
+      ;; move to a method called emc-undo-continue
+      (let ((undo-list (if (eq buffer-undo-list t)
+                           evil-temporary-undo
+                         buffer-undo-list)))
+        (unless (or (not undo-list) (car undo-list))
+          (while (and undo-list (null (car undo-list)))
+            (pop undo-list)))
+        (if (eq buffer-undo-list t)
+            (setq evil-temporary-undo undo-list)
+          (setq buffer-undo-list undo-list)))
+      ;; (message "undo %s %s: %s"
+      ;;          (point)
+      ;;          (length buffer-undo-list)
+      ;;          (car-safe buffer-undo-list))
+
+      ;; (when (and (eq (emc-get-command-name) 'evil-paste-after)
+      ;;            (null (car-safe buffer-undo-list)))
+      ;;   (while (and buffer-undo-list (null (car buffer-undo-list)))
+      ;;     (pop buffer-undo-list)))
+
       (evil-with-single-undo
         ;; (evil-with-transient-mark-mode)
         ;; (message "BEFORE-VISUAL %s" (evil-visual-state-p))
@@ -1140,7 +1190,9 @@ otherwise execute BODY."
           ;; (message "cursors %s" (mapcar 'emc-get-cursor-start emc-cursor-list))
           ;; (emc-command-reset)
           ;; (message "AFTER-VISUAL %s" (evil-visual-state-p))
-          )))))
+          ))
+      ;; (evil-end-undo-step)
+      )))
 
 ;; (defun emc-setup-key-maps ()
 ;;   "Sets up all key bindings for working with multiple cursors."
@@ -1216,15 +1268,23 @@ otherwise execute BODY."
   (remove-hook 'emc-after-cursors-deleted 'emc-after-cursors-teardown-hook)
   (remove-hook 'emc-before-cursors-created 'emc-before-cursors-setup-hook))
 
+(evil-define-local-var emc-paused-modes nil
+  "Modes paused before the cursors have been created.")
+
 (defun emc-before-cursors-setup-hook ()
   "Hook to run before any cursor is created."
-  (message "before cursors hook")
-  (evil-jumper-mode 0))
+  (when emc-debug (message "Before cursors hook"))
+  (setq emc-paused-modes nil)
+  (when (bound-and-true-p evil-jumper-mode)
+    (evil-jumper-mode 0)
+    (setq emc-paused-modes (cons (lambda () (evil-jumper-mode t))
+                                 emc-paused-modes))))
 
 (defun emc-after-cursors-teardown-hook ()
   "Hook to run after all cursors are deleted."
-  (message "after cursors hook")
-  (evil-jumper-mode t))
+  (when emc-debug (message "After cursors hook %s" emc-paused-modes))
+  (dolist (fn emc-paused-modes) (funcall fn))
+  (setq emc-paused-modes nil))
 
 (defun emc-init-mode ()
   "Initialize the evil-multiple-cursors mode."

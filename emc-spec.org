@@ -258,4 +258,7 @@ CLOSED: [2015-08-29 Sat 17:37]
 *** when in an error state some characters are recorded twice
 ** TODO Add before-cursors-creation/after-cursors-deletion hooks
 *** as a place to enable/disable modes that are incompatible with emc
+** TODO prevent the cursors from losing state when navigating through them
+*** all cursors navigation (next/prev) causes cursors to lose state as it re-creates them
+*** all undo position, markers, etc are lost
 
