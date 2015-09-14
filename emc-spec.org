@@ -236,6 +236,8 @@ CLOSED: [2015-08-29 Sat 17:37]
 - evil-repeat-keystrokes, etc
 *** ensure the post-command-hook is appended rather than inserted at the front
 ** TODO Use all vars through methods rather than directly
+*** clean up the cursor state methods
+*** need a better way to access cursor properties
 ** TODO Fix evil-complete-next
 *** currently it only works the first time
 *** should cycle through completions
@@ -245,7 +247,7 @@ CLOSED: [2015-08-29 Sat 17:37]
 *** slow commands for 10+ cursors
 - change "cw"
 - evil snipe "f-"
-- (execute-kbd-macro)
+- execute-kbd-macro seems to cause the slowness
 ** TODO Fix motions
 *** when there multiple cursors on the same line the jk motions causes some cursors to collapse at the same location on that line
 ** TODO Fix evil-repeat
@@ -261,4 +263,6 @@ CLOSED: [2015-08-29 Sat 17:37]
 ** TODO prevent the cursors from losing state when navigating through them
 *** all cursors navigation (next/prev) causes cursors to lose state as it re-creates them
 *** all undo position, markers, etc are lost
+** TODO Fix move text up/down
+*** currently it only works if the cursors are not on consecutive lines
 

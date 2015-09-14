@@ -38,6 +38,7 @@
         (eq cmd 'backward-delete-char-untabify)
         (eq cmd 'copy-to-the-end-of-line)
         (eq cmd 'delete-backward-char)
+        (eq cmd 'hippie-expand)
         (eq cmd 'keyboard-quit)
         (eq cmd 'move-text-down)
         (eq cmd 'move-text-up)
@@ -47,8 +48,6 @@
         (eq cmd 'self-insert-command)
         (eq cmd 'yank)
 
-        ;; (eq cmd 'undo-tree-undo)
-
         ;; evil commands
 
         (eq cmd 'evil-append)
@@ -57,6 +56,8 @@
         (eq cmd 'evil-change-line)
         (eq cmd 'evil-complete-next)
         (eq cmd 'evil-complete-next-line)
+        (eq cmd 'evil-complete-previous)
+        (eq cmd 'evil-complete-previous-line)
         (eq cmd 'evil-delete)
         (eq cmd 'evil-delete-backward-char-and-join)
         (eq cmd 'evil-delete-backward-word)
@@ -82,6 +83,7 @@
         (eq cmd 'evil-shift-right)
         (eq cmd 'evil-surround-region)
         (eq cmd 'evil-upcase)
+        (eq cmd 'evil-use-register)
         (eq cmd 'evil-visual-block)
         (eq cmd 'evil-visual-char)
         (eq cmd 'evil-visual-line)
@@ -240,8 +242,8 @@
                                    (and (equal keys-operator-pre
                                                keys-operator-post)
                                         (not (or
-                                              (equal keys-operator-pre [116])
-                                              (equal keys-operator-pre [102]))))
+                                              (equal keys-operator-pre [?t])
+                                              (equal keys-operator-pre [?f]))))
                                    (> (length keys-operator-pre) 1))
                                keys-operator-post
                              (vconcat keys-operator-pre

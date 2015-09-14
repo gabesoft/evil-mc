@@ -123,6 +123,16 @@
   (interactive)
   (message "%s" (mapcar 'emc-get-cursor-mark-ring emc-cursor-list)))
 
+(defun emc-print-cursors-registers ()
+  "Print the cursors registers."
+  (interactive)
+  (message "%s" (mapcar (lambda (cursor)
+                          (emc-get-cursor-property cursor :register-alist))
+                        emc-cursor-list))
+  (message "%s" (mapcar (lambda (cursor)
+                          (emc-get-cursor-property cursor :evil-this-register))
+                        emc-cursor-list)))
+
 ;; (defun emc-draw-cursor-at-point-old ()
 ;;   "Create a cursor overlay at point"
 ;;   (interactive)
@@ -873,6 +883,26 @@ otherwise execute BODY."
          (prev-column (or (emc-get-cursor-column cursor)
                           (emc-column-number (point))))
          (next-column nil)
+
+         ;; TODO need to have state per command
+         ;; dabbrev should be persisted only for evil-complete functions
+         ;; the property names should match the full value name
+         (dabbrev--friend-buffer-list (emc-get-cursor-property cursor :friend-buffer-list))
+         (dabbrev--last-buffer (emc-get-cursor-property cursor :last-buffer))
+         (dabbrev--last-buffer-found (emc-get-cursor-property cursor :last-buffer-found))
+         (dabbrev--last-table (emc-get-cursor-property cursor :last-table))
+         (dabbrev--last-abbrev-location (emc-get-cursor-property cursor :last-abbrev-location))
+         (dabbrev--last-abbreviation (emc-get-cursor-property cursor :last-abbreviation))
+         (dabbrev--last-expansion (emc-get-cursor-property cursor :last-expansion))
+         (dabbrev--last-expansion-location (emc-get-cursor-property cursor :last-expansion-location))
+         (dabbrev--last-direction (emc-get-cursor-property cursor :last-direction))
+
+         (evil-last-paste (emc-get-cursor-property cursor :evil-last-paste))
+         (evil-last-register (emc-get-cursor-property cursor :evil-last-register))
+         (evil-this-register (emc-get-cursor-property cursor :evil-this-register))
+         (evil-was-yanked-without-register (emc-get-cursor-property cursor :evil-was-yanked-without-register))
+         (register-alist (emc-get-cursor-property cursor :register-alist))
+
          (evil-markers-alist (emc-get-cursor-evil-markers-alist cursor))
          (evil-jump-list (emc-get-cursor-evil-jump-list cursor))
          (mark-ring (emc-get-cursor-mark-ring cursor))
@@ -884,6 +914,11 @@ otherwise execute BODY."
     ;; (message "evil-jump-list %s" evil-jump-list)
     ;; (message "evil-markers-alist %s" evil-markers-alist)
     ;; (message "mark-ring %s" mark-ring)
+    ;; (message "abbrev %s" dabbrev--last-abbrev-location)
+    ;; (message "before %s evil-this-register %s" (emc-get-cursor-start cursor) evil-this-register)
+    ;; (message "before %s register-alist %s" (emc-get-cursor-start cursor) register-alist)
+    ;; (when evil-this-register
+    ;;   (message "get-register %s" (get-register evil-this-register)))
 
     (cond ((eq cmd 'yaml-electric-dash-and-dot) (yaml-electric-dash-and-dot 1))
           ((eq cmd 'yaml-electric-bar-and-angle) (yaml-electric-bar-and-angle 1))
@@ -913,7 +948,11 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-delete-backward-char-and-join) (evil-delete-backward-char-and-join 1))
           ((eq cmd 'evil-complete-next) (evil-complete-next))
+          ((eq cmd 'evil-complete-previous) (evil-complete-previous))
           ((eq cmd 'evil-complete-next-line) (evil-complete-next-line))
+          ((eq cmd 'evil-complete-previous-line) (evil-complete-previous-line))
+          ((eq cmd 'hippie-expand) (hippie-expand 1))
+
 
           ((eq cmd 'evil-delete-char)
            (emc-with-region region 'evil-delete-char
@@ -929,12 +968,27 @@ otherwise execute BODY."
           ((eq cmd 'delete-backward-char) (delete-backward-char 1))
           ((eq cmd 'evil-replace) (evil-repeat 1))
 
-          ;; TODO fix undo after paste
-          ;;      all fake cursors and the real one should undo as one step
+          ((eq cmd 'evil-use-register) (evil-use-register last-input))
+
           ((or (eq cmd 'evil-paste-after)
                (eq cmd 'evil-paste-before))
 
-           (cond ((null region) (execute-kbd-macro keys-vector))
+           (cond ((null region)
+                  ;; (execute-kbd-macro keys-vector)
+                  ;; TODO use registers for all copy/paste/change/delete commands
+                  ;; including with regions
+                  ;; determine why we have to add evil-this-register to the keys-vector
+                  ;; alse when there is no register use
+                  ;; (funcall cmd keys-count) for performance
+                  (if evil-this-register
+                      (execute-kbd-macro (vconcat
+                                          [?\"]
+                                          (vector evil-this-register)
+                                          keys-vector))
+                    (execute-kbd-macro keys-vector))
+                  ;; TODO for funcall need to pass in the register
+                  ;; (funcall cmd keys-count)
+                  )
                  ((emc-char-region-p region)
                   (let (new-kill-ring new-kill-ring-yank-pointer)
                     (let ((kill-ring (copy-sequence kill-ring))
@@ -980,19 +1034,6 @@ otherwise execute BODY."
           ;; (emc-get-region-property)
           ;; (emc-get-cursor-overlay)
 
-          ;; TODO implement undo position
-          ;; - after undo all cursors should go to their original positions
-          ;; - inspect the last item in the undo list and record the cursor
-          ;;   position if necessary according to the last entry
-          ;; - how do we deal with the original cursor which sometimes moves as well
-          ;; - store point for cursor on
-          ;;   - undo-tree-undo
-          ;;   - undo-tree-redo
-          ;;   - undo-buffer-list changed
-          ;; - pop point for cursor on
-          ;;   - undo-tree-undo
-          ;;   - undo-tree-redo
-
           ((eq cmd 'evil-normal-state)
            (evil-insert 1)
            (evil-normal-state))
@@ -1017,7 +1058,12 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-yank)
            (cond ((null region)
-                  (execute-kbd-macro keys-vector))
+                  (if evil-this-register
+                      (execute-kbd-macro (vconcat
+                                          [?\"]
+                                          (vector evil-this-register)
+                                          keys-vector))
+                    (execute-kbd-macro keys-vector)))
                  ((emc-char-region-p region)
                   (emc-with-region region
                                    (lambda (start end)
@@ -1074,12 +1120,28 @@ otherwise execute BODY."
           ;; evil-surround integration cs'" etc
 
           (t (execute-kbd-macro keys-vector)))
+    ;; (message "after %s evil-this-register %s" (emc-get-cursor-start cursor) evil-this-register)
+    ;; (message "after %s register-alist %s" (emc-get-cursor-start cursor) register-alist)
     (emc-put-object-property cursor
                              :column next-column
                              :evil-markers-alist evil-markers-alist
                              :evil-jump-list evil-jump-list
                              :mark-ring mark-ring
                              :mark-evil-active mark-active
+                             :friend-buffer-list dabbrev--friend-buffer-list
+                             :last-buffer dabbrev--last-buffer
+                             :last-buffer-found dabbrev--last-buffer-found
+                             :last-table dabbrev--last-table
+                             :last-abbrev-location dabbrev--last-abbrev-location
+                             :last-abbreviation dabbrev--last-abbreviation
+                             :last-expansion dabbrev--last-expansion
+                             :last-expansion-location dabbrev--last-expansion-location
+                             :last-direction dabbrev--last-direction
+                             :evil-last-paste evil-last-paste
+                             :evil-last-register evil-last-register
+                             :evil-this-register evil-this-register
+                             :evil-was-yanked-without-register evil-was-yanked-without-register
+                             :register-alist register-alist
                              :kill-ring kill-ring
                              :kill-ring-yank-pointer kill-ring-yank-pointer
                              :region nil)))
@@ -1277,8 +1339,10 @@ otherwise execute BODY."
   (setq emc-paused-modes nil)
   (when (bound-and-true-p evil-jumper-mode)
     (evil-jumper-mode 0)
-    (setq emc-paused-modes (cons (lambda () (evil-jumper-mode t))
-                                 emc-paused-modes))))
+    (push (lambda () (evil-jumper-mode t)) emc-paused-modes))
+  (when (bound-and-true-p yas-minor-mode)
+    (yas-minor-mode 0)
+    (push (lambda () (yas-minor-mode t)) emc-paused-modes )))
 
 (defun emc-after-cursors-teardown-hook ()
   "Hook to run after all cursors are deleted."
