@@ -787,6 +787,9 @@
          (region (emc-get-cursor-region cursor))
          (region-type (emc-get-region-type region))
          (repeat-type (evil-get-command-property cmd :repeat))
+         (evil-last-register (emc-get-cursor-property cursor :evil-last-register))
+         (evil-this-register (emc-get-cursor-property cursor :evil-this-register))
+         (last-input (emc-get-command-last-input))
          (keys-count (emc-get-command-keys-count))
          (keys-vector (emc-get-command-keys-vector)))
     (when emc-debug (message "CMD-VISUAL %s" cmd))
@@ -810,6 +813,10 @@
                (eq cmd 'evil-find-char-backward)
                (eq cmd 'evil-find-char-to-backward))
            (evil-repeat-find-char)
+           (setq region (emc-update-region region)))
+
+          ((eq cmd 'evil-use-register)
+           (evil-use-register last-input)
            (setq region (emc-update-region region)))
 
           ((eq cmd 'evil-digit-argument-or-evil-beginning-of-line)
@@ -859,7 +866,10 @@
                   (setq region (emc-change-region-type region 'char)))))
 
           (t (message "not implemented")))
-    (emc-put-cursor-region cursor region)))
+    (emc-put-cursor-property cursor
+                             :evil-last-register evil-last-register
+                             :evil-this-register evil-this-register
+                             :region region)))
 
 (defmacro emc-with-region (region fn &rest body)
   "When the REGION exists and has an overlay execute FN
@@ -887,15 +897,15 @@ otherwise execute BODY."
          ;; TODO need to have state per command
          ;; dabbrev should be persisted only for evil-complete functions
          ;; the property names should match the full value name
-         (dabbrev--friend-buffer-list (emc-get-cursor-property cursor :friend-buffer-list))
-         (dabbrev--last-buffer (emc-get-cursor-property cursor :last-buffer))
-         (dabbrev--last-buffer-found (emc-get-cursor-property cursor :last-buffer-found))
-         (dabbrev--last-table (emc-get-cursor-property cursor :last-table))
-         (dabbrev--last-abbrev-location (emc-get-cursor-property cursor :last-abbrev-location))
-         (dabbrev--last-abbreviation (emc-get-cursor-property cursor :last-abbreviation))
-         (dabbrev--last-expansion (emc-get-cursor-property cursor :last-expansion))
-         (dabbrev--last-expansion-location (emc-get-cursor-property cursor :last-expansion-location))
-         (dabbrev--last-direction (emc-get-cursor-property cursor :last-direction))
+         (dabbrev--friend-buffer-list (emc-get-cursor-property cursor :dabbrev--friend-buffer-list))
+         (dabbrev--last-buffer (emc-get-cursor-property cursor :dabbrev--last-buffer))
+         (dabbrev--last-buffer-found (emc-get-cursor-property cursor :dabbrev--last-buffer-found))
+         (dabbrev--last-table (emc-get-cursor-property cursor :dabbrev--last-table))
+         (dabbrev--last-abbrev-location (emc-get-cursor-property cursor :dabbrev--last-abbrev-location))
+         (dabbrev--last-abbreviation (emc-get-cursor-property cursor :dabbrev--last-abbreviation))
+         (dabbrev--last-expansion (emc-get-cursor-property cursor :dabbrev--last-expansion))
+         (dabbrev--last-expansion-location (emc-get-cursor-property cursor :dabbrev--last-expansion-location))
+         (dabbrev--last-direction (emc-get-cursor-property cursor :dabbrev--last-direction))
 
          (evil-last-paste (emc-get-cursor-property cursor :evil-last-paste))
          (evil-last-register (emc-get-cursor-property cursor :evil-last-register))
@@ -909,7 +919,10 @@ otherwise execute BODY."
          (mark-active (emc-get-cursor-mark-active cursor))
          (kill-ring (emc-get-cursor-kill-ring cursor))
          (kill-ring-yank-pointer (emc-get-cursor-kill-ring-yank-pointer cursor))
-         (keys-vector (emc-get-command-keys-vector)))
+         (keys-vector (emc-get-command-keys-vector))
+         (keys-register (if evil-this-register (vconcat [?\"] (vector evil-this-register)) []))
+         (keys-vector-with-register (vconcat keys-register keys-vector))
+         )
     (when emc-debug (message "CMD %s keys %s" cmd keys-vector))
     ;; (message "evil-jump-list %s" evil-jump-list)
     ;; (message "evil-markers-alist %s" evil-markers-alist)
@@ -956,9 +969,9 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-delete-char)
            (emc-with-region region 'evil-delete-char
-                            (execute-kbd-macro keys-vector)))
+                            (execute-kbd-macro keys-vector-with-register)))
 
-          ((eq cmd 'evil-delete-line) (execute-kbd-macro keys-vector))
+          ((eq cmd 'evil-delete-line) (execute-kbd-macro keys-vector-with-register))
           ((eq cmd 'evil-join) (execute-kbd-macro keys-vector))
 
           ((eq cmd 'evil-insert-line) (evil-insert-line 1))
@@ -980,15 +993,9 @@ otherwise execute BODY."
                   ;; determine why we have to add evil-this-register to the keys-vector
                   ;; alse when there is no register use
                   ;; (funcall cmd keys-count) for performance
-                  (if evil-this-register
-                      (execute-kbd-macro (vconcat
-                                          [?\"]
-                                          (vector evil-this-register)
-                                          keys-vector))
-                    (execute-kbd-macro keys-vector))
-                  ;; TODO for funcall need to pass in the register
-                  ;; (funcall cmd keys-count)
-                  )
+
+                  ;; (execute-kbd-macro keys-vector-with-register)
+                  (funcall cmd keys-count evil-this-register))
                  ((emc-char-region-p region)
                   (let (new-kill-ring new-kill-ring-yank-pointer)
                     (let ((kill-ring (copy-sequence kill-ring))
@@ -999,7 +1006,7 @@ otherwise execute BODY."
                       (setq new-kill-ring-yank-pointer kill-ring-yank-pointer))
 
                     ;; execute paste with the old key ring
-                    (evil-paste-before keys-count)
+                    (evil-paste-before keys-count evil-this-register)
 
                     ;; update the kill ring with the overwritten text
                     (setq kill-ring new-kill-ring)
@@ -1010,7 +1017,7 @@ otherwise execute BODY."
                         (end (emc-get-region-end region)))
                     (unless (emc-ends-with-newline-p text)
                       (evil-insert-newline-below))
-                    (evil-paste-after keys-count)
+                    (evil-paste-after keys-count evil-this-register)
                     (save-excursion (evil-delete start end 'line))))))
 
           ((eq cmd 'paste-before-current-line) (paste-before-current-line 1))
@@ -1058,27 +1065,24 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-yank)
            (cond ((null region)
-                  (if evil-this-register
-                      (execute-kbd-macro (vconcat
-                                          [?\"]
-                                          (vector evil-this-register)
-                                          keys-vector))
-                    (execute-kbd-macro keys-vector)))
+                  (execute-kbd-macro keys-vector-with-register))
                  ((emc-char-region-p region)
                   (emc-with-region region
                                    (lambda (start end)
                                      (goto-char start)
-                                     (evil-yank start end))))
+                                     (evil-yank start end nil evil-this-register))))
                  ((emc-line-region-p region)
-                  (execute-kbd-macro "yy"))))
+                  (execute-kbd-macro (vconcat keys-register [?y ?y])))))
 
           ((eq cmd 'evil-delete)
            (cond ((null region)
-                  (execute-kbd-macro keys-vector))
+                  (execute-kbd-macro keys-vector-with-register))
                  ((emc-char-region-p region)
-                  (emc-with-region region 'evil-delete))
+                  (emc-with-region region
+                                   (lambda (start end)
+                                     (evil-delete start end nil evil-this-register))))
                  ((emc-line-region-p region)
-                  (execute-kbd-macro "dd")))
+                  (execute-kbd-macro (vconcat keys-register [?d ?d]))))
            (when (eolp) (evil-end-of-line)))
 
           ((eq cmd 'evil-change)
@@ -1087,15 +1091,15 @@ otherwise execute BODY."
                (cond ((null region)
                       (unless (eq point (point-at-bol))
                         (evil-forward-char))
-                      (execute-kbd-macro keys-vector))
+                      (execute-kbd-macro keys-vector-with-register))
                      ((emc-char-region-p region)
                       (emc-with-region region
                                        (lambda (start end)
                                          (evil-forward-char)
-                                         (evil-delete start end))))
+                                         (evil-delete start end nil evil-this-register))))
                      ((emc-line-region-p region)
                       (evil-forward-char)
-                      (execute-kbd-macro "cc"))))))
+                      (execute-kbd-macro (vconcat keys-register [?c ?c])))))))
 
           ((eq cmd 'evil-next-line)
            (setq next-column prev-column)
@@ -1122,21 +1126,21 @@ otherwise execute BODY."
           (t (execute-kbd-macro keys-vector)))
     ;; (message "after %s evil-this-register %s" (emc-get-cursor-start cursor) evil-this-register)
     ;; (message "after %s register-alist %s" (emc-get-cursor-start cursor) register-alist)
-    (emc-put-object-property cursor
+    (emc-put-cursor-property cursor
                              :column next-column
                              :evil-markers-alist evil-markers-alist
                              :evil-jump-list evil-jump-list
                              :mark-ring mark-ring
                              :mark-evil-active mark-active
-                             :friend-buffer-list dabbrev--friend-buffer-list
-                             :last-buffer dabbrev--last-buffer
-                             :last-buffer-found dabbrev--last-buffer-found
-                             :last-table dabbrev--last-table
-                             :last-abbrev-location dabbrev--last-abbrev-location
-                             :last-abbreviation dabbrev--last-abbreviation
-                             :last-expansion dabbrev--last-expansion
-                             :last-expansion-location dabbrev--last-expansion-location
-                             :last-direction dabbrev--last-direction
+                             :dabbrev--friend-buffer-list dabbrev--friend-buffer-list
+                             :dabbrev--last-buffer dabbrev--last-buffer
+                             :dabbrev--last-buffer-found dabbrev--last-buffer-found
+                             :dabbrev--last-table dabbrev--last-table
+                             :dabbrev--last-abbrev-location dabbrev--last-abbrev-location
+                             :dabbrev--last-abbreviation dabbrev--last-abbreviation
+                             :dabbrev--last-expansion dabbrev--last-expansion
+                             :dabbrev--last-expansion-location dabbrev--last-expansion-location
+                             :dabbrev--last-direction dabbrev--last-direction
                              :evil-last-paste evil-last-paste
                              :evil-last-register evil-last-register
                              :evil-this-register evil-this-register
