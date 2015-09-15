@@ -218,51 +218,65 @@ CLOSED: [2015-09-09 Wed 19:42]
 ** DONE Handle the insert mode
 CLOSED: [2015-08-29 Sat 17:37]
 - all operations performed in insert state should happen for all cursors
-** TODO Fix cursor faces 
-*** should be able to customize faces per evil state
-** TODO Implement undo for fake cursors
-*** should work with undo-tree as well as Emacs undo
-*** after undo position the cursors in the proper places
-*** TODO fix undo after a paste
-**** currently a second undo is necessary for the real cursor
-*** TODO fix cursor positions after undo
-**** after undo of certain actions the cursors end up in the wrong position
-- after cc for example
-** TODO Implement redo for fake cursors
-** TODO Implement paste/copy from/to registers
-** TODO Determine why some keys are lost
+** DONE Implement paste/copy from/to registers
+CLOSED: [2015-09-14 Mon 21:01]
+** DONE Determine why some keys are lost
+CLOSED: [2015-09-14 Mon 21:07]
 *** for example the command "csbB" results in "csB"
 *** use before advice for evil-repeat recording commands
 - evil-repeat-keystrokes, etc
 *** ensure the post-command-hook is appended rather than inserted at the front
+** DONE Fix evil-complete-next
+CLOSED: [2015-09-14 Mon 21:07]
+*** currently it only works the first time
+*** should cycle through completions
+** DONE Fix motions
+CLOSED: [2015-09-14 Mon 21:25]
+*** when there multiple cursors on the same line the jk motions causes some cursors to collapse at the same location on that line
+** DONE Add before-cursors-creation/after-cursors-deletion hooks
+CLOSED: [2015-09-14 Mon 21:30]
+*** as a place to enable/disable modes that are incompatible with emc
+** TODO Fix cursor faces 
+*** should be able to customize faces per evil state
+** TODO Implement undo/redo for fake cursors
+*** should work with undo-tree as well as Emacs undo
+*** after undo position the cursors in the proper places
+*** DONE fix undo after a paste
+CLOSED: [2015-09-14 Mon 21:12]
+**** currently a second undo is necessary for the real cursor
+*** TODO fix cursor positions after undo
+**** after undo of certain actions the cursors end up in the wrong position
+- after cc for example
 ** TODO Use all vars through methods rather than directly
 *** clean up the cursor state methods
 *** need a better way to access cursor properties
-** TODO Fix evil-complete-next
-*** currently it only works the first time
-*** should cycle through completions
 ** TODO Determine how paste of a non line over a visual line should work
 *** all fake cursors and the real one should behave the same
+*** maybe file a bug report for evil to make this behave as in vim (there should be a newline after the pasted text)
 ** TODO Improve performance
 *** slow commands for 10+ cursors
 - change "cw"
 - evil snipe "f-"
 - execute-kbd-macro seems to cause the slowness
-** TODO Fix motions
-*** when there multiple cursors on the same line the jk motions causes some cursors to collapse at the same location on that line
+*** a workaround for this is to narrow to region or function
 ** TODO Fix evil-repeat
 *** currently only works for some commands
+*** for self-insert-command and similar we need to tell evil-repeat to stop recording
+- currently it records the changes made at all cursors
+- how can we make evil-repeat work for cursor
 ** TODO Fix smartchr commands
 ** TODO Fix yasnippet commands
 *** something in pre-command-hook causes an error
-** TODO Run pre/post command hooks when running commands for fake cursors
 ** TODO Fix insertion js2 mode 
 *** when in an error state some characters are recorded twice
-** TODO Add before-cursors-creation/after-cursors-deletion hooks
-*** as a place to enable/disable modes that are incompatible with emc
 ** TODO prevent the cursors from losing state when navigating through them
 *** all cursors navigation (next/prev) causes cursors to lose state as it re-creates them
 *** all undo position, markers, etc are lost
 ** TODO Fix move text up/down
 *** currently it only works if the cursors are not on consecutive lines
-
+** TODO Implement debug messages & levels
+** TODO Implement cursors status
+*** number of cursors
+** TODO Refactor command run functions
+*** extract to own file
+** TODO Test with various modes (org, js2, ruby, etc)
