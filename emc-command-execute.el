@@ -16,29 +16,29 @@
 
 
 ;; TODO move to vars
-(defvar emc-cursor-state-group
-  '((:default . (:column
-                 :evil-jump-list
-                 :evil-last-paste
-                 :evil-last-register
-                 :evil-markers-alist
-                 :evil-this-register
-                 :evil-was-yanked-without-register
-                 :kill-ring
-                 :kill-ring-yank-pointer
-                 :mark-evil-active
-                 :mark-ring
-                 :region
-                 :register-alist))
-    (:complete . (:dabbrev--friend-buffer-list
-                  :dabbrev--last-buffer
-                  :dabbrev--last-buffer-found
-                  :dabbrev--last-table
-                  :dabbrev--last-abbrev-location
-                  :dabbrev--last-abbreviation
-                  :dabbrev--last-expansion
-                  :dabbrev--last-expansion-location
-                  :dabbrev--last-direction)))
+(defvar emc-cursor-state
+  '((:default . (column
+                 evil-jump-list
+                 evil-last-paste
+                 evil-last-register
+                 evil-markers-alist
+                 evil-this-register
+                 evil-was-yanked-without-register
+                 kill-ring
+                 kill-ring-yank-pointer
+                 mark-evil-active
+                 mark-ring
+                 region
+                 register-alist))
+    (:complete . (dabbrev--friend-buffer-list
+                  dabbrev--last-buffer
+                  dabbrev--last-buffer-found
+                  dabbrev--last-table
+                  dabbrev--last-abbrev-location
+                  dabbrev--last-abbreviation
+                  dabbrev--last-expansion
+                  dabbrev--last-expansion-location
+                  dabbrev--last-direction)))
   "State tracked per cursor.")
 
 (defun emc-execute-for (cursor)
