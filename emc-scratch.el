@@ -1346,7 +1346,13 @@ otherwise execute BODY."
     (push (lambda () (evil-jumper-mode t)) emc-paused-modes))
   (when (bound-and-true-p yas-minor-mode)
     (yas-minor-mode 0)
-    (push (lambda () (yas-minor-mode t)) emc-paused-modes )))
+    (push (lambda () (yas-minor-mode t)) emc-paused-modes ))
+  (when (or (bound-and-true-p web-mode) (eq major-mode 'web-mode))
+    (smartchr/undo-web-mode)
+    (push (lambda () (smartchr/init-web-mode)) emc-paused-modes))
+  (when (or (bound-and-true-p js2-mode) (eq major-mode 'js2-mode))
+    (smartchr/undo-js2-mode)
+    (push (lambda () (smartchr/init-js2-mode)) emc-paused-modes)))
 
 (defun emc-after-cursors-teardown-hook ()
   "Hook to run after all cursors are deleted."
