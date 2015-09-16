@@ -494,14 +494,14 @@
 ;; (defun emc-run-last-command-for-all-cursors ()
 ;;   "Runs the last command for all cursors."
 ;;   (interactive)
-;;   (unless (or emc-running-command)
-;;     (setq emc-running-command t)
+;;   (unless (or emc-executing-command)
+;;     (setq emc-executing-command t)
 ;;     (save-excursion
 ;;       (dolist (cursor emc-cursor-list)
 ;;         (let ((start (overlay-start cursor)))
 ;;           (goto-char start)
 ;;           (evil-repeat 1))))
-;;     (setq emc-running-command nil)))
+;;     (setq emc-executing-command nil)))
 
 ;; (defun emc-print-evil-register ()
 ;;   (setq emc-command-recording t)
@@ -605,7 +605,7 @@
 
 ;; (defun emc-begin-save-command ()
 ;;   "Begin saving the current command if it is a supported command in `emc-command-info'."
-;;   (when (not emc-running-command)
+;;   (when (not emc-executing-command)
 ;;     (emc-print-this-command "PRE")
 ;;     (let ((cmd (or (command-remapping this-original-command) this-original-command)))
 ;;       (when (emc-supported-command-p cmd)
@@ -617,7 +617,7 @@
 ;; (defun emc-record-key-sequence (prompt &optional continue-echo dont-downcase-last
 ;;                                        can-return-switch-frame cmd-loop)
 ;;   "Record the current command keys before they are reset."
-;;   (when (not emc-running-command)
+;;   (when (not emc-executing-command)
 ;;     (let* ((orig (emc-get-this-command-keys))
 ;;            (new (emc-normalize-keys (this-command-keys-vector)))
 ;;            (all (append orig new)))
@@ -630,7 +630,7 @@
 
 ;; (defun emc-finish-save-command ()
 ;;   "Finish saving the current command. This should be called from `post-command-hook'."
-;;   (when (not emc-running-command)
+;;   (when (not emc-executing-command)
 ;;     (emc-print-this-command "POST")
 ;;     (emc-append-this-command-keys (emc-append-unique
 ;;                                    (this-command-keys-vector)
@@ -639,7 +639,7 @@
 
 ;; (defun emc-position-cursors-after-insert ()
 ;;   "Re-position the cursors when exiting insert state."
-;;   (when (not emc-running-command)
+;;   (when (not emc-executing-command)
 ;;     (emc-clear-this-command)
 ;;     (emc-set-this-command 'evil-backward-char)
 ;;     (emc-run-command-for-all-cursors)))
@@ -1187,10 +1187,10 @@ otherwise execute BODY."
 
 (defun emc-run-command-for-all-cursors ()
   "Runs the current command for all cursors."
-  (unless (or (emc-running-command-p)
+  (unless (or (emc-executing-command-p)
               (emc-frozen-p)
               (not (emc-has-command-p)))
-    (let ((emc-running-command t))
+    (let ((emc-executing-command t))
       ;; (evil-start-undo-step t)
 
       ;; NOTE the logic below removes the undo marker for
@@ -1376,7 +1376,7 @@ otherwise execute BODY."
 ;; (defun emc-print-command-vars ()
 ;;   "Prints command variables."
 ;;   (interactive)
-;;   (prin1 (cons emc-command-info emc-running-command)))
+;;   (prin1 (cons emc-command-info emc-executing-command)))
 
 ;; (defun emc-record-command (info)(emc-command-info)
 ;;   (setq emc-command-info info))(emc-pre-command-hook)
