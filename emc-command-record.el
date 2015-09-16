@@ -1,9 +1,9 @@
-;;; emc-command-info.el --- Info for the currently running command
+;;; emc-command-record.el --- Record info for the currently running command
 
 ;;; Commentary:
 
-;; This file contains functions for storing and interacting with
-;; the currently running command info
+;; This file contains functions for recording information about
+;; the currently running command
 
 (require 'cl)
 (require 'evil)
@@ -14,10 +14,10 @@
 (defun emc-command-reset ()
   "Clear the currently saved command info."
   (setq emc-command nil)
-  (setq emc-command-recording nil))
+  (setq emc-recording-command nil))
 
 (defun emc-supported-command-p (cmd)
-  "Return true if CMD is supported for multiple cursors."
+  "Return true if cmd is supported for multiple cursors."
   (let ((repeat-type (evil-get-command-property cmd :repeat)))
     (or (eq repeat-type 'motion)
 
@@ -165,52 +165,52 @@
 
 (defun emc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
-  (when (emc-command-debug-p) (message "CMD %s %s" this-command (this-command-keys)))
-  (when (and (not (emc-running-command-p))
-             (not (emc-command-recording-p)))
+  (when (emc-recording-debug-p) (message "command %s %s" this-command (this-command-keys)))
+  (when (and (not (emc-executing-command-p))
+             (not (emc-recording-command-p)))
     (setq emc-command nil)
     (when (and (emc-has-cursors-p)
                (not (evil-emacs-state-p))
                (emc-supported-command-p this-command))
-      (setq emc-command-recording t)
+      (setq emc-recording-command t)
       (emc-set-command-property :name this-command
                                 :keys-pre (this-command-keys-vector)
                                 :evil-state-begin (emc-get-evil-state))
-      (when (emc-command-debug-p) (message "CMD-BEGIN %s" emc-command)))))
+      (when (emc-recording-debug-p) (message "record-begin %s" emc-command)))))
 (put 'emc-begin-command-save 'permanent-local-hook t)
 
 (defun emc-save-keys-motion (flag)
   "Save the current evil motion key sequence."
-  (when (emc-command-recording-p)
+  (when (emc-recording-command-p)
     (emc-save-keys flag
                    :keys-motion-pre
                    :keys-motion-post
                    (this-command-keys-vector))
-    (when (emc-command-debug-p)
-      (message "CMD-MOTION %s %s %s %s"
+    (when (emc-recording-debug-p)
+      (message "record-motion %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun emc-save-keys-operator (flag)
   "Save the current evil operator key sequence."
-  (when (and (emc-command-recording-p)
+  (when (and (emc-recording-command-p)
              (memq evil-state '(operator)))
     (emc-save-keys flag
                    :keys-operator-pre
                    :keys-operator-post
                    (this-command-keys-vector))
-    (when (emc-command-debug-p)
-      (message "CMD-OPERATOR %s %s %s %s"
+    (when (emc-recording-debug-p)
+      (message "record-operator %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun emc-finish-command-save ()
   "Completes the save of a command."
-  (when (emc-command-recording-p)
+  (when (emc-recording-command-p)
     (emc-set-command-property :evil-state-end (emc-get-evil-state)
                               :last-input last-input-event
                               :keys-post (this-command-keys-vector)
                               :keys-post-raw (this-single-command-raw-keys))
-    (when (emc-command-debug-p)
-      (message "CMD-FINISH %s %s" emc-command this-command))
+    (when (emc-recording-debug-p)
+      (message "record-finish %s %s" emc-command this-command))
     (ignore-errors
       (condition-case error
           (emc-finalize-command)
@@ -218,7 +218,7 @@
                         (emc-get-command-name)
                         (error-message-string error))
                nil))))
-  (setq emc-command-recording nil))
+  (setq emc-recording-command nil))
 (put 'emc-finish-command-save 'permanent-local-hook t)
 
 (defun emc-finalize-command ()
@@ -249,8 +249,8 @@
                              (vconcat keys-operator-pre
                                       keys-operator-post))))
                  (t (or keys-post keys-pre)))))
-  (when (emc-command-debug-p)
-    (message "CMD-DONE %s pre %s post %s keys-motion %s keys-operator %s keys %s"
+  (when (emc-recording-debug-p)
+    (message "record-done %s pre %s post %s keys-motion %s keys-operator %s keys %s"
              (emc-get-command-name)
              (emc-get-command-keys-string :keys-pre)
              (emc-get-command-keys-string :keys-post)
@@ -274,6 +274,6 @@
   (advice-remove 'evil-repeat-keystrokes #'emc-save-keys-motion)
   (advice-remove 'evil-repeat-motion #'emc-save-keys-operator))
 
-(provide 'emc-command-info)
+(provide 'emc-command-record)
 
-;;; emc-command-info.el ends here
+;;; emc-command-record.el ends here

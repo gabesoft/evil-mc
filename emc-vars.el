@@ -26,8 +26,11 @@
   :type 'integer
   :group 'emc)
 
-(evil-define-local-var emc-running-command nil
-  "True when running a command for all cursors.")
+(evil-define-local-var emc-executing-command nil
+  "True when executing a command for all cursors.")
+
+(evil-define-local-var emc-recording-command nil
+  "True when recording `this-command' data.")
 
 (evil-define-local-var emc-cursor-command nil
   "True if the current command is an emc cursor command.")
@@ -47,44 +50,74 @@
 (evil-define-local-var emc-command nil
   "Data for the current command to be executed by the fake cursors.")
 
-(evil-define-local-var emc-command-recording nil
-  "True if recording `this-command' data.")
+(evil-define-local-var emc-executing-debug nil
+  "If true display debug messages during the execution of a command.")
 
-(evil-define-local-var emc-command-debug nil
-  "If true display debug messages about the current command being recorded.")
-
-(evil-define-local-var emc-debug nil
-  "If true print debug information.")
+(evil-define-local-var emc-recording-debug nil
+  "If true display debug messages during the recording of a command.")
 
 (defun emc-has-cursors-p ()
   "True if there are any fake cursors."
   (not (null emc-cursor-list)))
 
-(defun emc-command-recording-p ()
-  "True if recording a command."
-  (eq emc-command-recording t))
-
-(defun emc-running-command-p ()
-  "True when running a command for all fake cursors."
-  (eq emc-running-command t))
-
-(defun emc-command-p ()
+(defun emc-has-command-p ()
   "True if there is data saved for the current command."
   (not (null emc-command)))
 
-(defun emc-command-debug-p ()
-  "True if debug for command recording is on."
-  (eq emc-command-debug t))
+(defun emc-has-pattern-p ()
+  "True if there is a saved pattern."
+  (not (null emc-pattern)))
 
-(defun emc-command-debug-on ()
-  "Show debug messages about the current command being recorded."
-  (interactive)
-  (setq emc-command-debug t))
+(defun emc-executing-command-p ()
+  "True when executing a command for all fake cursors."
+  (eq emc-executing-command t))
 
-(defun emc-command-debug-off ()
-  "Hide debug messages about the current command being recorded."
+(defun emc-recording-command-p ()
+  "True when recording a command."
+  (eq emc-recording-command t))
+
+(defun emc-executing-debug-p ()
+  "True if debugging is enabled during the execution of a command."
+  (eq emc-executing-debug t))
+
+(defun emc-recording-debug-p ()
+  "True if debugging is enabled during the recording of a command."
+  (eq emc-recording-debug t))
+
+(defun emc-debug (state executing recording)
+  "Enable debugging according to STATE for command EXECUTING or RECORDING or both."
+  (when recording (setq emc-recording-debug state))
+  (when executing (setq emc-executing-debug state)))
+
+(defun emc-executing-debug-on ()
+  "Turn debug on while executing a command."
   (interactive)
-  (setq emc-command-debug nil))
+  (emc-debug t t nil))
+
+(defun emc-executing-debug-off ()
+  "Turn debug off while executing a command."
+  (interactive)
+  (emc-debug nil t nil))
+
+(defun emc-recording-debug-on ()
+  "Turn debug on while recording a command."
+  (interactive)
+  (emc-debug t nil t))
+
+(defun emc-recording-debug-off ()
+  "Turn debug off while recording a command."
+  (interactive)
+  (emc-debug nil nil t))
+
+(defun emc-all-debug-on ()
+  "Turn all debug on."
+  (interactive)
+  (emc-debug t t t))
+
+(defun emc-all-debug-off ()
+  "Turn all debug off."
+  (interactive)
+  (emc-debug nil t t))
 
 (defun emc-print-pattern ()
   "Print the curent pattern."
@@ -145,10 +178,6 @@
   "Return the current pattern length."
   (when emc-pattern
     (- (emc-get-pattern-end) (emc-get-pattern-start))))
-
-(defun emc-has-pattern-p ()
-  "True if there is a saved pattern."
-  (not (null emc-pattern)))
 
 (provide'emc-vars)
 

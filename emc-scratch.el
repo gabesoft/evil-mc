@@ -5,20 +5,20 @@
 
 ;; (load-file "emc-common.el")
 ;; (load-file "emc-cursor-state.el")
-;; (load-file "emc-command-info.el")
+;; (load-file "emc-command-record.el")
 
 (require 'emc-vars)
 (require 'emc-common)
 (require 'emc-cursor-state)
 (require 'emc-cursor-make)
-(require 'emc-command-info)
+(require 'emc-command-record)
 (require 'emc-region)
 
 
 (evil-define-local-var emc-watch-buffers
   '("emc-common"
     "emc-cursor-state"
-    "emc-command-info"
+    "emc-command-record"
     "emc-region"
     "emc-scratch"))
 
@@ -512,16 +512,16 @@
 (defun emc-debug-on ()
   "Turn debug on."
   (interactive)
-  (setq emc-debug t))
+  (setq emc-executing-debug t))
 
 (defun emc-debug-off ()
   "Turn debug off."
   (interactive)
-  (setq emc-debug nil))
+  (setq emc-executing-debug nil))
 
 ;; (defun emc-print-this-command (msg)
 ;;   "Print info about `this-command' prefixed with MSG."
-;;   (when emc-debug
+;;   (when emc-executing-debug
 ;;     (message "%s: command %s keys %s vector %s raw %s last event %s last command %s"
 ;;              msg
 ;;              this-command
@@ -622,7 +622,7 @@
 ;;            (new (emc-normalize-keys (this-command-keys-vector)))
 ;;            (all (append orig new)))
 ;;       (emc-set-this-command-keys (remove-duplicates all :from-end t)))
-;;     (when emc-debug
+;;     (when emc-executing-debug
 ;;       (message "CMD-KEY-SEQ-OLD %s %s %s"
 ;;                (this-command-keys)
 ;;                (this-command-keys-vector)
@@ -792,7 +792,7 @@
          (last-input (emc-get-command-last-input))
          (keys-count (emc-get-command-keys-count))
          (keys-vector (emc-get-command-keys-vector)))
-    (when emc-debug (message "CMD-VISUAL %s" cmd))
+    (when emc-executing-debug (message "CMD-VISUAL %s" cmd))
     (cond ((or (eq cmd 'exchange-point-and-mark)
                (eq cmd 'evil-exchange-point-and-mark))
            (let* ((new-region (emc-exchange-region-point-and-mark region))
@@ -923,7 +923,7 @@ otherwise execute BODY."
          (keys-register (if evil-this-register (vconcat [?\"] (vector evil-this-register)) []))
          (keys-vector-with-register (vconcat keys-register keys-vector))
          )
-    (when emc-debug (message "CMD %s keys %s" cmd keys-vector))
+    (when emc-executing-debug (message "CMD %s keys %s" cmd keys-vector))
     ;; (message "evil-jump-list %s" evil-jump-list)
     ;; (message "evil-markers-alist %s" evil-markers-alist)
     ;; (message "mark-ring %s" mark-ring)
@@ -1162,8 +1162,8 @@ otherwise execute BODY."
 ;; TODO run the pre/post command hooks
 (defun emc-run-command (cursor)
   "Executes the command stored in `emc-command' for CURSOR."
-  (when (and (emc-command-p) (not emc-cursor-command))
-    (when emc-debug
+  (when (and (emc-has-command-p) (not emc-cursor-command))
+    (when emc-executing-debug
       (message "Executing %s command" (emc-get-command-name)))
     (ignore-errors
       (condition-case error
@@ -1189,7 +1189,7 @@ otherwise execute BODY."
   "Runs the current command for all cursors."
   (unless (or (emc-running-command-p)
               (emc-frozen-p)
-              (not (emc-command-p)))
+              (not (emc-has-command-p)))
     (let ((emc-running-command t))
       ;; (evil-start-undo-step t)
 
@@ -1339,7 +1339,7 @@ otherwise execute BODY."
 
 (defun emc-before-cursors-setup-hook ()
   "Hook to run before any cursor is created."
-  (when emc-debug (message "Before cursors hook"))
+  (when emc-executing-debug (message "Before cursors hook"))
   (setq emc-paused-modes nil)
   (when (bound-and-true-p evil-jumper-mode)
     (evil-jumper-mode 0)
@@ -1350,7 +1350,7 @@ otherwise execute BODY."
 
 (defun emc-after-cursors-teardown-hook ()
   "Hook to run after all cursors are deleted."
-  (when emc-debug (message "After cursors hook %s" emc-paused-modes))
+  (when emc-executing-debug (message "After cursors hook %s" emc-paused-modes))
   (dolist (fn emc-paused-modes) (funcall fn))
   (setq emc-paused-modes nil))
 
