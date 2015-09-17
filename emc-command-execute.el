@@ -7,6 +7,7 @@
 (require 'cl)
 (require 'evil)
 (require 'emc-common)
+(require 'emc-vars)
 (require 'emc-cursor-state)
 (require 'emc-cursor-make)
 (require 'emc-command-record)
@@ -14,36 +15,79 @@
 
 ;;; Code:
 
+(defmacro emc-define-handler (command &rest body)
+  (declare (indent defun)
+           (debug (&define name
+                           [&optional lambda-list]
+                           [&optional stringp]
+                           [&rest keyword sexp]
+                           def-body)))
+  (let (arg args doc doc-form key keys)
+    (when (listp (car-safe body)) (setq args (pop body)))
+    (when (> (length body) 1)
+      (if (eq (car-safe (car-safe body)) 'format)
+          (setq doc-form (pop body))
+        (when (stringp (car-safe body))
+          (setq doc (pop body)))))
+    (while (keywordp (car-safe body))
+      (setq key (pop body)
+            arg (pop body))
+      (unless nil (setq keys (plist-put keys key arg))))
+    `(progn
+       ,(when (and command body)
+          `(defun ,command ,args
+             ,@(when doc `(,doc))
+             ,@body))
+       ,(when (and command doc-form)
+          `(put ',command 'function-documentation ,doc-form))
+       (let ((func ',(if (and (null command) body)
+                         `(lambda ,args
+                            ,@body)
+                       command)))
+         (apply #'evil-set-command-properties func ',keys)
+         func))))
 
-;; TODO move to vars
-(defvar emc-cursor-state
-  '((:default . (column
-                 evil-jump-list
-                 evil-last-paste
-                 evil-last-register
-                 evil-markers-alist
-                 evil-this-register
-                 evil-was-yanked-without-register
-                 kill-ring
-                 kill-ring-yank-pointer
-                 mark-evil-active
-                 mark-ring
-                 region
-                 register-alist))
-    (:complete . (dabbrev--friend-buffer-list
-                  dabbrev--last-buffer
-                  dabbrev--last-buffer-found
-                  dabbrev--last-table
-                  dabbrev--last-abbrev-location
-                  dabbrev--last-abbreviation
-                  dabbrev--last-expansion
-                  dabbrev--last-expansion-location
-                  dabbrev--last-direction)))
-  "State tracked per cursor.")
+(defun emc-get-command-handler (cmd state)
+  "Get the handler function for CMD and evil STATE."
+  ;; TODO use state
+  ;; return a default handler per state if none is found
+  (emc-get-object-property emc-known-commands cmd))
+
+(emc-define-handler emc-execute-complete (cursor)
+  "Execute a completion command."
+  :cursor-state :complete
+  (funcall (emc-get-command-name)))
+
+(emc-define-handler emc-execute-hippie-expand (cursor)
+  "Execute a completion command."
+  :cursor-state :complete
+  (hippie-expand 1))
+
+(emc-define-handler emc-execute-find-char (cursor)
+  "Execute a `evil-find-char' command."
+  (evil-repeat-find-char (emc-get-command-keys-count)))
+
+(emc-define-handler emc-execute-evil-snipe (cursor)
+  "Execute a `evil-snipe' command"
+  (evil-snipe-repeat (emc-get-command-keys-count)))
 
 (defun emc-execute-for (cursor)
   "Execute the current command for CURSOR."
-  ())
+  (let ((cmd (emc-get-command-name))
+        (state (emc-get-command-state))
+        (handler (emc-get-command-handler cmd state))
+        (cursor-state (evil-get-command-property handler :cursor-state)))
+    ;; TODO set up cursor state
+    ;; get the default cursor state as well
+    (ignore-errors
+      (condition-case error
+          (funcall handler cursor)
+        (error (message "failed to execute %s with error %s"
+                        cmd
+                        (error-message-string error))
+               cursor)))
+    ;; TODO update cursor state
+    ))
 
 
 (defun emc-execute-for-all ()

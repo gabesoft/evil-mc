@@ -272,6 +272,7 @@ CLOSED: [2015-09-14 Mon 21:12]
 ** TODO prevent the cursors from losing state when navigating through them
 *** all cursors navigation (next/prev) causes cursors to lose state as it re-creates them
 *** all undo position, markers, etc are lost
+*** maybe create a cursor for the real one as well and mark it as non executable but keep it in up to date
 ** TODO Fix move text up/down
 *** currently it only works if the cursors are not on consecutive lines
 ** TODO Implement debug messages & levels

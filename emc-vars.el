@@ -26,6 +26,51 @@
   :type 'integer
   :group 'emc)
 
+(defvar emc-cursor-state
+  '((:default . (column
+                 evil-jump-list
+                 evil-last-paste
+                 evil-last-register
+                 evil-markers-alist
+                 evil-this-register
+                 evil-was-yanked-without-register
+                 kill-ring
+                 kill-ring-yank-pointer
+                 mark-evil-active
+                 mark-ring
+                 region
+                 register-alist))
+    (:complete . (dabbrev--friend-buffer-list
+                  dabbrev--last-buffer
+                  dabbrev--last-buffer-found
+                  dabbrev--last-table
+                  dabbrev--last-abbrev-location
+                  dabbrev--last-abbreviation
+                  dabbrev--last-expansion
+                  dabbrev--last-expansion-location
+                  dabbrev--last-direction)))
+  "State tracked per cursor.")
+
+(defvar emc-known-commands
+  '(
+    (evil-complete-next . emc-execute-complete)
+    (evil-complete-next-line . emc-execute-complete)
+    (evil-complete-previous . emc-execute-complete)
+    (evil-complete-previous-line . emc-execute-complete)
+    (evil-find-char . emc-execute-find-char)
+    (evil-find-char-backward . emc-execute-find-char)
+    (evil-find-char-to . emc-execute-find-char)
+    (evil-find-char-to-backward . emc-execute-find-char)
+    (evil-snipe-F . emc-execute-evil-snipe)
+    (evil-snipe-S . emc-execute-evil-snipe)
+    (evil-snipe-T . emc-execute-evil-snipe)
+    (evil-snipe-f . emc-execute-evil-snipe)
+    (evil-snipe-s . emc-execute-evil-snipe)
+    (evil-snipe-t . emc-execute-evil-snipe)
+    (hippie-expand . emc-execute-hippie-expand)
+    )
+  "A list of the supported commands and their handlers")
+
 (evil-define-local-var emc-executing-command nil
   "True when executing a command for all cursors.")
 
@@ -55,6 +100,10 @@
 
 (evil-define-local-var emc-recording-debug nil
   "If true display debug messages during the recording of a command.")
+
+(defun emc-known-command-p (cmd)
+  "True if CMD is a supported command"
+  (not (null (assq cmd emc-known-commands))))
 
 (defun emc-has-cursors-p ()
   "True if there are any fake cursors."

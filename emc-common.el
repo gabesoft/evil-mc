@@ -6,6 +6,8 @@
 
 ;;; Code:
 
+;; TODO replace these with
+;; evil-put-property evil-get-property
 (defun emc-get-object-property (obj prop)
   "Get the value of PROP from OBJ."
   (let ((item (assq prop obj)))
@@ -20,6 +22,13 @@
                                          (pop properties)
                                          (pop properties))))
     obj))
+
+(defun emc-put-object-properties (obj &rest properties)
+  "Return a new OBJ that has all the PROPERTIES specified."
+  (when properties
+    (apply #'emc-put-object-property
+           (cons obj properties))))
+
 
 (defun emc-column-number (pos)
   "Return the column number at POS."

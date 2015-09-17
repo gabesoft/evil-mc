@@ -127,10 +127,10 @@
   "Print the cursors registers."
   (interactive)
   (message "%s" (mapcar (lambda (cursor)
-                          (emc-get-cursor-property cursor :register-alist))
+                          (emc-get-cursor-property cursor 'register-alist))
                         emc-cursor-list))
   (message "%s" (mapcar (lambda (cursor)
-                          (emc-get-cursor-property cursor :evil-this-register))
+                          (emc-get-cursor-property cursor 'evil-this-register))
                         emc-cursor-list)))
 
 ;; (defun emc-draw-cursor-at-point-old ()
@@ -182,32 +182,32 @@
 
 ;; (emc-remove-cursors "next")
 
-(defun emc-set-pattern-from-visual-selection-old ()
-  "Stores the pattern delimited by the current visual region along with its position."
-  (let* ((range (evil-visual-range))
-         (start (car range))
-         (end (car (cdr range)))
-         (pattern (buffer-substring-no-properties start end)))
-    (if (< (length pattern) 2)
-        (error "At least 2 characters required for creating a cursor")
-      (setq emc-pattern (cons pattern (cons end start))))))
+;; (defun emc-set-pattern-from-visual-selection-old ()
+;;   "Stores the pattern delimited by the current visual region along with its position."
+;;   (let* ((range (evil-visual-range))
+;;          (start (car range))
+;;          (end (car (cdr range)))
+;;          (pattern (buffer-substring-no-properties start end)))
+;;     (if (< (length pattern) 2)
+;;         (error "At least 2 characters required for creating a cursor")
+;;       (setq emc-pattern (cons pattern (cons end start))))))
 
-(defun emc-get-pattern-old ()
-  "Get the current pattern if any."
-  (when emc-pattern (car emc-pattern)))
+;; (defun emc-get-pattern-old ()
+;;   "Get the current pattern if any."
+;;   (when emc-pattern (car emc-pattern)))
 
 ;; (defun emc-get-position ()
 ;;   "Get the position of the current pattern if any."
 ;;   (when emc-pattern (cdr emc-pattern)))
 
-(defun emc-add-cursor-old (overlay)
-  "Create a cursor object from OVERLAY and add it to the cursors list."
-  (setq emc-cursor-list
-        (cons (emc-put-cursor-property nil
-                                       :overlay overlay
-                                       :kill-ring (copy-sequence kill-ring)
-                                       :kill-ring-yank-pointer nil)
-              emc-cursor-list)))
+;; (defun emc-add-cursor-old (overlay)
+;;   "Create a cursor object from OVERLAY and add it to the cursors list."
+;;   (setq emc-cursor-list
+;;         (cons (emc-put-cursor-property nil
+;;                                        'overlay overlay
+;;                                        'kill-ring (copy-sequence kill-ring)
+;;                                        'kill-ring-yank-pointer nil)
+;;               emc-cursor-list)))
 
 ;; (defun emc-add-region (region)
 ;;   "Add REGION to the region list."
@@ -787,8 +787,8 @@
          (region (emc-get-cursor-region cursor))
          (region-type (emc-get-region-type region))
          (repeat-type (evil-get-command-property cmd :repeat))
-         (evil-last-register (emc-get-cursor-property cursor :evil-last-register))
-         (evil-this-register (emc-get-cursor-property cursor :evil-this-register))
+         (evil-last-register (emc-get-cursor-property cursor 'evil-last-register))
+         (evil-this-register (emc-get-cursor-property cursor 'evil-this-register))
          (last-input (emc-get-command-last-input))
          (keys-count (emc-get-command-keys-count))
          (keys-vector (emc-get-command-keys-vector)))
@@ -867,9 +867,9 @@
 
           (t (message "not implemented")))
     (emc-put-cursor-property cursor
-                             :evil-last-register evil-last-register
-                             :evil-this-register evil-this-register
-                             :region region)))
+                             'evil-last-register evil-last-register
+                             'evil-this-register evil-this-register
+                             'region region)))
 
 (defmacro emc-with-region (region fn &rest body)
   "When the REGION exists and has an overlay execute FN
@@ -897,21 +897,21 @@ otherwise execute BODY."
          ;; TODO need to have state per command
          ;; dabbrev should be persisted only for evil-complete functions
          ;; the property names should match the full value name
-         (dabbrev--friend-buffer-list (emc-get-cursor-property cursor :dabbrev--friend-buffer-list))
-         (dabbrev--last-buffer (emc-get-cursor-property cursor :dabbrev--last-buffer))
-         (dabbrev--last-buffer-found (emc-get-cursor-property cursor :dabbrev--last-buffer-found))
-         (dabbrev--last-table (emc-get-cursor-property cursor :dabbrev--last-table))
-         (dabbrev--last-abbrev-location (emc-get-cursor-property cursor :dabbrev--last-abbrev-location))
-         (dabbrev--last-abbreviation (emc-get-cursor-property cursor :dabbrev--last-abbreviation))
-         (dabbrev--last-expansion (emc-get-cursor-property cursor :dabbrev--last-expansion))
-         (dabbrev--last-expansion-location (emc-get-cursor-property cursor :dabbrev--last-expansion-location))
-         (dabbrev--last-direction (emc-get-cursor-property cursor :dabbrev--last-direction))
+         (dabbrev--friend-buffer-list (emc-get-cursor-property cursor 'dabbrev--friend-buffer-list))
+         (dabbrev--last-buffer (emc-get-cursor-property cursor 'dabbrev--last-buffer))
+         (dabbrev--last-buffer-found (emc-get-cursor-property cursor 'dabbrev--last-buffer-found))
+         (dabbrev--last-table (emc-get-cursor-property cursor 'dabbrev--last-table))
+         (dabbrev--last-abbrev-location (emc-get-cursor-property cursor 'dabbrev--last-abbrev-location))
+         (dabbrev--last-abbreviation (emc-get-cursor-property cursor 'dabbrev--last-abbreviation))
+         (dabbrev--last-expansion (emc-get-cursor-property cursor 'dabbrev--last-expansion))
+         (dabbrev--last-expansion-location (emc-get-cursor-property cursor 'dabbrev--last-expansion-location))
+         (dabbrev--last-direction (emc-get-cursor-property cursor 'dabbrev--last-direction))
 
-         (evil-last-paste (emc-get-cursor-property cursor :evil-last-paste))
-         (evil-last-register (emc-get-cursor-property cursor :evil-last-register))
-         (evil-this-register (emc-get-cursor-property cursor :evil-this-register))
-         (evil-was-yanked-without-register (emc-get-cursor-property cursor :evil-was-yanked-without-register))
-         (register-alist (emc-get-cursor-property cursor :register-alist))
+         (evil-last-paste (emc-get-cursor-property cursor 'evil-last-paste))
+         (evil-last-register (emc-get-cursor-property cursor 'evil-last-register))
+         (evil-this-register (emc-get-cursor-property cursor 'evil-this-register))
+         (evil-was-yanked-without-register (emc-get-cursor-property cursor 'evil-was-yanked-without-register))
+         (register-alist (emc-get-cursor-property cursor 'register-alist))
 
          (evil-markers-alist (emc-get-cursor-evil-markers-alist cursor))
          (evil-jump-list (emc-get-cursor-evil-jump-list cursor))
@@ -943,13 +943,13 @@ otherwise execute BODY."
           ((or (eq cmd 'evil-snipe-f) (eq cmd 'evil-snipe-F)
                (eq cmd 'evil-snipe-t) (eq cmd 'evil-snipe-T)
                (eq cmd 'evil-snipe-s) (eq cmd 'evil-snipe-S))
-           (evil-snipe-repeat 1))
+           (evil-snipe-repeat keys-count))
 
           ((or (eq cmd 'evil-find-char)
                (eq cmd 'evil-find-char-to)
                (eq cmd 'evil-find-char-backward)
                (eq cmd 'evil-find-char-to-backward))
-           (evil-repeat-find-char))
+           (evil-repeat-find-char keys-count))
 
           ((eq cmd 'evil-commentary)
            (emc-with-region region 'evil-commentary
@@ -1127,28 +1127,28 @@ otherwise execute BODY."
     ;; (message "after %s evil-this-register %s" (emc-get-cursor-start cursor) evil-this-register)
     ;; (message "after %s register-alist %s" (emc-get-cursor-start cursor) register-alist)
     (emc-put-cursor-property cursor
-                             :column next-column
-                             :evil-markers-alist evil-markers-alist
-                             :evil-jump-list evil-jump-list
-                             :mark-ring mark-ring
-                             :mark-evil-active mark-active
-                             :dabbrev--friend-buffer-list dabbrev--friend-buffer-list
-                             :dabbrev--last-buffer dabbrev--last-buffer
-                             :dabbrev--last-buffer-found dabbrev--last-buffer-found
-                             :dabbrev--last-table dabbrev--last-table
-                             :dabbrev--last-abbrev-location dabbrev--last-abbrev-location
-                             :dabbrev--last-abbreviation dabbrev--last-abbreviation
-                             :dabbrev--last-expansion dabbrev--last-expansion
-                             :dabbrev--last-expansion-location dabbrev--last-expansion-location
-                             :dabbrev--last-direction dabbrev--last-direction
-                             :evil-last-paste evil-last-paste
-                             :evil-last-register evil-last-register
-                             :evil-this-register evil-this-register
-                             :evil-was-yanked-without-register evil-was-yanked-without-register
-                             :register-alist register-alist
-                             :kill-ring kill-ring
-                             :kill-ring-yank-pointer kill-ring-yank-pointer
-                             :region nil)))
+                             'column next-column
+                             'evil-markers-alist evil-markers-alist
+                             'evil-jump-list evil-jump-list
+                             'mark-ring mark-ring
+                             'mark-evil-active mark-active
+                             'dabbrev--friend-buffer-list dabbrev--friend-buffer-list
+                             'dabbrev--last-buffer dabbrev--last-buffer
+                             'dabbrev--last-buffer-found dabbrev--last-buffer-found
+                             'dabbrev--last-table dabbrev--last-table
+                             'dabbrev--last-abbrev-location dabbrev--last-abbrev-location
+                             'dabbrev--last-abbreviation dabbrev--last-abbreviation
+                             'dabbrev--last-expansion dabbrev--last-expansion
+                             'dabbrev--last-expansion-location dabbrev--last-expansion-location
+                             'dabbrev--last-direction dabbrev--last-direction
+                             'evil-last-paste evil-last-paste
+                             'evil-last-register evil-last-register
+                             'evil-this-register evil-this-register
+                             'evil-was-yanked-without-register evil-was-yanked-without-register
+                             'register-alist register-alist
+                             'kill-ring kill-ring
+                             'kill-ring-yank-pointer kill-ring-yank-pointer
+                             'region nil)))
 
 ;; (defun emc-process-last-command-result (input)
 ;;   "Convert the INPUT of the last command into the expected format."
