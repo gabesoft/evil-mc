@@ -93,13 +93,13 @@
 
 (defun emc-get-evil-state ()
   "Get the current evil state."
-  (cond ((evil-insert-state-p) 'insert)
-        ((evil-motion-state-p) 'motion)
-        ((evil-visual-state-p) 'visual)
-        ((evil-normal-state-p) 'normal)
-        ((evil-replace-state-p) 'replace)
-        ((evil-operator-state-p) 'operator)
-        ((evil-emacs-state-p) 'emacs)))
+  (cond ((evil-insert-state-p) :insert)
+        ((evil-motion-state-p) :motion)
+        ((evil-visual-state-p) :visual)
+        ((evil-normal-state-p) :normal)
+        ((evil-replace-state-p) :replace)
+        ((evil-operator-state-p) :operator)
+        ((evil-emacs-state-p) :emacs)))
 
 (defun emc-get-command-property (name)
   "Return the current command property with NAME."

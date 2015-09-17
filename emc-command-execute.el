@@ -49,9 +49,11 @@
 
 (defun emc-get-command-handler (cmd state)
   "Get the handler function for CMD and evil STATE."
-  ;; TODO use state
-  ;; return a default handler per state if none is found
-  (emc-get-object-property emc-known-commands cmd))
+  ;; TODO add a default for visual and return acccording to state
+  ;; or determine what to do if no default is found
+  (let* ((handler-data (emc-get-object-property emc-known-commands cmd))
+         (handler (emc-get-object-property handler-data state)))
+    (or handler (emc-get-object-property handler-data :default))))
 
 (emc-define-handler emc-execute-complete (cursor)
   "Execute a completion command."
@@ -70,6 +72,10 @@
 (emc-define-handler emc-execute-evil-snipe (cursor)
   "Execute a `evil-snipe' command"
   (evil-snipe-repeat (emc-get-command-keys-count)))
+
+(emc-define-handler emc-execute-default (cursor)
+  "Execute a generic command for CURSOR."
+  (execute-kbd-macro (emc-get-command-keys-vector)))
 
 (defun emc-execute-for (cursor)
   "Execute the current command for CURSOR."

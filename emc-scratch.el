@@ -1170,7 +1170,7 @@ otherwise execute BODY."
           (progn
             ;; (run-hooks 'pre-command-hook)
             ;; (run-hooks 'evil-jump-hook)
-            (if (eq 'visual (emc-get-command-state))
+            (if (eq :visual (emc-get-command-state))
                 (emc-run-last-command-visual cursor)
               (emc-run-last-command cursor))
             ;; (run-hooks 'post-command-hook)
