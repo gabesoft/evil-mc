@@ -49,33 +49,143 @@
 
 (defun emc-get-command-handler (cmd state)
   "Get the handler function for CMD and evil STATE."
-  ;; TODO add a default for visual and return acccording to state
-  ;; or determine what to do if no default is found
   (let* ((handler-data (emc-get-object-property emc-known-commands cmd))
          (handler (emc-get-object-property handler-data state)))
-    (or handler (emc-get-object-property handler-data :default))))
+    (or handler
+        (emc-get-object-property handler-data :default)
+        (cond ((eq (evil-get-command-property cmd :repeat) 'motion)
+               (cond ((eq state :visual) 'emc-execute-visual-call-count)
+                     (t 'emc-execute-call-count)))))))
+
+;; normal state
+
+(emc-define-handler emc-execute-use-register (cursor)
+  "Execute an `evil-use-register' command for CURSOR."
+  (evil-use-register (emc-get-command-last-input))
+  (emc-clear-current-region))
 
 (emc-define-handler emc-execute-complete (cursor)
   "Execute a completion command."
   :cursor-state :complete
-  (funcall (emc-get-command-name)))
+  (funcall (emc-get-command-name))
+  (emc-clear-current-region))
 
 (emc-define-handler emc-execute-hippie-expand (cursor)
   "Execute a completion command."
   :cursor-state :complete
-  (hippie-expand 1))
+  (hippie-expand 1)
+  (emc-clear-current-region))
 
 (emc-define-handler emc-execute-find-char (cursor)
   "Execute a `evil-find-char' command."
-  (evil-repeat-find-char (emc-get-command-keys-count)))
+  (evil-repeat-find-char (emc-get-command-keys-count))
+  (emc-clear-current-region))
 
 (emc-define-handler emc-execute-evil-snipe (cursor)
-  "Execute a `evil-snipe' command"
-  (evil-snipe-repeat (emc-get-command-keys-count)))
+  "Execute a `evil-snipe' command."
+  (evil-snipe-repeat (emc-get-command-keys-count))
+  (emc-clear-current-region))
 
-(emc-define-handler emc-execute-default (cursor)
-  "Execute a generic command for CURSOR."
-  (execute-kbd-macro (emc-get-command-keys-vector)))
+;; NOTE use as last resort due to performance
+(emc-define-handler emc-execute-macro (cursor)
+  "Execute a generic command for CURSOR as a keyboard macro."
+  (execute-kbd-macro (emc-get-command-keys-vector))
+  (emc-clear-current-region))
+
+(emc-define-handler emc-execute-call (cursor)
+  "Execute a generic command for CURSOR as a function call without parameters."
+  (funcall (emc-get-command-name))
+  (emc-clear-current-region))
+
+(emc-define-handler emc-execute-call-count (cursor)
+  "Execute a generic command for CURSOR as a function call with count."
+  (funcall (emc-get-command-name) (emc-get-command-keys-count))
+  (emc-clear-current-region))
+
+(emc-define-handler emc-execute-not-supported (cursor)
+  "Throw an error for a not supported command for CURSOR."
+  (error ("%s is not supported" (emc-get-command-name)))
+  (emc-clear-current-region))
+
+(defun emc-clear-current-region ()
+  "Clears the current region."
+  (setq region nil))
+
+;; TODO look at all evil motions (evil-define-motion)
+;; distinguish between the ones that don't take a count
+
+;; visual state
+
+(emc-define-handler emc-execute-visual-line (cursor)
+  "Execute an `evil-visual-line' command for CURSOR."
+  (emc-execute-visual-region cursor 'line))
+
+(emc-define-handler emc-execute-visual-char (cursor)
+  "Execute an `evil-visual-char' command for CURSOR."
+  (emc-execute-visual-region cursor 'char))
+
+(defun emc-execute-visual-region (cursor type)
+  "Execute an `evil-visual-char' or `evil-visual-line'
+command for CURSOR according to TYPE."
+  (cond ((or (null region) (eq region-type type))
+         (setq region (emc-create-region (point) (point) type)))
+        (t
+         (setq region (emc-change-region-type region type)))))
+
+(emc-define-handler emc-execute-visual-text-object (cursor)
+  "Execute an text object command in visual state for CURSOR."
+  (let* ((limits (funcall cmd))
+         (start (nth 0 limits))
+         (end (1- (nth 1 limits))))
+    (goto-char end)
+    (setq region (emc-create-region start end 'char))))
+
+(emc-define-handler emc-execute-visual-use-register (cursor)
+  "Execute an `evil-use-register' command in visual state for CURSOR."
+  ;; TODO cannot reuse the normal state handlers here as
+  ;; they clear the current region
+  ;; extract into common methods
+  (emc-execute-use-register cursor)
+  (emc-update-current-region))
+
+(emc-define-handler emc-execute-exchange-point-and-mark (cursor)
+  "Execute ann exchange point and mark command for CURSOR."
+  (let* ((next-region (emc-exchange-region-point-and-mark region))
+         (mark (emc-get-region-mark next-region))
+         (point (emc-get-region-point next-region)))
+    (goto-char (if (< mark point) (1- point) point))
+    (setq region next-region)))
+
+(emc-define-handler emc-execute-visual-find-char (cursor)
+  "Execute an `evil-find-char' command when in visual state for CURSOR."
+  (emc-execute-find-char cursor)
+  (emc-update-current-region))
+
+(emc-define-handler emc-execute-visual-evil-snipe (cursor)
+  "Execute an `evil-snipe' command in visual state for CURSOR."
+  (emc-execute-evil-snipe cursor)
+  (emc-update-current-region))
+
+(emc-define-handler emc-execute-visual-macro (cursor)
+  "Execute a generic command as a keyboard macro for CURSOR in visual state."
+  (emc-execute-macro cursor)
+  (emc-update-current-region))
+
+(emc-define-handler emc-execute-visual-call (cursor)
+  "Execute a generic command as a function call for CURSOR in visual state."
+  (emc-execute-call cursor)
+  (emc-update-current-region))
+
+(emc-define-handler emc-execute-visual-call-count (cursor)
+  "Execute a generic command as a function call with count for CURSOR in visual state."
+  (emc-execute-call-count cursor)
+  (emc-update-current-region))
+
+(defun emc-update-current-region ()
+  "Updates the current region."
+  (setq region (emc-update-region region)))
+
+;; generic
 
 (defun emc-execute-for (cursor)
   "Execute the current command for CURSOR."
@@ -85,13 +195,17 @@
         (cursor-state (evil-get-command-property handler :cursor-state)))
     ;; TODO set up cursor state
     ;; get the default cursor state as well
-    (ignore-errors
-      (condition-case error
-          (funcall handler cursor)
-        (error (message "failed to execute %s with error %s"
-                        cmd
-                        (error-message-string error))
-               cursor)))
+    (if handler
+        (ignore-errors
+          (condition-case error
+              (funcall handler cursor)
+            (error (message "Failed to execute %s with error %s"
+                            cmd
+                            (error-message-string error))
+                   cursor)))
+      (message "No handler found for command %s" cmd)
+      cursor)
+
     ;; TODO update cursor state
     ))
 

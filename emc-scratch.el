@@ -821,6 +821,7 @@
 
           ((eq cmd 'evil-digit-argument-or-evil-beginning-of-line)
            (funcall cmd)
+           ;; (execute-kbd-macro keys-vector)
            (setq region (emc-update-region region)))
 
           ;; TODO add all text objects from ev
@@ -889,6 +890,7 @@ otherwise execute BODY."
   (let* ((cmd (emc-get-command-name))
          (last-input (emc-get-command-last-input))
          (keys-count (emc-get-command-keys-count))
+         (repeat-type (evil-get-command-property cmd :repeat))
          (region (emc-get-cursor-region cursor))
          (prev-column (or (emc-get-cursor-column cursor)
                           (emc-column-number (point))))
@@ -1112,6 +1114,27 @@ otherwise execute BODY."
            (forward-line (- keys-count))
            (goto-char (min (+ (point) prev-column)
                            (point-at-eol))))
+
+          ;; no argument motions
+          ;; add these to visual as well
+          ((or (eq cmd 'evil-beginning-of-line)
+               (eq cmd 'evil-beginning-of-visual-line)
+               (eq cmd 'evil-middle-of-visual-line)
+               ;; see also evil-digit-argument-or-evil-beginning-of-line
+               (eq cmd 'evil-beginning-of-line-or-digit-argument)
+               (eq cmd 'evil-first-non-blank)
+               (eq cmd 'evil-first-non-blank-of-visual-line)
+               (eq cmd 'evil-lookup)
+               (eq cmd 'evil-window-middle)
+               (eq cmd 'evil-visual-restore)
+               (eq cmd 'evil-visual-exchange-corners)
+               (eq cmd 'evil-search-forward)
+               (eq cmd 'evil-search-backward)
+               (eq cmd 'evil-goto-definition))
+           (funcall cmd))
+
+          ;; rest of motions
+          ((eq repeat-type 'motion) (funcall cmd keys-count))
 
           ;; TODO restore cursors position here
           ;; ((eq cmd 'undo-tree-undo)
