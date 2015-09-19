@@ -892,6 +892,7 @@ otherwise execute BODY."
          (keys-count (emc-get-command-keys-count))
          (repeat-type (evil-get-command-property cmd :repeat))
          (region (emc-get-cursor-region cursor))
+         (region-type (emc-get-region-type region))
          (prev-column (or (emc-get-cursor-column cursor)
                           (emc-column-number (point))))
          (next-column nil)
@@ -941,7 +942,6 @@ otherwise execute BODY."
           ((eq cmd 'orgtbl-self-insert-command) (self-insert-command 1))
           ((eq cmd 'transpose-chars-before-point) (transpose-chars-before-point 1))
 
-
           ((or (eq cmd 'evil-snipe-f) (eq cmd 'evil-snipe-F)
                (eq cmd 'evil-snipe-t) (eq cmd 'evil-snipe-T)
                (eq cmd 'evil-snipe-s) (eq cmd 'evil-snipe-S))
@@ -954,27 +954,41 @@ otherwise execute BODY."
            (evil-repeat-find-char keys-count))
 
           ((eq cmd 'evil-commentary)
-           (emc-with-region region 'evil-commentary
+           (emc-with-region region
+                            (lambda (start end)
+                              (evil-commentary start end)
+                              (goto-char start))
                             (execute-kbd-macro keys-vector)))
 
           ((eq cmd 'evil-find-char) (evil-repeat-find-char))
           ((eq cmd 'newline-and-indent) (newline-and-indent))
           ((eq cmd 'evil-append) (evil-append 1))
 
-          ((eq cmd 'evil-delete-backward-char-and-join) (evil-delete-backward-char-and-join 1))
+          ((eq cmd 'evil-delete-backward-char-and-join) (evil-delete-backward-char-and-join 4))
           ((eq cmd 'evil-complete-next) (evil-complete-next))
           ((eq cmd 'evil-complete-previous) (evil-complete-previous))
           ((eq cmd 'evil-complete-next-line) (evil-complete-next-line))
           ((eq cmd 'evil-complete-previous-line) (evil-complete-previous-line))
           ((eq cmd 'hippie-expand) (hippie-expand 1))
 
-
           ((eq cmd 'evil-delete-char)
            (emc-with-region region 'evil-delete-char
                             (execute-kbd-macro keys-vector-with-register)))
 
-          ((eq cmd 'evil-delete-line) (execute-kbd-macro keys-vector-with-register))
-          ((eq cmd 'evil-join) (execute-kbd-macro keys-vector))
+          ((eq cmd 'evil-delete-line)
+           (emc-with-region region 'evil-delete-line
+                            (execute-kbd-macro keys-vector-with-register)))
+
+          ;; TODO left here
+          ;; determine what needs to run before cmd when region
+          ((eq cmd 'evil-join)
+           (emc-with-region region
+                            (lambda (start end)
+                              (goto-char start)
+                              (evil-join start end))
+                            (execute-kbd-macro keys-vector-with-register)))
+
+          ((eq cmd 'electric-newline-and-maybe-indent) (electric-newline-and-maybe-indent))
 
           ((eq cmd 'evil-insert-line) (evil-insert-line 1))
           ((eq cmd 'evil-append-line) (evil-append-line 1))
@@ -1068,23 +1082,33 @@ otherwise execute BODY."
           ((eq cmd 'evil-yank)
            (cond ((null region)
                   (execute-kbd-macro keys-vector-with-register))
-                 ((emc-char-region-p region)
+                 (t
                   (emc-with-region region
                                    (lambda (start end)
-                                     (goto-char start)
-                                     (evil-yank start end nil evil-this-register))))
-                 ((emc-line-region-p region)
-                  (execute-kbd-macro (vconcat keys-register [?y ?y])))))
+                                     (goto-char (min (emc-get-region-mark region)
+                                                     (emc-get-region-point region)))
+                                     (evil-yank
+                                      start
+                                      end
+                                      region-type
+                                      evil-this-register))))
+                 ;; ((emc-line-region-p region)
+                 ;;  (execute-kbd-macro (vconcat keys-register [?y ?y])))
+                 ))
 
           ((eq cmd 'evil-delete)
            (cond ((null region)
                   (execute-kbd-macro keys-vector-with-register))
-                 ((emc-char-region-p region)
+                 (t
                   (emc-with-region region
                                    (lambda (start end)
-                                     (evil-delete start end nil evil-this-register))))
-                 ((emc-line-region-p region)
-                  (execute-kbd-macro (vconcat keys-register [?d ?d]))))
+                                     (evil-delete
+                                      start
+                                      end
+                                      region-type
+                                      evil-this-register)))))
+           ;; ((emc-line-region-p region)
+           ;;  (execute-kbd-macro (vconcat keys-register [?d ?d]))))
            (when (eolp) (evil-end-of-line)))
 
           ((eq cmd 'evil-change)
@@ -1094,14 +1118,18 @@ otherwise execute BODY."
                       (unless (eq point (point-at-bol))
                         (evil-forward-char))
                       (execute-kbd-macro keys-vector-with-register))
-                     ((emc-char-region-p region)
+                     (t
                       (emc-with-region region
                                        (lambda (start end)
                                          (evil-forward-char)
-                                         (evil-delete start end nil evil-this-register))))
-                     ((emc-line-region-p region)
-                      (evil-forward-char)
-                      (execute-kbd-macro (vconcat keys-register [?c ?c])))))))
+                                         (evil-delete
+                                          start
+                                          end
+                                          region-type
+                                          evil-this-register))))))))
+          ;; ((emc-line-region-p region)
+          ;;  (evil-forward-char)
+          ;;  (execute-kbd-macro (vconcat keys-register [?c ?c])))))))
 
           ((eq cmd 'evil-next-line)
            (setq next-column prev-column)
@@ -1117,20 +1145,21 @@ otherwise execute BODY."
 
           ;; no argument motions
           ;; add these to visual as well
-          ((or (eq cmd 'evil-beginning-of-line)
-               (eq cmd 'evil-beginning-of-visual-line)
-               (eq cmd 'evil-middle-of-visual-line)
-               (eq cmd 'evil-digit-argument-or-evil-beginning-of-line)
-               (eq cmd 'evil-beginning-of-line-or-digit-argument)
-               (eq cmd 'evil-first-non-blank)
-               (eq cmd 'evil-first-non-blank-of-visual-line)
-               (eq cmd 'evil-lookup)
-               (eq cmd 'evil-window-middle)
-               (eq cmd 'evil-visual-restore)
-               (eq cmd 'evil-visual-exchange-corners)
-               (eq cmd 'evil-search-forward)
-               (eq cmd 'evil-search-backward)
-               (eq cmd 'evil-goto-definition))
+          ((or
+            (eq cmd 'evil-beginning-of-line)
+            (eq cmd 'evil-beginning-of-visual-line)
+            (eq cmd 'evil-middle-of-visual-line)
+            (eq cmd 'evil-digit-argument-or-evil-beginning-of-line)
+            (eq cmd 'evil-beginning-of-line-or-digit-argument)
+            (eq cmd 'evil-first-non-blank)
+            (eq cmd 'evil-first-non-blank-of-visual-line)
+            (eq cmd 'evil-lookup)
+            (eq cmd 'evil-window-middle)
+            (eq cmd 'evil-visual-restore)
+            (eq cmd 'evil-visual-exchange-corners)
+            (eq cmd 'evil-search-forward)
+            (eq cmd 'evil-search-backward)
+            (eq cmd 'evil-goto-definition))
            (funcall cmd))
 
           ;; rest of motions

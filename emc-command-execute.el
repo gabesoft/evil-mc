@@ -47,15 +47,8 @@
          (apply #'evil-set-command-properties func ',keys)
          func))))
 
-(defun emc-get-command-handler (cmd state)
-  "Get the handler function for CMD and evil STATE."
-  (let* ((handler-data (emc-get-object-property emc-known-commands cmd))
-         (handler (emc-get-object-property handler-data state)))
-    (or handler
-        (emc-get-object-property handler-data :default)
-        (cond ((eq (evil-get-command-property cmd :repeat) 'motion)
-               (cond ((eq state :visual) 'emc-execute-visual-call-count)
-                     (t 'emc-execute-call-count)))))))
+;; TODO none of the functions below need to take cursor as parameter
+;;      and they should expect all cursor state to be set
 
 (defun emc-execute-use-register (cursor)
   "Executed an `evil-use-register' command for CURSOR."
@@ -66,12 +59,40 @@
   (hippie-expand 1))
 
 (defun emc-execute-find-char (cursor)
-  "Execute a `evil-find-char' command."
+  "Execute an `evil-find-char' command for CURSOR."
   (evil-repeat-find-char (emc-get-command-keys-count)))
 
 (defun emc-execute-evil-snipe (cursor)
-  "Execute a `evil-snipe' command."
+  "Execute an `evil-snipe' command for CURSOR."
   (evil-snipe-repeat (emc-get-command-keys-count)))
+
+(defun emc-execute-evil-commentary (cursor)
+  "Execute an `evil-commentary' command for CURSOR."
+  (if region
+      (let ((start (emc-get-region-start region)))
+        (evil-commentary start (emc-get-region-end region))
+        (goto-char start))
+    (emc-execute-macro cursor)))
+
+(defun emc-execute-with-region-and-register (cmd)
+  "Execute CMD with the current register and region."
+  (if region
+      ;; TODO may need to run a command here and after
+      (funcall cmd
+               (emc-get-region-start region)
+               (emc-get-region-end region)
+               (emc-get-region-type region)
+               evil-this-register)
+    (execute-kbd-macro (emc-get-keys-vector-with-register))))
+
+;; TODO wire up the handlers below
+(defun emc-execute-evil-delete-char (cursor)
+  "Execute an `evil-delete-char' command for CURSOR."
+  (emc-execute-with-region-and-register 'evil-delete-char))
+
+(defun emc-execute-evil-delete-line (cursor)
+  "Execute an `evil-delete-line' command for CURSOR."
+  (emc-execute-with-region-and-register 'evil-delete-line))
 
 (defun emc-execute-macro (cursor)
   "Execute a generic command for CURSOR as a keyboard macro."
@@ -81,7 +102,7 @@
   "Execute a generic command for CURSOR as a function call without parameters."
   (funcall (emc-get-command-name)))
 
-(defun emc-execute-call-count (cursor)
+(defun emc-execute-call-with-count (cursor)
   "Execute a generic command for CURSOR as a function call with count."
   (funcall (emc-get-command-name) (emc-get-command-keys-count)))
 
@@ -94,7 +115,7 @@
   (setq region nil))
 
 (defun emc-update-current-region ()
-  "Updates the current region."
+  "Update the current region."
   (setq region (emc-update-region region)))
 
 (defun emc-execute-visual-region (cursor type)
@@ -104,6 +125,16 @@ command for CURSOR according to TYPE."
          (setq region (emc-create-region (point) (point) type)))
         (t
          (setq region (emc-change-region-type region type)))))
+
+(defun emc-get-keys-vector-with-register ()
+  "Return the keys-vector of current command prepended
+by the value of `evil-this-register'."
+  (if evil-this-register
+      (vconcat [?\"]
+               (vector evil-this-register)
+               (emc-get-command-keys-vector))
+    (emc-get-command-keys-vector)))
+
 
 ;; handlers for normal state
 
@@ -122,27 +153,31 @@ command for CURSOR according to TYPE."
   (emc-clear-current-region))
 
 (emc-define-handler emc-execute-normal-find-char (cursor)
-  (emc-execute-normal-find-char cursor)
+  (emc-execute-find-char cursor)
   (emc-clear-current-region))
 
 (emc-define-handler emc-execute-normal-evil-snipe (cursor)
-  (emc-execute-normal-evil-snipe cursor)
+  (emc-execute-evil-snipe cursor)
+  (emc-clear-current-region))
+
+(emc-define-handler emc-execute-normal-evil-commentary (cursor)
+  (emc-execute-evil-commentary cursor)
   (emc-clear-current-region))
 
 (emc-define-handler emc-execute-normal-macro (cursor)
-  (emc-execute-normal-macro cursor)
+  (emc-execute-macro cursor)
   (emc-clear-current-region))
 
 (emc-define-handler emc-execute-normal-call (cursor)
-  (emc-execute-normal-call cursor)
+  (emc-execute-call cursor)
   (emc-clear-current-region))
 
-(emc-define-handler emc-execute-normal-call-count (cursor)
-  (emc-execute-normal-call-count cursor)
+(emc-define-handler emc-execute-normal-call-with-count (cursor)
+  (emc-execute-call-with-count cursor)
   (emc-clear-current-region))
 
 (emc-define-handler emc-execute-normal-not-supported (cursor)
-  (emc-execute-normal-not-supported cursor)
+  (emc-execute-not-supported cursor)
   (emc-clear-current-region))
 
 ;; handlers for visual state
@@ -188,10 +223,20 @@ command for CURSOR according to TYPE."
   (emc-update-current-region))
 
 (emc-define-handler emc-execute-visual-call-count (cursor)
-  (emc-execute-call-count cursor)
+  (emc-execute-call-with-count cursor)
   (emc-update-current-region))
 
 ;; ----
+
+(defun emc-get-command-handler (cmd state)
+  "Get the handler function for CMD and evil STATE."
+  (let* ((handler-data (emc-get-object-property emc-known-commands cmd))
+         (handler (emc-get-object-property handler-data state)))
+    (or handler
+        (emc-get-object-property handler-data :default)
+        (cond ((eq (evil-get-command-property cmd :repeat) 'motion)
+               (cond ((eq state :visual) 'emc-execute-visual-call-count)
+                     (t 'emc-execute-call-with-count)))))))
 
 (defun emc-execute-for (cursor)
   "Execute the current command for CURSOR."

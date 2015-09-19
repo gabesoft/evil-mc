@@ -32,6 +32,7 @@
         (eq cmd 'transpose-chars-before-point)
         (eq cmd 'yaml-electric-dash-and-dot)
         (eq cmd 'yaml-electric-bar-and-angle)
+        (eq cmd 'electric-newline-and-maybe-indent)
 
         ;; emacs commands
 
