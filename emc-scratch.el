@@ -1120,7 +1120,7 @@ otherwise execute BODY."
           ((or (eq cmd 'evil-beginning-of-line)
                (eq cmd 'evil-beginning-of-visual-line)
                (eq cmd 'evil-middle-of-visual-line)
-               ;; see also evil-digit-argument-or-evil-beginning-of-line
+               (eq cmd 'evil-digit-argument-or-evil-beginning-of-line)
                (eq cmd 'evil-beginning-of-line-or-digit-argument)
                (eq cmd 'evil-first-non-blank)
                (eq cmd 'evil-first-non-blank-of-visual-line)
