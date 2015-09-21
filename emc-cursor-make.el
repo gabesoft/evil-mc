@@ -114,13 +114,15 @@ the cursors are ordered by the cursor overlay start position."
         (first-cursor (not (emc-has-cursors-p)))
         (pos (or pos (point))))
     (when first-cursor (emc-cursors-before))
-    (emc-insert-cursor (emc-put-cursor-property
-                        nil
-                        'overlay (emc-cursor-overlay-at-pos pos)
-                        'column (emc-column-number pos)
-                        'evil-markers-alist (default-value 'evil-markers-alist)
-                        'kill-ring (copy-sequence kill-ring)
-                        'kill-ring-yank-pointer nil))))
+    (let ((cursor (emc-put-cursor-property
+                   nil
+                   'overlay (emc-cursor-overlay-at-pos pos)
+                   'column (emc-column-number pos)
+                   'evil-markers-alist (default-value 'evil-markers-alist)
+                   'kill-ring (copy-sequence kill-ring)
+                   'kill-ring-yank-pointer nil)))
+      (emc-insert-cursor cursor)
+      cursor)))
 
 (defun emc-undo-cursor-at-pos (&optional pos)
   "Delete the cursor at POS from `emc-cursor-list' and remove its overlay."

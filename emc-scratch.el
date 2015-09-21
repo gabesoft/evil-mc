@@ -12,6 +12,7 @@
 (require 'emc-cursor-state)
 (require 'emc-cursor-make)
 (require 'emc-command-record)
+(require 'emc-command-execute)
 (require 'emc-region)
 
 
@@ -956,8 +957,8 @@ otherwise execute BODY."
           ((eq cmd 'evil-commentary)
            (emc-with-region region
                             (lambda (start end)
-                              (evil-commentary start end)
-                              (goto-char start))
+                              (goto-char start)
+                              (evil-commentary start end))
                             (execute-kbd-macro keys-vector)))
 
           ((eq cmd 'evil-find-char) (evil-repeat-find-char))
@@ -1369,12 +1370,14 @@ otherwise execute BODY."
   (define-key evil-normal-state-local-map (kbd ",p") 'emc-skip-and-goto-prev-match)
   (define-key evil-visual-state-local-map (kbd ",p") 'emc-skip-and-goto-prev-match))
 
+;; TODO move all hooks to emc-mode.el
 (defun emc-add-hooks ()
   "Adds all emc related hooks."
   (interactive)
   (emc-command-reset)
   (emc-add-command-hooks)
-  (add-hook 'post-command-hook 'emc-run-command-for-all-cursors t t)
+  ;; (add-hook 'post-command-hook 'emc-run-command-for-all-cursors t t)
+  (add-hook 'post-command-hook 'emc-execute-for-all t t)
   (add-hook 'emc-after-cursors-deleted 'emc-after-cursors-teardown-hook)
   (add-hook 'emc-before-cursors-created 'emc-before-cursors-setup-hook))
 

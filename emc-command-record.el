@@ -131,8 +131,8 @@
   (emc-get-command-property (or name :keys)))
 
 (defun emc-get-command-keys-count ()
-  "Get the current command numeric prefix."
-  (emc-get-command-property :keys-count))
+  "Get the current command numeric prefix or one."
+  (or (emc-get-command-property :keys-count) 1))
 
 (defun emc-get-command-keys-string (&optional name)
   "Get the command keys, stored at the property with NAME, as a string."
@@ -166,7 +166,7 @@
 
 (defun emc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
-  (when (emc-recording-debug-p) (message "command %s %s" this-command (this-command-keys)))
+  (when (emc-recording-debug-p) (message "Command %s %s" this-command (this-command-keys)))
   (when (and (not (emc-executing-command-p))
              (not (emc-recording-command-p)))
     (setq emc-command nil)
@@ -177,7 +177,7 @@
       (emc-set-command-property :name this-command
                                 :keys-pre (this-command-keys-vector)
                                 :evil-state-begin (emc-get-evil-state))
-      (when (emc-recording-debug-p) (message "record-begin %s" emc-command)))))
+      (when (emc-recording-debug-p) (message "Record-begin %s" emc-command)))))
 (put 'emc-begin-command-save 'permanent-local-hook t)
 
 (defun emc-save-keys-motion (flag)
@@ -188,7 +188,7 @@
                    :keys-motion-post
                    (this-command-keys-vector))
     (when (emc-recording-debug-p)
-      (message "record-motion %s %s %s %s"
+      (message "Record-motion %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun emc-save-keys-operator (flag)
@@ -200,7 +200,7 @@
                    :keys-operator-post
                    (this-command-keys-vector))
     (when (emc-recording-debug-p)
-      (message "record-operator %s %s %s %s"
+      (message "Record-operator %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun emc-finish-command-save ()
@@ -211,7 +211,7 @@
                               :keys-post (this-command-keys-vector)
                               :keys-post-raw (this-single-command-raw-keys))
     (when (emc-recording-debug-p)
-      (message "record-finish %s %s" emc-command this-command))
+      (message "Record-finish %s %s" emc-command this-command))
     (ignore-errors
       (condition-case error
           (emc-finalize-command)
@@ -251,7 +251,7 @@
                                       keys-operator-post))))
                  (t (or keys-post keys-pre)))))
   (when (emc-recording-debug-p)
-    (message "record-done %s pre %s post %s keys-motion %s keys-operator %s keys %s"
+    (message "Record-done %s pre %s post %s keys-motion %s keys-operator %s keys %s"
              (emc-get-command-name)
              (emc-get-command-keys-string :keys-pre)
              (emc-get-command-keys-string :keys-post)
