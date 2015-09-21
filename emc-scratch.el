@@ -1054,9 +1054,12 @@ otherwise execute BODY."
           ;; ((eq cmd 'evil-goto-mark) (evil-goto-mark last-input))
           ;; ((eq cmd 'evil-goto-mark-line) (evil-goto-mark-line last-input))
 
-          ;; (emc-get-cursor-evil-markers-alist)
-          ;; (emc-get-region-property)
-          ;; (emc-get-cursor-overlay)
+          ;; (emc-get-cursor-evil-markers-alist 1)
+          ;; (emc-get-region-property 1)
+          ;; (emc-get-cursor-overlay 1)
+          ;; (emc-get-cursor-evil-markers-alist 2)
+          ;; (emc-get-region-property 2)
+          ;; (emc-get-cursor-overlay 2)
 
           ((eq cmd 'evil-normal-state)
            (evil-insert 1)

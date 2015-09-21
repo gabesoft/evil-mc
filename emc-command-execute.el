@@ -422,6 +422,16 @@ by the value of `evil-this-register'."
   (let ((names (evil-get-command-property handler :cursor-clear)))
     (if (atom names) (list names) names)))
 
+;; TODO make this work and use below
+(defmacro emc-run-in-cursor-context (cursor vars &rest body)
+  (let ((state (mapcar
+                (lambda (var)
+                  (list var (emc-get-cursor-property cursor var)))
+                vars)))
+    (message "state %s" state)
+    `(let ,state
+       ,@body)))
+
 (defun emc-execute-for (cursor)
   "Execute the current command for CURSOR."
   (let* ((cmd (emc-get-command-name))
@@ -429,8 +439,12 @@ by the value of `evil-this-register'."
          (handler (emc-get-command-handler cmd state))
          (vars (emc-get-state-variables handler))
          (skip (emc-get-clear-variables handler)))
+    (message "vars %s" vars)
     (when (emc-executing-debug-p)
       (message "Execute %s with %s" cmd handler))
+    ;; TODO need to unbind these vars
+    ;;      the real cursor gets polluted
+    ;;      maybe use a let
     (dolist (var vars)
       (set var (emc-get-cursor-property cursor var)))
     (goto-char (emc-get-cursor-start cursor))
