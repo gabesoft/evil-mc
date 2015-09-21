@@ -110,7 +110,7 @@
                evil-this-register)
     (emc-execute-macro t)))
 
-TODO fix paste (does not save all pastes when there is a region)
+;; TODO fix paste (does not save all pastes when there is a region)
 (defun emc-execute-evil-change-line ()
   "Execute an `evil-change-line' comand."
   (if region
