@@ -16,6 +16,9 @@
 ;;; Code:
 
 (defmacro emc-define-handler (command &rest body)
+  "Define a COMMAND handler with BODY.
+
+\(fn COMMAND BODY...)"
   (declare (indent defun)
            (debug (&define name
                            [&optional lambda-list]
@@ -46,6 +49,30 @@
                        command)))
          (apply #'evil-set-command-properties func ',keys)
          func))))
+
+;; (when (fboundp 'font-lock-add-keywords)
+;;   (font-lock-add-keywords
+;;    'emacs-lisp-mode
+;;    '(("(\\(emc-define-handler\\)" 1 font-lock-keyword-face))))
+
+;; (emc-define-handler abc
+;;   "Test"
+;;   ())
+
+;; (when (fboundp 'font-lock-add-keywords)
+;;   (font-lock-add-keywords
+;;    'emacs-lisp-mode
+;;    ;; Match the `emc-define-handler' macro.
+;;    '(("(\\(evil-\\(?:ex-\\)?define-\
+;; \\(?:[^ k][^ e][^ y]\\|[-[:word:]]\\{4,\\}\\)\\)\
+;; \\>[ \f\t\n\r\v]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
+;;       (1 font-lock-keyword-face)
+;;       (2 font-lock-function-name-face nil t))
+;;      ("(\\(evil-\\(?:delay\\|narrow\\|signal\\|save\\|with\\(?:out\\)?\\)\
+;; \\(?:-[-[:word:]]+\\)?\\)\\>\[ \f\t\n\r\v]+"
+;;       1 font-lock-keyword-face)
+;;      ("(\\(evil-\\(?:[-[:word:]]\\)*loop\\)\\>[ \f\t\n\r\v]+"
+;;       1 font-lock-keyword-face))))
 
 (defun emc-execute-evil-use-register ()
   "Executed an `evil-use-register' command."
