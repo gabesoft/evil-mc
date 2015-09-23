@@ -382,7 +382,7 @@ by the value of `evil-this-register'."
   (emc-execute-visual-region 'char))
 
 (emc-define-handler emc-execute-visual-text-object ()
-  (let* ((limits (funcall cmd))
+  (let* ((limits (funcall (emc-get-command-name)))
          (start (nth 0 limits))
          (end (1- (nth 1 limits))))
     (goto-char end)
