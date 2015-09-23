@@ -233,7 +233,7 @@
          (keys-motion-post (emc-get-command-property :keys-motion-post))
          (keys-operator-pre (emc-get-command-property :keys-operator-pre))
          (keys-operator-post (emc-get-command-property :keys-operator-post)))
-    (emc-set-command-property :keys-count (or keys-pre-count 1))
+    (emc-set-command-property :keys-count keys-pre-count)
     (emc-set-command-property
      :keys (cond ((or keys-motion-post keys-motion-pre)
                   (or keys-motion-post keys-motion-pre))

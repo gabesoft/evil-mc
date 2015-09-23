@@ -980,8 +980,6 @@ otherwise execute BODY."
            (emc-with-region region 'evil-delete-line
                             (execute-kbd-macro keys-vector-with-register)))
 
-          ;; TODO left here
-          ;; determine what needs to run before cmd when region
           ((eq cmd 'evil-join)
            (emc-with-region region
                             (lambda (start end)
@@ -1054,12 +1052,13 @@ otherwise execute BODY."
           ;; ((eq cmd 'evil-goto-mark) (evil-goto-mark last-input))
           ;; ((eq cmd 'evil-goto-mark-line) (evil-goto-mark-line last-input))
 
-          ;; (emc-get-cursor-evil-markers-alist 1)
-          ;; (emc-get-region-property 1)
-          ;; (emc-get-cursor-overlay 1)
-          ;; (emc-get-cursor-evil-markers-alist 2)
-          ;; (emc-get-region-property 2)
-          ;; (emc-get-cursor-overlay 2)
+          ;; (emc-cursor-get-evil-markers-alist 1)
+          ;; (emc-region-get-property 1)
+          ;; (emc-cursor-get-overlay 1)
+          ;; (emc-cursor-get-evil-markers-alist 2)
+          ;; (emc-region-get-property 2)
+          ;; (emc-region-get-property 2)
+          ;; (emc-cursor-get-overlay 2)
 
           ((eq cmd 'evil-normal-state)
            (evil-insert 1)

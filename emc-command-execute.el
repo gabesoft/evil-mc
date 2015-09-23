@@ -50,34 +50,6 @@
          (apply #'evil-set-command-properties func ',keys)
          func))))
 
-;; (when (fboundp 'font-lock-add-keywords)
-;;   (font-lock-add-keywords
-;;    'emacs-lisp-mode
-;;    '(("(\\(emc-define-handler\\)" 1 font-lock-keyword-face))))
-
-;; (emc-define-handler abc
-;;   "Test"
-;;   ())
-
-;; (when (fboundp 'font-lock-add-keywords)
-;;   (font-lock-add-keywords
-;;    'emacs-lisp-mode
-;;    ;; Match the `emc-define-handler' macro.
-;;    '(("(\\(evil-\\(?:ex-\\)?define-\
-;; \\(?:[^ k][^ e][^ y]\\|[-[:word:]]\\{4,\\}\\)\\)\
-;; \\>[ \f\t\n\r\v]*\\(\\(?:\\sw\\|\\s_\\)+\\)?"
-;;       (1 font-lock-keyword-face)
-;;       (2 font-lock-function-name-face nil t))
-;;      ("(\\(evil-\\(?:delay\\|narrow\\|signal\\|save\\|with\\(?:out\\)?\\)\
-;; \\(?:-[-[:word:]]+\\)?\\)\\>\[ \f\t\n\r\v]+"
-;;       1 font-lock-keyword-face)
-;;      ("(\\(evil-\\(?:[-[:word:]]\\)*loop\\)\\>[ \f\t\n\r\v]+"
-;;       1 font-lock-keyword-face))))
-
-(defun emc-execute-evil-use-register ()
-  "Executed an `evil-use-register' command."
-  (evil-use-register (emc-get-command-last-input)))
-
 (defun emc-execute-hippie-expand ()
   "Execute a completion command."
   (hippie-expand 1))
@@ -105,6 +77,18 @@
       (let ((start (emc-get-region-start region)))
         (goto-char start)
         (evil-join start (emc-get-region-end region)))
+    (emc-execute-macro)))
+
+(defun emc-execute-evil-surround-region ()
+  "Execute an `evil-surround-region' command."
+  (if region
+      (let ((start (emc-get-region-start region)))
+        (goto-char start)
+        (evil-surround-region
+         start
+         (emc-get-region-end region)
+         (emc-get-region-type region)
+         (emc-get-command-last-input)))
     (emc-execute-macro)))
 
 (defun emc-execute-change-case (cmd)
@@ -137,7 +121,6 @@
                evil-this-register)
     (emc-execute-macro t)))
 
-;; TODO fix paste (does not save all pastes when there is a region)
 (defun emc-execute-evil-change-line ()
   "Execute an `evil-change-line' comand."
   (if region
@@ -206,9 +189,20 @@ to the keys vector"
        (emc-get-command-keys-vector-with-register)
      (emc-get-command-keys-vector))))
 
+(defun emc-execute-evil-goto-line ()
+  "Execute an `evil-goto-line' command."
+  (let ((count (emc-get-command-property :keys-count)))
+    (if count
+        (evil-goto-line count)
+      (evil-goto-line))))
+
 (defun emc-execute-call ()
   "Execute a generic command as a function call without parameters."
   (funcall (emc-get-command-name)))
+
+(defun emc-execute-call-with-last-input ()
+  "Executed a generic command as a function call with the last input character."
+  (funcall (emc-get-command-name) (emc-get-command-last-input)))
 
 (defun emc-execute-call-with-count ()
   "Execute a generic command as a function call with count."
@@ -256,10 +250,6 @@ by the value of `evil-this-register'."
 
 ;; handlers for normal state
 
-(emc-define-handler emc-execute-normal-evil-use-register ()
-  :cursor-clear (region column)
-  (emc-execute-evil-use-register))
-
 (emc-define-handler emc-execute-normal-complete ()
   :cursor-clear (region column)
   :cursor-state :complete
@@ -285,6 +275,10 @@ by the value of `evil-this-register'."
 (emc-define-handler emc-execute-normal-evil-join ()
   :cursor-clear (region column)
   (emc-execute-evil-join))
+
+(emc-define-handler emc-execute-normal-evil-surround-region ()
+  :cursor-clear (region column)
+  (emc-execute-evil-surround-region))
 
 (emc-define-handler emc-execute-normal-evil-replace ()
   :cursor-clear (region column)
@@ -334,6 +328,10 @@ by the value of `evil-this-register'."
   :cursor-clear (region column)
   (emc-execute-evil-change-line))
 
+(emc-define-handler emc-execute-normal-evil-goto-line ()
+  :cursor-clear (region column)
+  (emc-execute-evil-goto-line))
+
 (emc-define-handler emc-execute-normal-next-line ()
   :cursor-clear region
   (emc-execute-move-to-line 'next))
@@ -359,9 +357,17 @@ by the value of `evil-this-register'."
   :cursor-clear (region column)
   (emc-execute-call))
 
+(emc-define-handler emc-execute-normal-call-with-last-input ()
+  :cursor-clear (region column)
+  (emc-execute-call-with-last-input))
+
 (emc-define-handler emc-execute-normal-call-with-count ()
   :cursor-clear (region column)
   (emc-execute-call-with-count))
+
+(emc-define-handler emc-execute-normal-keyboard-quit ()
+  :cursor-clear (region column)
+  (ignore))
 
 (emc-define-handler emc-execute-normal-not-supported ()
   :cursor-clear (region column)
@@ -382,10 +388,6 @@ by the value of `evil-this-register'."
     (goto-char end)
     (setq region (emc-create-region start end 'char))))
 
-(emc-define-handler emc-execute-visual-evil-use-register ()
-  (emc-execute-evil-use-register)
-  (emc-update-current-region))
-
 (emc-define-handler emc-execute-exchange-point-and-mark ()
   (let* ((next-region (emc-exchange-region-point-and-mark region))
          (mark (emc-get-region-mark next-region))
@@ -401,6 +403,11 @@ by the value of `evil-this-register'."
   (emc-execute-evil-snipe)
   (emc-update-current-region))
 
+(emc-define-handler emc-execute-visual-evil-goto-line ()
+  :cursor-clear (region column)
+  (emc-execute-evil-goto-line)
+  (emc-update-current-region))
+
 (emc-define-handler emc-execute-visual-next-line ()
   (emc-execute-move-to-line 'next)
   (emc-update-current-region))
@@ -411,6 +418,10 @@ by the value of `evil-this-register'."
 
 (emc-define-handler emc-execute-visual-macro ()
   (emc-execute-macro)
+  (emc-update-current-region))
+
+(emc-define-handler emc-execute-visual-call-with-last-input ()
+  (emc-execute-call-with-last-input)
   (emc-update-current-region))
 
 (emc-define-handler emc-execute-visual-call ()
@@ -451,6 +462,8 @@ by the value of `evil-this-register'."
 
 (defun emc-execute-for (cursor)
   "Execute the current command for CURSOR."
+  ;; TODO move all vars that are the same for all cursors to
+  ;;      emc-execute-for-all : everything in the let* below
   (let* ((cmd (emc-get-command-name))
          (state (emc-get-command-state))
          (handler (emc-get-command-handler cmd state))
@@ -485,7 +498,6 @@ by the value of `evil-this-register'."
       cursor)
     ))
 
-
 (defun emc-execute-for-all ()
   "Execute the current command, stored at `emc-command', for all fake cursors."
   (when (and (emc-has-command-p)
@@ -515,6 +527,11 @@ are undone in the same step as the current command."
     (if (eq buffer-undo-list t)
         (setq evil-temporary-undo undo-list)
       (setq buffer-undo-list undo-list))))
+
+(when (fboundp 'font-lock-add-keywords)
+  (font-lock-add-keywords
+   'emacs-lisp-mode
+   '(("(\\(emc-define-handler\\)" . font-lock-keyword-face))))
 
 (provide 'emc-command-execute)
 
