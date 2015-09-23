@@ -1327,8 +1327,6 @@ otherwise execute BODY."
 
 ;;   (define-key evil-normal-state-local-map (kbd "C-k") 'emc-make-cursor-here-old)
 ;;   (define-key evil-normal-state-local-map (kbd "C-m") 'emc-freeze)
-;;   (define-key evil-normal-state-local-map (kbd "C-l") 'emc-unfreeze)
-
 ;;   (define-key evil-normal-state-local-map (kbd "C-,") 'emc-destroy-all-cursors))
 
 ;; (emc-setup-key-maps)

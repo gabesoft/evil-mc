@@ -128,6 +128,7 @@
     (evil-paste-before . ((:default . emc-execute-normal-evil-paste)))
     (evil-previous-line . ((:default . emc-execute-normal-prev-line) (:visual . emc-execute-visual-prev-line)))
     (evil-previous-match . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
+    (evil-repeat . ((:default . emc-execute-normal-call-with-count)))
     (evil-replace . ((:default . emc-execute-normal-evil-replace)))
     (evil-search-backward . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
     (evil-search-forward . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
