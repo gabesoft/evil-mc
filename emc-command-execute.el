@@ -465,31 +465,27 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
   (when (emc-executing-debug-p)
     (message "Execute %s with %s" (emc-get-command-name) handler))
   (goto-char (emc-get-cursor-start cursor))
-  (if handler
-      (ignore-errors
-        (condition-case error
-            (cl-progv
-                state-variables
-                (mapcar (lambda (var) (emc-get-cursor-property cursor var))
-                        state-variables)
-              (funcall handler)
-              (emc-delete-cursor-overlay cursor)
-              (emc-delete-region-overlay (emc-get-cursor-region cursor))
-              (apply 'emc-put-cursor-property
-                     (emc-put-cursor-overlay cursor
-                                             (emc-cursor-overlay-at-pos))
-                     (apply 'append (mapcar (lambda (var)
-                                              (list var
-                                                    (unless (memq var clear-variables)
-                                                      (symbol-value var))))
-                                            state-variables))))
-          (error (message "Failed to execute %s with error %s"
-                          (emc-get-command-name)
-                          (error-message-string error))
-                 cursor)))
-    (message "No handler found for command %s" (emc-get-command-name))
-    cursor)
-  )
+  (ignore-errors
+    (condition-case error
+        (cl-progv
+            state-variables
+            (mapcar (lambda (var) (emc-get-cursor-property cursor var))
+                    state-variables)
+          (funcall handler)
+          (emc-delete-cursor-overlay cursor)
+          (emc-delete-region-overlay (emc-get-cursor-region cursor))
+          (apply 'emc-put-cursor-property
+                 (emc-put-cursor-overlay cursor
+                                         (emc-cursor-overlay-at-pos))
+                 (apply 'append (mapcar (lambda (var)
+                                          (list var
+                                                (unless (memq var clear-variables)
+                                                  (symbol-value var))))
+                                        state-variables))))
+      (error (message "Failed to execute %s with error %s"
+                      (emc-get-command-name)
+                      (error-message-string error))
+             cursor))))
 
 (defun emc-execute-for-all ()
   "Execute the current command, stored at `emc-command', for all fake cursors."
@@ -505,16 +501,19 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
                      (emc-get-command-state)))
            (state-variables (emc-get-state-variables handler))
            (clear-variables (emc-get-clear-variables handler)))
-      (emc-remove-last-undo-marker)
-      (evil-with-single-undo
-        (save-excursion
-          (dolist (cursor emc-cursor-list)
-            (setq cursor-list (emc-insert-cursor-into-list
-                               (emc-execute-for cursor
-                                                state-variables
-                                                clear-variables)
-                               cursor-list)))
-          (setq emc-cursor-list cursor-list))))))
+      (unless handler
+        (message "No handler found for command %s" (emc-get-command-name)))
+      (when handler
+        (emc-remove-last-undo-marker)
+        (evil-with-single-undo
+          (save-excursion
+            (dolist (cursor emc-cursor-list)
+              (setq cursor-list (emc-insert-cursor-into-list
+                                 (emc-execute-for cursor
+                                                  state-variables
+                                                  clear-variables)
+                                 cursor-list)))
+            (setq emc-cursor-list cursor-list)))))))
 
 (defun emc-remove-last-undo-marker ()
   "Remove the last undo marker so that future commands
