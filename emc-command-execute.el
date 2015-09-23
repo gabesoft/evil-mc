@@ -404,7 +404,6 @@ by the value of `evil-this-register'."
   (emc-update-current-region))
 
 (emc-define-handler emc-execute-visual-evil-goto-line ()
-  :cursor-clear (region column)
   (emc-execute-evil-goto-line)
   (emc-update-current-region))
 
