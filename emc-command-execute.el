@@ -109,7 +109,7 @@
                     (emc-get-region-end region)
                     (emc-get-region-type region)
                     (emc-get-command-last-input))
-    (evil-repeat (emc-get-command-keys-count))))
+    (emc-execute-macro)))
 
 (defun emc-execute-with-region-and-register (cmd)
   "Execute CMD with the current register and region."
@@ -507,15 +507,19 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
       (unless handler
         (message "No handler found for command %s" (emc-get-command-name)))
       (when handler
+        ;; (evil-repeat-stop)
         (emc-remove-last-undo-marker)
         (evil-with-single-undo
           (save-excursion
             (dolist (cursor emc-cursor-list)
+              ;; (evil-repeat-start)
               (setq cursor-list (emc-insert-cursor-into-list
                                  (emc-execute-for cursor
                                                   state-variables
                                                   clear-variables)
-                                 cursor-list)))
+                                 cursor-list))
+              ;; (evil-repeat-stop)
+              )
             (setq emc-cursor-list cursor-list)))))))
 
 (defun emc-remove-last-undo-marker ()
