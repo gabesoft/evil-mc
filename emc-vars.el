@@ -161,6 +161,7 @@
     (paste-before-current-line . ((:default . emc-execute-normal-call-with-count)))
     (self-insert-command . ((:default . emc-execute-normal-call-with-count)))
     (transpose-chars-before-point . ((:default . emc-execute-normal-call-with-count)))
+    (yaml-electric-backspace . ((:default . emc-execute-normal-call-with-count)))
     (yaml-electric-bar-and-angle . ((:default . emc-execute-normal-call-with-count)))
     (yaml-electric-dash-and-dot . ((:default . emc-execute-normal-call-with-count)))
     (yank . ((:default . emc-execute-normal-call)))
