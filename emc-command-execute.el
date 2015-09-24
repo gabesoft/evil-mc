@@ -459,29 +459,29 @@ by the value of `evil-this-register'."
   (let ((names (evil-get-command-property handler :cursor-clear)))
     (if (atom names) (list names) names)))
 
+(defun emc-get-var-name-value (var)
+  "Gets the current name and value pair of VAR or nil if it needs to be cleared."
+  (list var (unless (memq var clear-variables) (symbol-value var))))
+
 (defun emc-execute-for (cursor state-variables clear-variables)
   "Execute the current command for CURSOR in the context of STATE-VARIABLES and
 ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
   (when (emc-executing-debug-p)
     (message "Execute %s with %s" (emc-get-command-name) handler))
-  (goto-char (emc-get-cursor-start cursor))
   (ignore-errors
     (condition-case error
         (cl-progv
             state-variables
-            (mapcar (lambda (var) (emc-get-cursor-property cursor var))
-                    state-variables)
+            (emc-get-cursor-properties cursor state-variables)
+
+          (goto-char (emc-get-cursor-start cursor))
           (funcall handler)
           (emc-delete-cursor-overlay cursor)
           (emc-delete-region-overlay (emc-get-cursor-region cursor))
+
           (apply 'emc-put-cursor-property
-                 (emc-put-cursor-overlay cursor
-                                         (emc-cursor-overlay-at-pos))
-                 (apply 'append (mapcar (lambda (var)
-                                          (list var
-                                                (unless (memq var clear-variables)
-                                                  (symbol-value var))))
-                                        state-variables))))
+                 (emc-put-cursor-overlay cursor (emc-cursor-overlay-at-pos))
+                 (mapcan 'emc-get-var-name-value state-variables)))
       (error (message "Failed to execute %s with error %s"
                       (emc-get-command-name)
                       (error-message-string error))

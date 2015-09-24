@@ -9,13 +9,18 @@
 ;;; Code:
 
 (defun emc-get-cursor-property (cursor name)
-  "Return the value of the property with NAME from CURSOR."
+  "Return the value of the CURSOR property with NAME."
   (when cursor (emc-get-object-property cursor name)))
 
 (defun emc-put-cursor-property (cursor &rest properties)
-  "Return a new cursor that has one or more PROPERTIES
-set to the specified values."
+  "Return a new CURSOR that has one or more PROPERTIES set to the specified values."
   (apply 'emc-put-object-property (cons cursor properties)))
+
+(defun emc-get-cursor-properties (cursor properties)
+  "Return the values of all CURSOR PROPERTIES as a list."
+  (when cursor
+    (mapcar (lambda (prop) (emc-get-object-property cursor prop))
+            properties)))
 
 (defun emc-get-cursor-overlay (cursor)
   "Get the overlay for CURSOR."
@@ -76,19 +81,19 @@ set to the specified values."
   (emc-put-cursor-property cursor 'evil-jump-list evil-jump-list))
 
 (defun emc-get-cursor-mark-ring (cursor)
-  "Get the mark-ring for CURSOR."
+  "Get the `mark-ring' for CURSOR."
   (emc-get-cursor-property cursor 'mark-ring))
 
 (defun emc-put-cursor-mark-ring (cursor mark-ring)
-  "Set the mark-ring for CURSOR to MARK-RING."
+  "Set the `mark-ring' for CURSOR to MARK-RING."
   (emc-put-cursor-property cursor 'mark-ring mark-ring))
 
 (defun emc-get-cursor-mark-active (cursor)
-  "Get the mark-active for CURSOR."
+  "Get the `mark-active' for CURSOR."
   (emc-get-cursor-property cursor 'mark-active))
 
 (defun emc-put-cursor-mark-active (cursor mark-active)
-  "Set the mark-active for CURSOR to MARK-active."
+  "Set the `mark-active' for CURSOR to MARK-ACTIVE."
   (emc-put-cursor-property cursor 'mark-active mark-active))
 
 (defun emc-get-cursor-start (cursor)

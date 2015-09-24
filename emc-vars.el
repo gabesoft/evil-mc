@@ -160,6 +160,8 @@
     (paste-after-current-line . ((:default . emc-execute-normal-call-with-count)))
     (paste-before-current-line . ((:default . emc-execute-normal-call-with-count)))
     (self-insert-command . ((:default . emc-execute-normal-call-with-count)))
+    (spacemacs/evil-numbers-decrease . ((:default . emc-execute-normal-call-with-count)))
+    (spacemacs/evil-numbers-increase . ((:default . emc-execute-normal-call-with-count)))
     (transpose-chars-before-point . ((:default . emc-execute-normal-call-with-count)))
     (yaml-electric-backspace . ((:default . emc-execute-normal-call-with-count)))
     (yaml-electric-bar-and-angle . ((:default . emc-execute-normal-call-with-count)))
