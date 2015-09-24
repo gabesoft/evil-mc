@@ -31,7 +31,15 @@
                  evil-jump-list
                  evil-last-paste
                  evil-last-register
+                 evil-last-repeat
                  evil-markers-alist
+                 evil-recording-repeat
+                 evil-repeat-count
+                 evil-repeat-info
+                 evil-repeat-keys
+                 evil-repeat-pos
+                 evil-repeat-ring
+                 evil-repeat-move-cursor
                  evil-this-register
                  evil-was-yanked-without-register
                  kill-ring
@@ -53,6 +61,7 @@
 
 (defvar emc-known-commands
   '(
+
     (backward-delete-char-untabify . ((:default . emc-execute-normal-call-with-count)))
     (copy-to-the-end-of-line . ((:default . emc-execute-normal-call)))
     (delete-backward-char . ((:default . emc-execute-normal-call-with-count)))

@@ -479,6 +479,9 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
           (emc-delete-cursor-overlay cursor)
           (emc-delete-region-overlay (emc-get-cursor-region cursor))
 
+          ;; TODO determine why the repeat ring is not populated
+          ;; (message "REPEAT RING %s" evil-repeat-ring)
+
           (apply 'emc-put-cursor-property
                  (emc-put-cursor-overlay cursor (emc-cursor-overlay-at-pos))
                  (mapcan 'emc-get-var-name-value state-variables)))
