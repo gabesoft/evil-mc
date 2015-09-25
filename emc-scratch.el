@@ -1319,10 +1319,10 @@ otherwise execute BODY."
 ;; (defun emc-setup-key-maps ()
 ;;   "Sets up all key bindings for working with multiple cursors."
 ;;   (interactive)
-;;   (define-key holy-visual-evil-local-map (kbd "C-n") 'emc-make-next-cursor-old)
-;;   (define-key holy-normal-evil-local-map (kbd "C-n") 'emc-make-next-cursor-old)
-;;   (define-key holy-visual-evil-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
-;;   (define-key holy-normal-evil-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
+;;   (define-key (key) (visual) define-visual-evil-local-map (kbd "C-n") 'emc-make-next-cursor-old)
+;;   (define-key (key) (normal) define-normal-evil-local-map (kbd "C-n") 'emc-make-next-cursor-old)
+;;   (define-key (key) (visual) define-visual-evil-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
+;;   (define-key test test define-normal-evil-local-map (kbd "C-t") 'emc-skip-next-cursor-old)
 ;;   (define-key holy-visual-evil-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
 ;;   (define-key evil-normal-state-local-map (kbd "C-p") 'emc-undo-prev-cursor-old)
 

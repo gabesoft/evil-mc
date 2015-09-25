@@ -475,13 +475,13 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
             (emc-get-cursor-properties cursor state-variables)
 
           (goto-char (emc-get-cursor-start cursor))
+
+          (evil-repeat-pre-hook)
           (funcall handler)
+          (evil-repeat-post-hook)
+
           (emc-delete-cursor-overlay cursor)
           (emc-delete-region-overlay (emc-get-cursor-region cursor))
-
-          ;; TODO determine why the repeat ring is not populated
-          ;; (message "REPEAT RING %s" evil-repeat-ring)
-
           (apply 'emc-put-cursor-property
                  (emc-put-cursor-overlay cursor (emc-cursor-overlay-at-pos))
                  (mapcan 'emc-get-var-name-value state-variables)))
@@ -507,19 +507,16 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
       (unless handler
         (message "No handler found for command %s" (emc-get-command-name)))
       (when handler
-        ;; (evil-repeat-stop)
+        (evil-repeat-post-hook)
         (emc-remove-last-undo-marker)
         (evil-with-single-undo
           (save-excursion
             (dolist (cursor emc-cursor-list)
-              ;; (evil-repeat-start)
               (setq cursor-list (emc-insert-cursor-into-list
                                  (emc-execute-for cursor
                                                   state-variables
                                                   clear-variables)
-                                 cursor-list))
-              ;; (evil-repeat-stop)
-              )
+                                 cursor-list)))
             (setq emc-cursor-list cursor-list)))))))
 
 (defun emc-remove-last-undo-marker ()

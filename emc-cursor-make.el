@@ -119,6 +119,7 @@ the cursors are ordered by the cursor overlay start position."
                    'overlay (emc-cursor-overlay-at-pos pos)
                    'column (emc-column-number pos)
                    'evil-markers-alist (default-value 'evil-markers-alist)
+                   'evil-repeat-ring (make-ring 10)
                    'kill-ring (copy-sequence kill-ring)
                    'kill-ring-yank-pointer nil)))
       (emc-insert-cursor cursor)
