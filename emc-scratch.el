@@ -873,7 +873,7 @@
                              'evil-this-register evil-this-register
                              'region region)))
 
-(defmacro emc-with-region (region fn &rest body)
+(defmacro emc-with-region-old (region fn &rest body)
   "When the REGION exists and has an overlay execute FN
 otherwise execute BODY."
   `(if region
@@ -955,11 +955,11 @@ otherwise execute BODY."
            (evil-repeat-find-char keys-count))
 
           ((eq cmd 'evil-commentary)
-           (emc-with-region region
-                            (lambda (start end)
-                              (goto-char start)
-                              (evil-commentary start end))
-                            (execute-kbd-macro keys-vector)))
+           (emc-with-region-old region
+                                (lambda (start end)
+                                  (goto-char start)
+                                  (evil-commentary start end))
+                                (execute-kbd-macro keys-vector)))
 
           ((eq cmd 'evil-find-char) (evil-repeat-find-char))
           ((eq cmd 'newline-and-indent) (newline-and-indent))
@@ -973,19 +973,19 @@ otherwise execute BODY."
           ((eq cmd 'hippie-expand) (hippie-expand 1))
 
           ((eq cmd 'evil-delete-char)
-           (emc-with-region region 'evil-delete-char
-                            (execute-kbd-macro keys-vector-with-register)))
+           (emc-with-region-old region 'evil-delete-char
+                                (execute-kbd-macro keys-vector-with-register)))
 
           ((eq cmd 'evil-delete-line)
-           (emc-with-region region 'evil-delete-line
-                            (execute-kbd-macro keys-vector-with-register)))
+           (emc-with-region-old region 'evil-delete-line
+                                (execute-kbd-macro keys-vector-with-register)))
 
           ((eq cmd 'evil-join)
-           (emc-with-region region
-                            (lambda (start end)
-                              (goto-char start)
-                              (evil-join start end))
-                            (execute-kbd-macro keys-vector-with-register)))
+           (emc-with-region-old region
+                                (lambda (start end)
+                                  (goto-char start)
+                                  (evil-join start end))
+                                (execute-kbd-macro keys-vector-with-register)))
 
           ((eq cmd 'electric-newline-and-maybe-indent) (electric-newline-and-maybe-indent))
 
@@ -1016,7 +1016,7 @@ otherwise execute BODY."
                     (let ((kill-ring (copy-sequence kill-ring))
                           (kill-ring-yank-pointer nil))
 
-                      (emc-with-region region 'evil-delete)
+                      (emc-with-region-old region 'evil-delete)
                       (setq new-kill-ring kill-ring)
                       (setq new-kill-ring-yank-pointer kill-ring-yank-pointer))
 
@@ -1078,7 +1078,7 @@ otherwise execute BODY."
           ((eq cmd 'evil-visual-line) (evil-force-normal-state))
 
           ((eq cmd 'evil-surround-region)
-           (emc-with-region
+           (emc-with-region-old
             region
             (lambda (start end)
               (evil-surround-region start end nil last-input))))
@@ -1087,15 +1087,15 @@ otherwise execute BODY."
            (cond ((null region)
                   (execute-kbd-macro keys-vector-with-register))
                  (t
-                  (emc-with-region region
-                                   (lambda (start end)
-                                     (goto-char (min (emc-get-region-mark region)
-                                                     (emc-get-region-point region)))
-                                     (evil-yank
-                                      start
-                                      end
-                                      region-type
-                                      evil-this-register))))
+                  (emc-with-region-old region
+                                       (lambda (start end)
+                                         (goto-char (min (emc-get-region-mark region)
+                                                         (emc-get-region-point region)))
+                                         (evil-yank
+                                          start
+                                          end
+                                          region-type
+                                          evil-this-register))))
                  ;; ((emc-line-region-p region)
                  ;;  (execute-kbd-macro (vconcat keys-register [?y ?y])))
                  ))
@@ -1104,13 +1104,13 @@ otherwise execute BODY."
            (cond ((null region)
                   (execute-kbd-macro keys-vector-with-register))
                  (t
-                  (emc-with-region region
-                                   (lambda (start end)
-                                     (evil-delete
-                                      start
-                                      end
-                                      region-type
-                                      evil-this-register)))))
+                  (emc-with-region-old region
+                                       (lambda (start end)
+                                         (evil-delete
+                                          start
+                                          end
+                                          region-type
+                                          evil-this-register)))))
            ;; ((emc-line-region-p region)
            ;;  (execute-kbd-macro (vconcat keys-register [?d ?d]))))
            (when (eolp) (evil-end-of-line)))
@@ -1123,14 +1123,14 @@ otherwise execute BODY."
                         (evil-forward-char))
                       (execute-kbd-macro keys-vector-with-register))
                      (t
-                      (emc-with-region region
-                                       (lambda (start end)
-                                         (evil-forward-char)
-                                         (evil-delete
-                                          start
-                                          end
-                                          region-type
-                                          evil-this-register))))))))
+                      (emc-with-region-old region
+                                           (lambda (start end)
+                                             (evil-forward-char)
+                                             (evil-delete
+                                              start
+                                              end
+                                              region-type
+                                              evil-this-register))))))))
           ;; ((emc-line-region-p region)
           ;;  (evil-forward-char)
           ;;  (execute-kbd-macro (vconcat keys-register [?c ?c])))))))

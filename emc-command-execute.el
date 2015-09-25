@@ -50,6 +50,16 @@
          (apply #'evil-set-command-properties func ',keys)
          func))))
 
+(defmacro emc-with-region (region form &rest body)
+  "TODO: doc"
+  (declare (indent 2) (debug t))
+  `(if ,region
+       (let ((region-start  (emc-get-region-start ,region))
+             (region-end  (emc-get-region-end ,region))
+             (region-type  (emc-get-region-type ,region)))
+         ,form)
+     ,@body))
+
 (defun emc-execute-hippie-expand ()
   "Execute a completion command."
   (hippie-expand 1))
@@ -63,47 +73,45 @@
   (evil-snipe-repeat (emc-get-command-keys-count)))
 
 ;; TODO refactor all region methods below
+;; if all execute macro add to emc-with-region
 (defun emc-execute-evil-commentary ()
   "Execute an `evil-commentary' command."
-  (if region
-      (let ((start (emc-get-region-start region)))
-        (goto-char start)
-        (evil-commentary start (emc-get-region-end region)))
+  (emc-with-region region
+      (progn
+        (when (eq region-type 'char) (goto-char region-start))
+        (evil-commentary region-start region-end))
     (emc-execute-macro)))
 
 (defun emc-execute-evil-join ()
   "Execute an `evil-join' command."
-  (if region
-      (let ((start (emc-get-region-start region)))
-        (goto-char start)
-        (evil-join start (emc-get-region-end region)))
+  (emc-with-region region
+      (progn
+        (goto-char region-start)
+        (evil-join region-start region-end))
     (emc-execute-macro)))
 
 (defun emc-execute-evil-surround-region ()
   "Execute an `evil-surround-region' command."
-  (if region
-      (let ((start (emc-get-region-start region)))
-        (goto-char start)
-        (evil-surround-region
-         start
-         (emc-get-region-end region)
-         (emc-get-region-type region)
-         (emc-get-command-last-input)))
+  (emc-with-region region
+      (progn
+        (goto-char region-start)
+        (evil-surround-region region-start
+                              region-end
+                              region-type
+                              (emc-get-command-last-input)))
     (emc-execute-macro)))
 
 (defun emc-execute-change-case (cmd)
   "Execute an `evil-invert-char', `evil-invert-case' `evil-upcase' or `evil-downcase' command."
-  (if region
-      (let ((start (emc-get-region-start region)))
-        (goto-char start)
-        (funcall cmd
-                 start
-                 (emc-get-region-end region)
-                 (emc-get-region-type region)))
+  (emc-with-region region
+      (progn
+        (goto-char region-start)
+        (funcall cmd region-start region-end region-type))
     (emc-execute-macro)))
 
 (defun emc-execute-evil-replace ()
   "Execute an `evil-replace' command."
+  ;; TODO left here (replace with emc-with-region)
   (if region
       (evil-replace (emc-get-region-start region)
                     (emc-get-region-end region)
