@@ -51,7 +51,7 @@
          func))))
 
 (defmacro emc-with-region (region form &rest body)
-  "TODO: doc"
+  "Execute FORM if there is a REGION. Otherwise execute BODY."
   (declare (indent 2) (debug t))
   `(if ,region
        (let ((region-start  (emc-get-region-start ,region))
@@ -59,6 +59,14 @@
              (region-type  (emc-get-region-type ,region)))
          ,form)
      ,@body))
+
+(defmacro emc-with-region-or-execute-macro (region add-register &rest body)
+  "Execute BODY if there is a REGION.
+Otherwise, run `emc-execute-macro' with ADD-REGISTER."
+  (declare (indent 2) (debug t))
+  `(emc-with-region ,region
+       (progn ,@body)
+     (emc-execute-macro ,add-register)))
 
 (defun emc-execute-hippie-expand ()
   "Execute a completion command."
@@ -72,77 +80,61 @@
   "Execute an `evil-snipe' command."
   (evil-snipe-repeat (emc-get-command-keys-count)))
 
-;; TODO refactor all region methods below
-;; if all execute macro add to emc-with-region
 (defun emc-execute-evil-commentary ()
   "Execute an `evil-commentary' command."
-  (emc-with-region region
-      (progn
-        (when (eq region-type 'char) (goto-char region-start))
-        (evil-commentary region-start region-end))
-    (emc-execute-macro)))
+  (emc-with-region-or-execute-macro region nil
+    (when (eq region-type 'char) (goto-char region-start))
+    (evil-commentary region-start region-end)))
 
 (defun emc-execute-evil-join ()
   "Execute an `evil-join' command."
-  (emc-with-region region
-      (progn
-        (goto-char region-start)
-        (evil-join region-start region-end))
-    (emc-execute-macro)))
+  (emc-with-region-or-execute-macro region nil
+    (progn
+      (goto-char region-start)
+      (evil-join region-start region-end))))
 
 (defun emc-execute-evil-surround-region ()
   "Execute an `evil-surround-region' command."
-  (emc-with-region region
-      (progn
-        (goto-char region-start)
-        (evil-surround-region region-start
-                              region-end
-                              region-type
-                              (emc-get-command-last-input)))
-    (emc-execute-macro)))
+  (emc-with-region-or-execute-macro region nil
+    (goto-char region-start)
+    (evil-surround-region region-start
+                          region-end
+                          region-type
+                          (emc-get-command-last-input))))
 
 (defun emc-execute-change-case (cmd)
-  "Execute an `evil-invert-char', `evil-invert-case' `evil-upcase' or `evil-downcase' command."
-  (emc-with-region region
-      (progn
-        (goto-char region-start)
-        (funcall cmd region-start region-end region-type))
-    (emc-execute-macro)))
+  "Execute an `evil-invert-char', `evil-invert-case' `evil-upcase'
+or `evil-downcase' command."
+  (emc-with-region-or-execute-macro region nil
+    (goto-char region-start)
+    (funcall cmd region-start region-end region-type)))
 
 (defun emc-execute-evil-replace ()
   "Execute an `evil-replace' command."
-  ;; TODO left here (replace with emc-with-region)
-  (if region
-      (evil-replace (emc-get-region-start region)
-                    (emc-get-region-end region)
-                    (emc-get-region-type region)
-                    (emc-get-command-last-input))
-    (emc-execute-macro)))
+  (emc-with-region-or-execute-macro region nil
+    (evil-replace region-start
+                  region-end
+                  region-type
+                  (emc-get-command-last-input))))
 
 (defun emc-execute-with-region-and-register (cmd)
   "Execute CMD with the current register and region."
-  (if region
-      (funcall cmd
-               (emc-get-region-start region)
-               (emc-get-region-end region)
-               (emc-get-region-type region)
-               evil-this-register)
-    (emc-execute-macro t)))
+  (emc-with-region-or-execute-macro region t
+    (funcall cmd region-start region-end region-type evil-this-register)))
 
 (defun emc-execute-evil-change-line ()
   "Execute an `evil-change-line' comand."
-  (if region
-      (evil-delete-line
-       (emc-get-region-start region)
-       (emc-get-region-end region)
-       (emc-get-region-type region)
-       evil-this-register)
+  (emc-with-region region
+      (evil-delete-line region-start
+                        region-end
+                        region-type
+                        evil-this-register)
     (evil-delete-line (point) (1+ (point)))))
 
 (defun emc-execute-evil-yank ()
   "Execute an `evil-yank' comand."
-  (emc-execute-with-region-and-register 'evil-yank)
-  (when region
+  (emc-with-region-or-execute-macro region t
+    (evil-yank region-start region-end region-type evil-this-register)
     (goto-char (min (emc-get-region-mark region)
                     (emc-get-region-point region)))))
 
