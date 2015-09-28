@@ -178,8 +178,10 @@ the cursors are ordered by the cursor overlay start position."
              (>= (point-max) end)
              (< start end))
         (setq emc-pattern
-              (cons (emc-make-pattern (buffer-substring-no-properties start end)
-                                      whole-word)
+              (cons (emc-make-pattern
+                     (regexp-quote (buffer-substring-no-properties
+                                    start end))
+                     whole-word)
                     range))
       (error "Invalid range %s" range))))
 
