@@ -175,12 +175,13 @@
                                       keys-operator-post))))
                  (t (or keys-post keys-pre)))))
   (when (emc-recording-debug-p)
-    (message "Record-done %s pre %s post %s keys-motion %s keys-operator %s keys %s"
+    (message "Record-done %s pre %s post %s keys-motion %s keys-operator %s count %s keys %s"
              (emc-get-command-name)
              (emc-get-command-keys-string :keys-pre)
              (emc-get-command-keys-string :keys-post)
              (emc-get-command-keys-string :keys-motion-post)
              (emc-get-command-keys-string :keys-operator-post)
+             (emc-get-command-keys-string :keys-count)
              (emc-get-command-keys-string :keys))))
 
 (defun emc-add-command-hooks ()

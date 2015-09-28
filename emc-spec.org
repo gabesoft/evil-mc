@@ -258,6 +258,9 @@ CLOSED: [2015-09-14 Mon 21:12]
 - change "cw"
 - evil snipe "f-"
 - execute-kbd-macro seems to cause the slowness
+- some operations are slow even for a few cursors in large files
+  - maybe its due to some minor modes
+  - seems like aggressive indent could cause slowness
 *** a workaround for this is to narrow to region or function
 ** TODO Fix evil-repeat
 *** currently only works for some commands
@@ -281,3 +284,7 @@ CLOSED: [2015-09-14 Mon 21:12]
 ** TODO Refactor command run functions
 *** extract to own file
 ** TODO Test with various modes (org, js2, ruby, etc)
+** TODO Insertion of characters takes a while to display the last char for fake cursors
+** TODO Fix pattern 
+*** when selecting a quote or square bracket creating cursors errors out with invalid pattern
+

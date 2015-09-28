@@ -6,8 +6,13 @@
 
 ;;; Code:
 
+;; (defface emc-cursor-default-face
+;;   '((t (:background "#D13A82")))
+;;   "The face used for simple fake cursors."
+;;   :group 'emc)
+
 (defface emc-cursor-default-face
-  '((t (:background "#D13A82")))
+  '((t (:inherit cursor :inverse-video nil)))
   "The face used for simple fake cursors."
   :group 'emc)
 
@@ -37,9 +42,9 @@
                  evil-repeat-count
                  evil-repeat-info
                  evil-repeat-keys
+                 evil-repeat-move-cursor
                  evil-repeat-pos
                  evil-repeat-ring
-                 evil-repeat-move-cursor
                  evil-this-register
                  evil-was-yanked-without-register
                  kill-ring
@@ -63,6 +68,8 @@
   '(
 
     (backward-delete-char-untabify . ((:default . emc-execute-normal-call-with-count)))
+    (company-complete-selection . ((:default . emc-execute-normal-call)))
+    (company-select-next . ((:default . emc-execute-normal-ignore)))
     (copy-to-the-end-of-line . ((:default . emc-execute-normal-call)))
     (delete-backward-char . ((:default . emc-execute-normal-call-with-count)))
     (electric-newline-and-maybe-indent . ((:default . emc-execute-normal-call)))
@@ -122,6 +129,7 @@
     (evil-inner-symbol . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
     (evil-inner-tag . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
     (evil-inner-word . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
+    (evil-insert . ((:default . emc-execute-normal-call-with-count)))
     (evil-insert-line . ((:default . emc-execute-normal-call-with-count)))
     (evil-invert-case . ((:default . emc-execute-normal-evil-invert-case)))
     (evil-invert-char . ((:default . emc-execute-normal-evil-invert-char)))
@@ -145,6 +153,8 @@
     (evil-search-backward . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
     (evil-search-forward . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
     (evil-set-marker . ((:default . emc-execute-normal-call-with-last-input) (:visual . emc-execute-visual-call-with-last-input)))
+    (evil-shift-left . ((:default . emc-execute-normal-evil-shift-left) (:visual . emc-execute-visual-evil-shift-left)))
+    (evil-shift-right . ((:default . emc-execute-normal-evil-shift-right) (:visual . emc-execute-visual-evil-shift-right)))
     (evil-snipe-F . ((:default . emc-execute-normal-evil-snipe) (:visual . emc-execute-visual-evil-snipe)))
     (evil-snipe-S . ((:default . emc-execute-normal-evil-snipe) (:visual . emc-execute-visual-evil-snipe)))
     (evil-snipe-T . ((:default . emc-execute-normal-evil-snipe) (:visual . emc-execute-visual-evil-snipe)))
@@ -163,7 +173,9 @@
     (evil-yank . ((:default . emc-execute-normal-evil-yank)))
     (exchange-point-and-mark . ((:visual . emc-execute-exchange-point-and-mark)))
     (hippie-expand . ((:default . emc-execute-normal-hippie-expand)))
-    (keyboard-quit . ((:default . emc-execute-normal-keyboard-quit)))
+    (indent-for-tab-command . ((:default . emc-execute-normal-call)))
+    (indent-region-or-buffer . ((:default . emc-execute-normal-ignore)))
+    (keyboard-quit . ((:default . emc-execute-normal-ignore)))
     (move-text-down . ((:default . emc-execute-normal-call-with-count)))
     (move-text-up . ((:default . emc-execute-normal-call-with-count)))
     (newline-and-indent . ((:default . emc-execute-normal-call)))
@@ -175,6 +187,9 @@
     (spacemacs/evil-numbers-decrease . ((:default . emc-execute-normal-call-with-count)))
     (spacemacs/evil-numbers-increase . ((:default . emc-execute-normal-call-with-count)))
     (transpose-chars-before-point . ((:default . emc-execute-normal-call-with-count)))
+    (undo . ((:default . emc-execute-normal-ignore)))
+    (undo-tree-redo . ((:default . emc-execute-normal-ignore)))
+    (undo-tree-undo . ((:default . emc-execute-normal-ignore)))
     (yaml-electric-backspace . ((:default . emc-execute-normal-call-with-count)))
     (yaml-electric-bar-and-angle . ((:default . emc-execute-normal-call-with-count)))
     (yaml-electric-dash-and-dot . ((:default . emc-execute-normal-call-with-count)))

@@ -54,8 +54,8 @@
     (save-excursion
       (goto-char pos)
       (if (eolp)
-          (emc-cursor-overlay-at-eol (point))
-        (emc-cursor-overlay-inline (point))))))
+          (emc-cursor-overlay-at-eol pos)
+        (emc-cursor-overlay-inline pos)))))
 
 (defun emc-sort-cursors ()
   "Sort the cursors list by position."

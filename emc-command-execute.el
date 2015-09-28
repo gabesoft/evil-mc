@@ -89,9 +89,16 @@ Otherwise, run `emc-execute-macro' with ADD-REGISTER."
 (defun emc-execute-evil-join ()
   "Execute an `evil-join' command."
   (emc-with-region-or-execute-macro region nil
-    (progn
-      (goto-char region-start)
-      (evil-join region-start region-end))))
+    (goto-char region-start)
+    (evil-join region-start region-end)))
+
+(defun emc-execute-evil-shift (cmd)
+  "Execute an `evil-shift-left' or `evil-shift-right'."
+  (emc-with-region-or-execute-macro region nil
+    (funcall cmd
+             region-start
+             region-end
+             (emc-get-command-keys-count))))
 
 (defun emc-execute-evil-surround-region ()
   "Execute an `evil-surround-region' command."
@@ -276,6 +283,14 @@ by the value of `evil-this-register'."
   :cursor-clear (region column)
   (emc-execute-evil-join))
 
+(emc-define-handler emc-execute-normal-evil-shift-left ()
+  :cursor-clear (region column)
+  (emc-execute-evil-shift 'evil-shift-left))
+
+(emc-define-handler emc-execute-normal-evil-shift-right ()
+  :cursor-clear (region column)
+  (emc-execute-evil-shift 'evil-shift-right))
+
 (emc-define-handler emc-execute-normal-evil-surround-region ()
   :cursor-clear (region column)
   (emc-execute-evil-surround-region))
@@ -365,7 +380,7 @@ by the value of `evil-this-register'."
   :cursor-clear (region column)
   (emc-execute-call-with-count))
 
-(emc-define-handler emc-execute-normal-keyboard-quit ()
+(emc-define-handler emc-execute-normal-ignore ()
   :cursor-clear (region column)
   (ignore))
 
@@ -413,6 +428,14 @@ by the value of `evil-this-register'."
 
 (emc-define-handler emc-execute-visual-prev-line ()
   (emc-execute-move-to-line 'prev)
+  (emc-update-current-region))
+
+(emc-define-handler emc-execute-visual-shift-left ()
+  (emc-execute-evil-shift 'evil-shift-left)
+  (emc-update-current-region))
+
+(emc-define-handler emc-execute-visual-shift-right ()
+  (emc-execute-evil-shift 'evil-shift-right)
   (emc-update-current-region))
 
 (emc-define-handler emc-execute-visual-macro ()

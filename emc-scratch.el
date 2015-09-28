@@ -124,6 +124,11 @@
   (interactive)
   (message "%s" (mapcar 'emc-get-cursor-mark-ring emc-cursor-list)))
 
+(defun emc-print-cursors-overlay ()
+  "Print the cursors overlay."
+  (interactive)
+  (message "%s" (mapcar 'emc-get-cursor-overlay emc-cursor-list)))
+
 (defun emc-print-cursors-registers ()
   "Print the cursors registers."
   (interactive)
@@ -1052,14 +1057,10 @@ otherwise execute BODY."
           ;; ((eq cmd 'evil-goto-mark) (evil-goto-mark last-input))
           ;; ((eq cmd 'evil-goto-mark-line) (evil-goto-mark-line last-input))
 
-          ;; (emc-cursor-get-evil-markers-alist 4)
-          ;; (emc-region-get-property 4)
-          ;; (emc-cursor-get-overlay 4)
-          ;; (emc-cursor-get-evil-markers-alist 3)
-          ;; (emc-region-get-property 3)
-          ;; (emc-region-get-property 3)
-          ;; (emc-cursor-get-overlay 3)
-          ;; (emc-cursor-get-overlay 3)
+          ;; (emc-get-property-region 6)
+          ;; (emc-get-overlay-cursor 6)
+          ;; (emc-get-property-region 5)
+          ;; (emc-get-overlay-cursor 5)
 
           ((eq cmd 'evil-normal-state)
            (evil-insert 1)
@@ -1397,6 +1398,12 @@ otherwise execute BODY."
   "Hook to run before any cursor is created."
   (when emc-executing-debug (message "Before cursors hook"))
   (setq emc-paused-modes nil)
+  (when (bound-and-true-p flyspell-mode)
+    (flyspell-mode -1)
+    (push (lambda () (flyspell-mode 1)) emc-paused-modes))
+  (when (bound-and-true-p aggressive-indent-mode)
+    (aggressive-indent-mode -1)
+    (push (lambda () (aggressive-indent-mode 1)) emc-paused-modes))
   (when (bound-and-true-p evil-jumper-mode)
     (evil-jumper-mode 0)
     (push (lambda () (evil-jumper-mode t)) emc-paused-modes))
@@ -1522,7 +1529,8 @@ otherwise execute BODY."
 ;;   (setq evil-ex-make-search-pattern "<def>")
 ;;   (setq evil-ex-search-direction 'forward)
 ;;   (evil-ex-search 2))
-
+;; (abcd-test 123)
+;; (abcd-test 123)
 ;; (evil-ex-search-abort)
 ;; (evil-ex-hl-set-overlays)
 ;; (rot13-region 9 11)
