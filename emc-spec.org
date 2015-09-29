@@ -285,6 +285,13 @@ CLOSED: [2015-09-14 Mon 21:12]
 *** extract to own file
 ** TODO Test with various modes (org, js2, ruby, etc)
 ** TODO Insertion of characters takes a while to display the last char for fake cursors
-** TODO Fix pattern 
+** DONE Fix pattern 
+CLOSED: [2015-09-28 Mon 21:44]
 *** when selecting a quote or square bracket creating cursors errors out with invalid pattern
+** Rename emc to evil-mc
+*** prefixes
+*** file names
+*** project name
+*** documentation
+
 

@@ -12,20 +12,26 @@
 
 (require 'evil)
 
-(require 'emc-vars)
 (require 'emc-common)
+(require 'emc-vars)
 (require 'emc-cursor-state)
-(require 'emc-command-info)
+(require 'emc-cursor-make)
+(require 'emc-command-record)
+(require 'emc-command-execute)
 (require 'emc-region)
 
 (eval-when-compile (require 'cl-lib))
 
 ;;; Code:
 
-(defgroup evil-multiple-cursors nil
+(defgroup evil-mc nil
   "Multiple cursors implementation for evil mode."
-  :prefix "evil-multiple-cursors-"
+  :prefix "evil-mc-"
   :group 'evil)
+
+(define-minor-mode evil-mc-mode
+  "Minor mode for evil multiple cursors."
+  :group 'evil-mc)
 
 (defvar evil-multiple-cursors-mode-map
   (let ((map (make-sparse-keymap)))
