@@ -4,7 +4,7 @@
 
 ;; This file contains functions for creating a visual region for a fake cursor
 
-(require 'emc-common)
+(require 'evil-mc-common)
 
 ;;; Code:
 
@@ -166,6 +166,6 @@ set to the specified values."
     (let ((overlay (emc-get-region-overlay region)))
       (when overlay (delete-overlay overlay)))))
 
-(provide 'emc-region)
+(provide 'evil-mc-region)
 
 ;;; emc-region.el ends here

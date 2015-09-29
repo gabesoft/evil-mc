@@ -7,21 +7,21 @@
 ;; (load-file "emc-cursor-state.el")
 ;; (load-file "emc-command-record.el")
 
-(require 'emc-vars)
-(require 'emc-common)
-(require 'emc-cursor-state)
-(require 'emc-cursor-make)
-(require 'emc-command-record)
-(require 'emc-command-execute)
-(require 'emc-region)
+(require 'evil-mc-vars)
+(require 'evil-mc-common)
+(require 'evil-mc-cursor-state)
+(require 'evil-mc-cursor-make)
+(require 'evil-mc-command-record)
+(require 'evil-mc-command-execute)
+(require 'evil-mc-region)
 
 
 (evil-define-local-var emc-watch-buffers
-  '("emc-common"
-    "emc-cursor-state"
-    "emc-command-record"
-    "emc-region"
-    "emc-scratch"))
+  '("evil-mc-common"
+    "evil-mc-cursor-state"
+    "evil-mc-command-record"
+    "evil-mc-region"
+    "evil-mc-scratch"))
 
 ;; (remove-hook 'auto-save-mode-hook (lambda () (message "auto-save-mode-hook")))
 ;; (remove-hook 'auto-save-hook (lambda () (message "auto-save-hook")))
@@ -1434,14 +1434,14 @@ otherwise execute BODY."
   (interactive)
   (message "Mark %s Point %s" (mark) (point)))
 
-(provide 'emc-scratch)
+(provide 'evil-mc-scratch)
 
-;; (defun emc-print-command-vars ()
+;; (defun evil-mc-print-command-vars ()
 ;;   "Prints command variables."
 ;;   (interactive)
-;;   (prin1 (cons emc-command-info emc-executing-command)))
+;;   (prin1 (cons evil-mc-command-info evil-mc-executing-command)))
 
-;; (defun emc-record-command (info)(emc-command-info)
+;; (defun evil-mc-record-command (info)(emc-command-info)
 ;;   (setq emc-command-info info))(emc-pre-command-hook)
 
 ;; (defun emc-pre-command-hook ()

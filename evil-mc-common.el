@@ -36,6 +36,6 @@
     (goto-char pos)
     (current-column)))
 
-(provide 'emc-common)
+(provide 'evil-mc-common)
 
 ;;; emc-common.el ends here

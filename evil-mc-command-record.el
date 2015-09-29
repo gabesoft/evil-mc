@@ -7,7 +7,7 @@
 
 (require 'cl)
 (require 'evil)
-(require 'emc-common)
+(require 'evil-mc-common)
 
 ;;; Code:
 
@@ -200,6 +200,6 @@
   (advice-remove 'evil-repeat-keystrokes #'emc-save-keys-motion)
   (advice-remove 'evil-repeat-motion #'emc-save-keys-operator))
 
-(provide 'emc-command-record)
+(provide 'evil-mc-command-record)
 
 ;;; emc-command-record.el ends here

@@ -15,7 +15,7 @@
 (require 'evil)
 (require 'evil-surround)
 ;; (require 'emc-mode)
-(require 'emc-scratch)
+(require 'evil-mc-scratch)
 (require 'espuds)
 (require 'ert)
 

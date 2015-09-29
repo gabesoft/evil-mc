@@ -4,7 +4,7 @@
 
 ;; This file contains functions to interact with the state of a fake cursor
 
-(require 'emc-common)
+(require 'evil-mc-common)
 
 ;;; Code:
 
@@ -112,6 +112,6 @@
     (let ((overlay (emc-get-cursor-overlay cursor)))
       (when overlay (delete-overlay overlay)))))
 
-(provide 'emc-cursor-state)
+(provide 'evil-mc-cursor-state)
 
 ;;; emc-cursor-state.el ends here

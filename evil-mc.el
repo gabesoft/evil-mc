@@ -12,13 +12,13 @@
 
 (require 'evil)
 
-(require 'emc-common)
-(require 'emc-vars)
-(require 'emc-cursor-state)
-(require 'emc-cursor-make)
-(require 'emc-command-record)
-(require 'emc-command-execute)
-(require 'emc-region)
+(require 'evil-mc-common)
+(require 'evil-mc-vars)
+(require 'evil-mc-cursor-state)
+(require 'evil-mc-cursor-make)
+(require 'evil-mc-command-record)
+(require 'evil-mc-command-execute)
+(require 'evil-mc-region)
 
 (eval-when-compile (require 'cl-lib))
 
@@ -108,6 +108,6 @@
   (evil-multiple-cursors-override-mode -1))
 
 
-(provide 'evil-mc-mode)
+(provide 'evil-mc)
 
 ;;; evil-mc-mode.el ends here

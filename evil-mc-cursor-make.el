@@ -4,10 +4,10 @@
 
 ;; This file contains functions for creating and deleting fake cursors
 
-(require 'emc-common)
-(require 'emc-vars)
-(require 'emc-cursor-state)
-(require 'emc-region)
+(require 'evil-mc-common)
+(require 'evil-mc-vars)
+(require 'evil-mc-cursor-state)
+(require 'evil-mc-region)
 
 ;;; Code:
 
@@ -347,6 +347,6 @@ closest to it when searching forwards."
     (emc-make-cursors-for-all)
     (emc-print-cursors-info "Created")))
 
-(provide 'emc-cursor-make)
+(provide 'evil-mc-cursor-make)
 
 ;;; emc-cursor-make.el ends here

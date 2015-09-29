@@ -1,4 +1,4 @@
-;;; emc-command-execute.el --- Execute commands for every fake cursor
+;;; evil-mc-command-execute.el --- Execute commands for every fake cursor
 
 ;;; Commentary:
 
@@ -6,12 +6,12 @@
 
 (require 'cl)
 (require 'evil)
-(require 'emc-common)
-(require 'emc-vars)
-(require 'emc-cursor-state)
-(require 'emc-cursor-make)
-(require 'emc-command-record)
-(require 'emc-region)
+(require 'evil-mc-common)
+(require 'evil-mc-vars)
+(require 'evil-mc-cursor-state)
+(require 'evil-mc-cursor-make)
+(require 'evil-mc-command-record)
+(require 'evil-mc-region)
 
 ;;; Code:
 
@@ -570,6 +570,6 @@ are undone in the same step as the current command."
    'emacs-lisp-mode
    '(("(\\(emc-define-handler\\)" . font-lock-keyword-face))))
 
-(provide 'emc-command-execute)
+(provide 'evil-mc-command-execute)
 
-;;; emc-command-execute.el ends here
+;;; evil-mc-command-execute.el ends here

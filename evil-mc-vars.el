@@ -359,6 +359,6 @@
   (when emc-pattern
     (- (emc-get-pattern-end) (emc-get-pattern-start))))
 
-(provide'emc-vars)
+(provide'evil-mc-vars)
 
 ;;; emc-vars.el ends here

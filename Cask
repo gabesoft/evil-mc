@@ -1,7 +1,7 @@
 (source gnu)
 (source melpa)
 
-(package-file "emc-mode.el")
+(package-file "evil-mc.el")
 
 (development
  (depends-on "evil")
