@@ -124,6 +124,12 @@ or `evil-downcase' command."
                   region-type
                   (emc-get-command-last-input))))
 
+(defun emc-execute-evil-exchange ()
+  "Execute an `evil-exchange' command."
+  (emc-with-region-or-execute-macro region nil
+    (goto-char region-start)
+    (evil-exchange region-start region-end region-type)))
+
 (defun emc-execute-with-region-and-register (cmd)
   "Execute CMD with the current register and region."
   (emc-with-region-or-execute-macro region t
@@ -298,6 +304,10 @@ by the value of `evil-this-register'."
 (emc-define-handler emc-execute-normal-evil-replace ()
   :cursor-clear (region column)
   (emc-execute-evil-replace))
+
+(emc-define-handler emc-execute-normal-evil-exchange ()
+  :cursor-clear (region column)
+  (emc-execute-evil-exchange))
 
 (emc-define-handler emc-execute-normal-evil-delete ()
   :cursor-clear (region column)

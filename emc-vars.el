@@ -33,6 +33,8 @@
 
 (defvar emc-cursor-state
   '((:default . (column
+                 evil-exchange--overlays
+                 evil-exchange--position
                  evil-jump-list
                  evil-last-paste
                  evil-last-register
@@ -150,6 +152,7 @@
     (evil-repeat-pop . ((:default . emc-execute-normal-call-with-count)))
     (evil-repeat-pop-next . ((:default . emc-execute-normal-call-with-count)))
     (evil-replace . ((:default . emc-execute-normal-evil-replace)))
+    (evil-exchange . ((:default . emc-execute-normal-evil-exchange)))
     (evil-search-backward . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
     (evil-search-forward . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
     (evil-set-marker . ((:default . emc-execute-normal-call-with-last-input) (:visual . emc-execute-visual-call-with-last-input)))
@@ -317,12 +320,12 @@
   "True if the fake cursors are frozen."
   (eq emc-frozen t))
 
-(defun emc-stop-cursors ()
+(defun emc-pause-cursors ()
   "Freeze the fake cursors."
   (interactive)
   (setq emc-frozen t))
 
-(defun emc-thaw-cursors ()
+(defun emc-resume-cursors ()
   "Unfreeze the fake cursors."
   (interactive)
   (setq emc-frozen nil))
