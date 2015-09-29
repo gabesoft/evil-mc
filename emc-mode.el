@@ -1,10 +1,10 @@
-;;; emc-mode.el --- Multiple cursors minor mode for evil
+;;; evil-mc-mode.el --- Multiple cursors minor mode for evil
 
 ;; Author: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Version: 0.0.1
-;; Keywords: evil editing cursors vim evil-multiple-cursors emc
+;; Keywords: evil editing cursors vim evil-multiple-cursors emc evil-mc
 ;; Package-Requires ((emacs "24") (evil "1.2.3"))
-;; Homepage: https://github.com/gabesoft/evil-multiple-cursors
+;; Homepage: https://github.com/gabesoft/evil-mc
 ;;
 ;; This file is not part of GNU Emacs.
 
@@ -31,7 +31,25 @@
 
 (define-minor-mode evil-mc-mode
   "Minor mode for evil multiple cursors."
-  :group 'evil-mc)
+  :group 'evil-mc
+  :init-value nil
+  :lighter " mc"
+  (cond (evil-mc-mode
+         ;; Turn on here
+         )
+        (t
+         ;; Turn off here
+         )))
+
+(defun turn-on-evil-mc-mode (&optional arg)
+  "Turn on evil-mc mode in the current buffer."
+  (interactive)
+  (evil-mc-mode (or arg 1)))
+
+(defun turn-on-evil-mc-mode (&optional arg)
+  "Turn off evil-mc mode in the current buffer."
+  (interactive)
+  (evil-mc-mode (or arg -1)))
 
 (defvar evil-multiple-cursors-mode-map
   (let ((map (make-sparse-keymap)))
@@ -90,6 +108,6 @@
   (evil-multiple-cursors-override-mode -1))
 
 
-(provide 'emc-mode)
+(provide 'evil-mc-mode)
 
-;;; emc-mode.el ends here
+;;; evil-mc-mode.el ends here

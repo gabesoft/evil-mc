@@ -31,7 +31,7 @@
      (lambda () (goto-char (point-min))))
 
 (And "^The cursors are frozen$"
-     (lambda () (emc-stop-cursors)))
+     (lambda () (emc-pause-cursors)))
 
 (defun run-and-verify (table &optional undo)
   "Runs all the key sequences in TABLE and verifies them,
