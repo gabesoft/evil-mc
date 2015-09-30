@@ -1,4 +1,4 @@
-;;; emc-command-record.el --- Record info for the currently running command
+;;; evil-mc-command-record.el --- Record info for the currently running command
 
 ;;; Commentary:
 
@@ -11,12 +11,12 @@
 
 ;;; Code:
 
-(defun emc-command-reset ()
+(defun evil-mc-command-reset ()
   "Clear the currently saved command info."
-  (setq emc-command nil)
-  (setq emc-recording-command nil))
+  (setq evil-mc-command nil)
+  (setq evil-mc-recording-command nil))
 
-(defun emc-get-evil-state ()
+(defun evil-mc-get-evil-state ()
   "Get the current evil state."
   (cond ((evil-insert-state-p) :insert)
         ((evil-motion-state-p) :motion)
@@ -26,139 +26,139 @@
         ((evil-operator-state-p) :operator)
         ((evil-emacs-state-p) :emacs)))
 
-(defun emc-get-command-property (name)
+(defun evil-mc-get-command-property (name)
   "Return the current command property with NAME."
-  (emc-get-object-property emc-command name))
+  (evil-mc-get-object-property evil-mc-command name))
 
-(defun emc-set-command-property (&rest properties)
-  "Set one or more command PROPERTIES and their values into `emc-command'."
-  (setq emc-command (apply 'emc-put-object-property
-                           (cons emc-command properties))))
+(defun evil-mc-set-command-property (&rest properties)
+  "Set one or more command PROPERTIES and their values into `evil-mc-command'."
+  (setq evil-mc-command (apply 'evil-mc-put-object-property
+                           (cons evil-mc-command properties))))
 
-(defun emc-add-command-property (&rest properties)
-  "Append to values of one or more PROPERTIES into `emc-command'."
+(defun evil-mc-add-command-property (&rest properties)
+  "Append to values of one or more PROPERTIES into `evil-mc-command'."
   (while properties
     (let* ((name (pop properties))
            (new-value (pop properties))
-           (old-value (emc-get-command-property name)))
+           (old-value (evil-mc-get-command-property name)))
       (cond ((null old-value)
-             (emc-set-command-property name new-value))
+             (evil-mc-set-command-property name new-value))
             ((vectorp old-value)
-             (emc-set-command-property name (vconcat old-value new-value)))
+             (evil-mc-set-command-property name (vconcat old-value new-value)))
             ((listp old-value)
-             (emc-set-command-property name (nconc old-value new-value)))
+             (evil-mc-set-command-property name (nconc old-value new-value)))
             (t
              (error "Current value is not a sequence %s" old-value))))))
 
-(defun emc-get-command-keys-vector (&optional name)
+(defun evil-mc-get-command-keys-vector (&optional name)
   "Get the command keys, stored at the property with NAME as a vector."
-  (emc-get-command-property (or name :keys)))
+  (evil-mc-get-command-property (or name :keys)))
 
-(defun emc-get-command-keys-count ()
+(defun evil-mc-get-command-keys-count ()
   "Get the current command numeric prefix or one."
-  (or (emc-get-command-property :keys-count) 1))
+  (or (evil-mc-get-command-property :keys-count) 1))
 
-(defun emc-get-command-keys-string (&optional name)
+(defun evil-mc-get-command-keys-string (&optional name)
   "Get the command keys, stored at the property with NAME, as a string."
-  (when emc-command
-    (let* ((keys (emc-get-command-property (or name :keys)))
+  (when evil-mc-command
+    (let* ((keys (evil-mc-get-command-property (or name :keys)))
            (keys-string (mapcar (lambda (k) (if (characterp k)
                                                 (char-to-string k) ""))
                                 keys)))
       (apply 'concat keys-string))))
 
-(defun emc-get-command-name ()
+(defun evil-mc-get-command-name ()
   "Return the current command name."
-  (when emc-command
-    (emc-get-command-property :name)))
+  (when evil-mc-command
+    (evil-mc-get-command-property :name)))
 
-(defun emc-get-command-state ()
+(defun evil-mc-get-command-state ()
   "Return the current command end evil state."
-  (when emc-command
-    (emc-get-command-property :evil-state-end)))
+  (when evil-mc-command
+    (evil-mc-get-command-property :evil-state-end)))
 
-(defun emc-get-command-last-input ()
+(defun evil-mc-get-command-last-input ()
   "Return the last input for the current command."
-  (when emc-command
-    (emc-get-command-property :last-input)))
+  (when evil-mc-command
+    (evil-mc-get-command-property :last-input)))
 
-(defun emc-save-keys (flag pre-name post-name keys)
+(defun evil-mc-save-keys (flag pre-name post-name keys)
   "Save KEYS at PRE-NAME or POST-NAME according to FLAG."
   (ecase flag
-    (pre (emc-add-command-property pre-name keys))
-    (post (emc-add-command-property post-name keys))))
+    (pre (evil-mc-add-command-property pre-name keys))
+    (post (evil-mc-add-command-property post-name keys))))
 
-(defun emc-begin-command-save ()
+(defun evil-mc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
-  (when (emc-recording-debug-p) (message "Command %s %s" this-command (this-command-keys)))
-  (when (and (not (emc-executing-command-p))
-             (not (emc-recording-command-p)))
-    (setq emc-command nil)
-    (when (and (emc-has-cursors-p)
+  (when (evil-mc-recording-debug-p) (message "Command %s %s" this-command (this-command-keys)))
+  (when (and (not (evil-mc-executing-command-p))
+             (not (evil-mc-recording-command-p)))
+    (setq evil-mc-command nil)
+    (when (and (evil-mc-has-cursors-p)
                (not (evil-emacs-state-p))
-               (emc-known-command-p this-command))
-      (setq emc-recording-command t)
-      (emc-set-command-property :name this-command
+               (evil-mc-known-command-p this-command))
+      (setq evil-mc-recording-command t)
+      (evil-mc-set-command-property :name this-command
                                 :keys-pre (this-command-keys-vector)
-                                :evil-state-begin (emc-get-evil-state))
-      (when (emc-recording-debug-p) (message "Record-begin %s" emc-command)))))
-(put 'emc-begin-command-save 'permanent-local-hook t)
+                                :evil-state-begin (evil-mc-get-evil-state))
+      (when (evil-mc-recording-debug-p) (message "Record-begin %s" evil-mc-command)))))
+(put 'evil-mc-begin-command-save 'permanent-local-hook t)
 
-(defun emc-save-keys-motion (flag)
+(defun evil-mc-save-keys-motion (flag)
   "Save the current evil motion key sequence."
-  (when (emc-recording-command-p)
-    (emc-save-keys flag
+  (when (evil-mc-recording-command-p)
+    (evil-mc-save-keys flag
                    :keys-motion-pre
                    :keys-motion-post
                    (this-command-keys-vector))
-    (when (emc-recording-debug-p)
+    (when (evil-mc-recording-debug-p)
       (message "Record-motion %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
-(defun emc-save-keys-operator (flag)
+(defun evil-mc-save-keys-operator (flag)
   "Save the current evil operator key sequence."
-  (when (and (emc-recording-command-p)
+  (when (and (evil-mc-recording-command-p)
              (memq evil-state '(operator)))
-    (emc-save-keys flag
+    (evil-mc-save-keys flag
                    :keys-operator-pre
                    :keys-operator-post
                    (this-command-keys-vector))
-    (when (emc-recording-debug-p)
+    (when (evil-mc-recording-debug-p)
       (message "Record-operator %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
-(defun emc-finish-command-save ()
+(defun evil-mc-finish-command-save ()
   "Completes the save of a command."
-  (when (emc-recording-command-p)
-    (emc-set-command-property :evil-state-end (emc-get-evil-state)
+  (when (evil-mc-recording-command-p)
+    (evil-mc-set-command-property :evil-state-end (evil-mc-get-evil-state)
                               :last-input last-input-event
                               :keys-post (this-command-keys-vector)
                               :keys-post-raw (this-single-command-raw-keys))
-    (when (emc-recording-debug-p)
-      (message "Record-finish %s %s" emc-command this-command))
+    (when (evil-mc-recording-debug-p)
+      (message "Record-finish %s %s" evil-mc-command this-command))
     (ignore-errors
       (condition-case error
-          (emc-finalize-command)
+          (evil-mc-finalize-command)
         (error (message "Saving command %s failed with %s"
-                        (emc-get-command-name)
+                        (evil-mc-get-command-name)
                         (error-message-string error))
                nil))))
-  (setq emc-recording-command nil))
-(put 'emc-finish-command-save 'permanent-local-hook t)
+  (setq evil-mc-recording-command nil))
+(put 'evil-mc-finish-command-save 'permanent-local-hook t)
 
-(defun emc-finalize-command ()
+(defun evil-mc-finalize-command ()
   "Make the command data ready for use, after a save."
-  (let* ((keys-pre (emc-get-command-property :keys-pre))
+  (let* ((keys-pre (evil-mc-get-command-property :keys-pre))
          (keys-pre-with-count (evil-extract-count keys-pre))
          (keys-pre-count (nth 0 keys-pre-with-count))
          (keys-pre-cmd (vconcat (nth 2 keys-pre-with-count)))
-         (keys-post (emc-get-command-property :keys-post))
-         (keys-motion-pre (emc-get-command-property :keys-motion-pre))
-         (keys-motion-post (emc-get-command-property :keys-motion-post))
-         (keys-operator-pre (emc-get-command-property :keys-operator-pre))
-         (keys-operator-post (emc-get-command-property :keys-operator-post)))
-    (emc-set-command-property :keys-count keys-pre-count)
-    (emc-set-command-property
+         (keys-post (evil-mc-get-command-property :keys-post))
+         (keys-motion-pre (evil-mc-get-command-property :keys-motion-pre))
+         (keys-motion-post (evil-mc-get-command-property :keys-motion-post))
+         (keys-operator-pre (evil-mc-get-command-property :keys-operator-pre))
+         (keys-operator-post (evil-mc-get-command-property :keys-operator-post)))
+    (evil-mc-set-command-property :keys-count keys-pre-count)
+    (evil-mc-set-command-property
      :keys (cond ((or keys-motion-post keys-motion-pre)
                   (or keys-motion-post keys-motion-pre))
                  ((or keys-operator-pre keys-operator-post)
@@ -174,32 +174,16 @@
                              (vconcat keys-operator-pre
                                       keys-operator-post))))
                  (t (or keys-post keys-pre)))))
-  (when (emc-recording-debug-p)
+  (when (evil-mc-recording-debug-p)
     (message "Record-done %s pre %s post %s keys-motion %s keys-operator %s count %s keys %s"
-             (emc-get-command-name)
-             (emc-get-command-keys-string :keys-pre)
-             (emc-get-command-keys-string :keys-post)
-             (emc-get-command-keys-string :keys-motion-post)
-             (emc-get-command-keys-string :keys-operator-post)
-             (emc-get-command-keys-string :keys-count)
-             (emc-get-command-keys-string :keys))))
-
-(defun emc-add-command-hooks ()
-  "Add hooks used for saving the current command."
-  (interactive)
-  (add-hook 'pre-command-hook 'emc-begin-command-save nil t)
-  (add-hook 'post-command-hook 'emc-finish-command-save t t)
-  (advice-add 'evil-repeat-keystrokes :before #'emc-save-keys-motion)
-  (advice-add 'evil-repeat-motion :before #'emc-save-keys-operator))
-
-(defun emc-remove-command-hooks ()
-  "Remove hooks used for saving the current command."
-  (interactive)
-  (remove-hook 'pre-command-hook 'emc-begin-command-save t)
-  (remove-hook 'post-command-hook 'emc-finish-command-save t)
-  (advice-remove 'evil-repeat-keystrokes #'emc-save-keys-motion)
-  (advice-remove 'evil-repeat-motion #'emc-save-keys-operator))
+             (evil-mc-get-command-name)
+             (evil-mc-get-command-keys-string :keys-pre)
+             (evil-mc-get-command-keys-string :keys-post)
+             (evil-mc-get-command-keys-string :keys-motion-post)
+             (evil-mc-get-command-keys-string :keys-operator-post)
+             (evil-mc-get-command-keys-string :keys-count)
+             (evil-mc-get-command-keys-string :keys))))
 
 (provide 'evil-mc-command-record)
 
-;;; emc-command-record.el ends here
+;;; evil-mc-command-record.el ends here

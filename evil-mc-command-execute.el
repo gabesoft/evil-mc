@@ -15,7 +15,7 @@
 
 ;;; Code:
 
-(defmacro emc-define-handler (command &rest body)
+(defmacro evil-mc-define-handler (command &rest body)
   "Define a COMMAND handler with BODY.
 
 \(fn COMMAND BODY...)"
@@ -50,433 +50,433 @@
          (apply #'evil-set-command-properties func ',keys)
          func))))
 
-(defmacro emc-with-region (region form &rest body)
+(defmacro evil-mc-with-region (region form &rest body)
   "Execute FORM if there is a REGION. Otherwise execute BODY."
   (declare (indent 2) (debug t))
   `(if ,region
-       (let ((region-start  (emc-get-region-start ,region))
-             (region-end  (emc-get-region-end ,region))
-             (region-type  (emc-get-region-type ,region)))
+       (let ((region-start  (evil-mc-get-region-start ,region))
+             (region-end  (evil-mc-get-region-end ,region))
+             (region-type  (evil-mc-get-region-type ,region)))
          ,form)
      ,@body))
 
-(defmacro emc-with-region-or-execute-macro (region add-register &rest body)
+(defmacro evil-mc-with-region-or-execute-macro (region add-register &rest body)
   "Execute BODY if there is a REGION.
-Otherwise, run `emc-execute-macro' with ADD-REGISTER."
+Otherwise, run `evil-mc-execute-macro' with ADD-REGISTER."
   (declare (indent 2) (debug t))
-  `(emc-with-region ,region
+  `(evil-mc-with-region ,region
        (progn ,@body)
-     (emc-execute-macro ,add-register)))
+     (evil-mc-execute-macro ,add-register)))
 
-(defun emc-execute-hippie-expand ()
+(defun evil-mc-execute-hippie-expand ()
   "Execute a completion command."
   (hippie-expand 1))
 
-(defun emc-execute-evil-find-char ()
+(defun evil-mc-execute-evil-find-char ()
   "Execute an `evil-find-char' command."
-  (evil-repeat-find-char (emc-get-command-keys-count)))
+  (evil-repeat-find-char (evil-mc-get-command-keys-count)))
 
-(defun emc-execute-evil-snipe ()
+(defun evil-mc-execute-evil-snipe ()
   "Execute an `evil-snipe' command."
-  (evil-snipe-repeat (emc-get-command-keys-count)))
+  (evil-snipe-repeat (evil-mc-get-command-keys-count)))
 
-(defun emc-execute-evil-commentary ()
+(defun evil-mc-execute-evil-commentary ()
   "Execute an `evil-commentary' command."
-  (emc-with-region-or-execute-macro region nil
+  (evil-mc-with-region-or-execute-macro region nil
     (when (eq region-type 'char) (goto-char region-start))
     (evil-commentary region-start region-end)))
 
-(defun emc-execute-evil-join ()
+(defun evil-mc-execute-evil-join ()
   "Execute an `evil-join' command."
-  (emc-with-region-or-execute-macro region nil
+  (evil-mc-with-region-or-execute-macro region nil
     (goto-char region-start)
     (evil-join region-start region-end)))
 
-(defun emc-execute-evil-shift (cmd)
+(defun evil-mc-execute-evil-shift (cmd)
   "Execute an `evil-shift-left' or `evil-shift-right'."
-  (emc-with-region-or-execute-macro region nil
+  (evil-mc-with-region-or-execute-macro region nil
     (funcall cmd
              region-start
              region-end
-             (emc-get-command-keys-count))))
+             (evil-mc-get-command-keys-count))))
 
-(defun emc-execute-evil-surround-region ()
+(defun evil-mc-execute-evil-surround-region ()
   "Execute an `evil-surround-region' command."
-  (emc-with-region-or-execute-macro region nil
+  (evil-mc-with-region-or-execute-macro region nil
     (goto-char region-start)
     (evil-surround-region region-start
                           region-end
                           region-type
-                          (emc-get-command-last-input))))
+                          (evil-mc-get-command-last-input))))
 
-(defun emc-execute-change-case (cmd)
+(defun evil-mc-execute-change-case (cmd)
   "Execute an `evil-invert-char', `evil-invert-case' `evil-upcase'
 or `evil-downcase' command."
-  (emc-with-region-or-execute-macro region nil
+  (evil-mc-with-region-or-execute-macro region nil
     (goto-char region-start)
     (funcall cmd region-start region-end region-type)))
 
-(defun emc-execute-evil-replace ()
+(defun evil-mc-execute-evil-replace ()
   "Execute an `evil-replace' command."
-  (emc-with-region-or-execute-macro region nil
+  (evil-mc-with-region-or-execute-macro region nil
     (evil-replace region-start
                   region-end
                   region-type
-                  (emc-get-command-last-input))))
+                  (evil-mc-get-command-last-input))))
 
-(defun emc-execute-evil-exchange ()
+(defun evil-mc-execute-evil-exchange ()
   "Execute an `evil-exchange' command."
-  (emc-with-region-or-execute-macro region nil
+  (evil-mc-with-region-or-execute-macro region nil
     (goto-char region-start)
     (evil-exchange region-start region-end region-type)))
 
-(defun emc-execute-with-region-and-register (cmd)
+(defun evil-mc-execute-with-region-and-register (cmd)
   "Execute CMD with the current register and region."
-  (emc-with-region-or-execute-macro region t
+  (evil-mc-with-region-or-execute-macro region t
     (funcall cmd region-start region-end region-type evil-this-register)))
 
-(defun emc-execute-evil-change-line ()
+(defun evil-mc-execute-evil-change-line ()
   "Execute an `evil-change-line' comand."
-  (emc-with-region region
+  (evil-mc-with-region region
       (evil-delete-line region-start
                         region-end
                         region-type
                         evil-this-register)
     (evil-delete-line (point) (1+ (point)))))
 
-(defun emc-execute-evil-yank ()
+(defun evil-mc-execute-evil-yank ()
   "Execute an `evil-yank' comand."
-  (emc-with-region-or-execute-macro region t
+  (evil-mc-with-region-or-execute-macro region t
     (evil-yank region-start region-end region-type evil-this-register)
-    (goto-char (min (emc-get-region-mark region)
-                    (emc-get-region-point region)))))
+    (goto-char (min (evil-mc-get-region-mark region)
+                    (evil-mc-get-region-point region)))))
 
-(defun emc-execute-evil-delete ()
+(defun evil-mc-execute-evil-delete ()
   "Execute an `evil-delete' comand."
-  (emc-execute-with-region-and-register 'evil-delete))
+  (evil-mc-execute-with-region-and-register 'evil-delete))
 
-(defun emc-execute-evil-change ()
+(defun evil-mc-execute-evil-change ()
   "Execute an `evil-change' comand."
   (let ((point (point)))
     (evil-with-state normal
       (unless (and region (eq point (point-at-bol)))
         (evil-forward-char))
-      (emc-execute-with-region-and-register 'evil-change))))
+      (evil-mc-execute-with-region-and-register 'evil-change))))
 
-(defun emc-execute-evil-paste ()
+(defun evil-mc-execute-evil-paste ()
   "Execute an `evil-paste-before' or `evil-paste-after' command."
   (cond ((null region)
-         (funcall (emc-get-command-name)
-                  (emc-get-command-keys-count)
+         (funcall (evil-mc-get-command-name)
+                  (evil-mc-get-command-keys-count)
                   evil-this-register))
-        ((emc-char-region-p region)
+        ((evil-mc-char-region-p region)
          (let (new-kill-ring new-kill-ring-yank-pointer)
            (let ((kill-ring (copy-sequence kill-ring))
                  (kill-ring-yank-pointer nil))
 
-             (emc-execute-evil-delete)
+             (evil-mc-execute-evil-delete)
              (setq new-kill-ring kill-ring)
              (setq new-kill-ring-yank-pointer kill-ring-yank-pointer))
 
            ;; execute paste with the old key ring
-           (evil-paste-before (emc-get-command-keys-count) evil-this-register)
+           (evil-paste-before (evil-mc-get-command-keys-count) evil-this-register)
 
            ;; update the kill ring with the overwritten text
            (setq kill-ring new-kill-ring)
            (setq kill-ring-yank-pointer new-kill-ring-yank-pointer)))
-        ((emc-line-region-p region)
+        ((evil-mc-line-region-p region)
          (let ((text (substring-no-properties (current-kill 0 t)))
-               (start (emc-get-region-start region))
-               (end (emc-get-region-end region)))
-           (unless (emc-ends-with-newline-p text)
+               (start (evil-mc-get-region-start region))
+               (end (evil-mc-get-region-end region)))
+           (unless (evil-mc-ends-with-newline-p text)
              (evil-insert-newline-below))
-           (evil-paste-after (emc-get-command-keys-count) evil-this-register)
+           (evil-paste-after (evil-mc-get-command-keys-count) evil-this-register)
            (save-excursion (evil-delete start end 'line))))))
 
-(defun emc-execute-macro (&optional add-register)
+(defun evil-mc-execute-macro (&optional add-register)
   "Execute a generic command as a keyboard macro.
 If ADD-REGISTER is not nil add the current `evil-this-register'
 to the keys vector"
   (execute-kbd-macro
    (if add-register
-       (emc-get-command-keys-vector-with-register)
-     (emc-get-command-keys-vector))))
+       (evil-mc-get-command-keys-vector-with-register)
+     (evil-mc-get-command-keys-vector))))
 
-(defun emc-execute-evil-goto-line ()
+(defun evil-mc-execute-evil-goto-line ()
   "Execute an `evil-goto-line' command."
-  (let ((count (emc-get-command-property :keys-count)))
+  (let ((count (evil-mc-get-command-property :keys-count)))
     (if count
         (evil-goto-line count)
       (evil-goto-line))))
 
-(defun emc-execute-call ()
+(defun evil-mc-execute-call ()
   "Execute a generic command as a function call without parameters."
-  (funcall (emc-get-command-name)))
+  (funcall (evil-mc-get-command-name)))
 
-(defun emc-execute-call-with-last-input ()
+(defun evil-mc-execute-call-with-last-input ()
   "Executed a generic command as a function call with the last input character."
-  (funcall (emc-get-command-name) (emc-get-command-last-input)))
+  (funcall (evil-mc-get-command-name) (evil-mc-get-command-last-input)))
 
-(defun emc-execute-call-with-count ()
+(defun evil-mc-execute-call-with-count ()
   "Execute a generic command as a function call with count."
-  (funcall (emc-get-command-name) (emc-get-command-keys-count)))
+  (funcall (evil-mc-get-command-name) (evil-mc-get-command-keys-count)))
 
-(defun emc-execute-move-to-line (dir)
+(defun evil-mc-execute-move-to-line (dir)
   "Execute a move to line command in DIR."
-  (let* ((keys-count (emc-get-command-keys-count))
+  (let* ((keys-count (evil-mc-get-command-keys-count))
          (count (ecase dir (next keys-count) (prev (- keys-count)))))
-    (setq column (or column (emc-column-number (point))))
+    (setq column (or column (evil-mc-column-number (point))))
     (forward-line count)
     (goto-char (min (+ (point) column) (point-at-eol)))))
 
-(defun emc-execute-not-supported ()
+(defun evil-mc-execute-not-supported ()
   "Throw an error for a not supported command."
   (evil-force-normal-state)
-  (error ("%s is not supported" (emc-get-command-name))))
+  (error ("%s is not supported" (evil-mc-get-command-name))))
 
-(defun emc-clear-current-region ()
+(defun evil-mc-clear-current-region ()
   "Clears the current region."
   (setq region nil))
 
-(defun emc-update-current-region ()
+(defun evil-mc-update-current-region ()
   "Update the current region."
-  (setq region (emc-update-region region)))
+  (setq region (evil-mc-update-region region)))
 
-(defun emc-execute-visual-region (type)
+(defun evil-mc-execute-visual-region (type)
   "Execute an `evil-visual-char' or `evil-visual-line'
 command according to TYPE."
   (cond ((or (null region)
-             (eq (emc-get-region-type region) type))
-         (setq region (emc-create-region (point) (point) type)))
+             (eq (evil-mc-get-region-type region) type))
+         (setq region (evil-mc-create-region (point) (point) type)))
         (t
-         (setq region (emc-change-region-type region type)))))
+         (setq region (evil-mc-change-region-type region type)))))
 
-(defun emc-get-command-keys-vector-with-register ()
+(defun evil-mc-get-command-keys-vector-with-register ()
   "Return the keys-vector of current command prepended
 by the value of `evil-this-register'."
   (if evil-this-register
       (vconcat [?\"]
                (vector evil-this-register)
-               (emc-get-command-keys-vector))
-    (emc-get-command-keys-vector)))
+               (evil-mc-get-command-keys-vector))
+    (evil-mc-get-command-keys-vector)))
 
 
 ;; handlers for normal state
 
-(emc-define-handler emc-execute-normal-complete ()
+(evil-mc-define-handler evil-mc-execute-normal-complete ()
   :cursor-clear (region column)
   :cursor-state :complete
-  (emc-execute-call))
+  (evil-mc-execute-call))
 
-(emc-define-handler emc-execute-normal-hippie-expand ()
+(evil-mc-define-handler evil-mc-execute-normal-hippie-expand ()
   :cursor-clear (region column)
   :cursor-state :complete
   (hippie-expand 1))
 
-(emc-define-handler emc-execute-normal-evil-find-char ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-find-char ()
   :cursor-clear (region column)
-  (emc-execute-evil-find-char))
+  (evil-mc-execute-evil-find-char))
 
-(emc-define-handler emc-execute-normal-evil-snipe ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-snipe ()
   :cursor-clear (region column)
-  (emc-execute-evil-snipe))
+  (evil-mc-execute-evil-snipe))
 
-(emc-define-handler emc-execute-normal-evil-commentary ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-commentary ()
   :cursor-clear (region column)
-  (emc-execute-evil-commentary))
+  (evil-mc-execute-evil-commentary))
 
-(emc-define-handler emc-execute-normal-evil-join ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-join ()
   :cursor-clear (region column)
-  (emc-execute-evil-join))
+  (evil-mc-execute-evil-join))
 
-(emc-define-handler emc-execute-normal-evil-shift-left ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-shift-left ()
   :cursor-clear (region column)
-  (emc-execute-evil-shift 'evil-shift-left))
+  (evil-mc-execute-evil-shift 'evil-shift-left))
 
-(emc-define-handler emc-execute-normal-evil-shift-right ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-shift-right ()
   :cursor-clear (region column)
-  (emc-execute-evil-shift 'evil-shift-right))
+  (evil-mc-execute-evil-shift 'evil-shift-right))
 
-(emc-define-handler emc-execute-normal-evil-surround-region ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-surround-region ()
   :cursor-clear (region column)
-  (emc-execute-evil-surround-region))
+  (evil-mc-execute-evil-surround-region))
 
-(emc-define-handler emc-execute-normal-evil-replace ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-replace ()
   :cursor-clear (region column)
-  (emc-execute-evil-replace))
+  (evil-mc-execute-evil-replace))
 
-(emc-define-handler emc-execute-normal-evil-exchange ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-exchange ()
   :cursor-clear (region column)
-  (emc-execute-evil-exchange))
+  (evil-mc-execute-evil-exchange))
 
-(emc-define-handler emc-execute-normal-evil-delete ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-delete ()
   :cursor-clear (region column)
-  (emc-execute-evil-delete))
+  (evil-mc-execute-evil-delete))
 
-(emc-define-handler emc-execute-normal-evil-yank ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-yank ()
   :cursor-clear (region column)
-  (emc-execute-evil-yank))
+  (evil-mc-execute-evil-yank))
 
-(emc-define-handler emc-execute-normal-evil-change ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-change ()
   :cursor-clear (region column)
-  (emc-execute-evil-change))
+  (evil-mc-execute-evil-change))
 
-(emc-define-handler emc-execute-normal-evil-paste ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-paste ()
   :cursor-clear (region column)
-  (emc-execute-evil-paste))
+  (evil-mc-execute-evil-paste))
 
-(emc-define-handler emc-execute-normal-evil-invert-char ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-invert-char ()
   :cursor-clear (region column)
-  (emc-execute-change-case 'evil-invert-char))
+  (evil-mc-execute-change-case 'evil-invert-char))
 
-(emc-define-handler emc-execute-normal-evil-invert-case ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-invert-case ()
   :cursor-clear (region column)
-  (emc-execute-change-case 'evil-invert-case))
+  (evil-mc-execute-change-case 'evil-invert-case))
 
-(emc-define-handler emc-execute-normal-evil-upcase ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-upcase ()
   :cursor-clear (region column)
-  (emc-execute-change-case 'evil-upcase))
+  (evil-mc-execute-change-case 'evil-upcase))
 
-(emc-define-handler emc-execute-normal-evil-downcase ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-downcase ()
   :cursor-clear (region column)
-  (emc-execute-change-case 'evil-downcase))
+  (evil-mc-execute-change-case 'evil-downcase))
 
-(emc-define-handler emc-execute-normal-evil-delete-char ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-delete-char ()
   :cursor-clear (region column)
-  (emc-execute-with-region-and-register 'evil-delete-char))
+  (evil-mc-execute-with-region-and-register 'evil-delete-char))
 
-(emc-define-handler emc-execute-normal-evil-delete-line ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-delete-line ()
   :cursor-clear (region column)
-  (emc-execute-with-region-and-register 'evil-delete-line))
+  (evil-mc-execute-with-region-and-register 'evil-delete-line))
 
-(emc-define-handler emc-execute-normal-evil-change-line ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-change-line ()
   :cursor-clear (region column)
-  (emc-execute-evil-change-line))
+  (evil-mc-execute-evil-change-line))
 
-(emc-define-handler emc-execute-normal-evil-goto-line ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-goto-line ()
   :cursor-clear (region column)
-  (emc-execute-evil-goto-line))
+  (evil-mc-execute-evil-goto-line))
 
-(emc-define-handler emc-execute-normal-next-line ()
+(evil-mc-define-handler evil-mc-execute-normal-next-line ()
   :cursor-clear region
-  (emc-execute-move-to-line 'next))
+  (evil-mc-execute-move-to-line 'next))
 
-(emc-define-handler emc-execute-normal-prev-line ()
+(evil-mc-define-handler evil-mc-execute-normal-prev-line ()
   :cursor-clear region
-  (emc-execute-move-to-line 'prev))
+  (evil-mc-execute-move-to-line 'prev))
 
-(emc-define-handler emc-execute-normal-force-normal-state ()
+(evil-mc-define-handler evil-mc-execute-normal-force-normal-state ()
   :cursor-clear region
   (evil-force-normal-state))
 
-(emc-define-handler emc-execute-normal-evil-normal-state ()
+(evil-mc-define-handler evil-mc-execute-normal-evil-normal-state ()
   :cursor-clear region
   (evil-insert 1)
   (evil-normal-state))
 
-(emc-define-handler emc-execute-normal-macro ()
+(evil-mc-define-handler evil-mc-execute-normal-macro ()
   :cursor-clear (region column)
-  (emc-execute-macro))
+  (evil-mc-execute-macro))
 
-(emc-define-handler emc-execute-normal-call ()
+(evil-mc-define-handler evil-mc-execute-normal-call ()
   :cursor-clear (region column)
-  (emc-execute-call))
+  (evil-mc-execute-call))
 
-(emc-define-handler emc-execute-normal-call-with-last-input ()
+(evil-mc-define-handler evil-mc-execute-normal-call-with-last-input ()
   :cursor-clear (region column)
-  (emc-execute-call-with-last-input))
+  (evil-mc-execute-call-with-last-input))
 
-(emc-define-handler emc-execute-normal-call-with-count ()
+(evil-mc-define-handler evil-mc-execute-normal-call-with-count ()
   :cursor-clear (region column)
-  (emc-execute-call-with-count))
+  (evil-mc-execute-call-with-count))
 
-(emc-define-handler emc-execute-normal-ignore ()
+(evil-mc-define-handler evil-mc-execute-normal-ignore ()
   :cursor-clear (region column)
   (ignore))
 
-(emc-define-handler emc-execute-normal-not-supported ()
+(evil-mc-define-handler evil-mc-execute-normal-not-supported ()
   :cursor-clear (region column)
-  (emc-execute-not-supported))
+  (evil-mc-execute-not-supported))
 
 ;; handlers for visual state
 
-(emc-define-handler emc-execute-visual-line ()
-  (emc-execute-visual-region 'line))
+(evil-mc-define-handler evil-mc-execute-visual-line ()
+  (evil-mc-execute-visual-region 'line))
 
-(emc-define-handler emc-execute-visual-char ()
-  (emc-execute-visual-region 'char))
+(evil-mc-define-handler evil-mc-execute-visual-char ()
+  (evil-mc-execute-visual-region 'char))
 
-(emc-define-handler emc-execute-visual-text-object ()
-  (let* ((limits (funcall (emc-get-command-name)))
+(evil-mc-define-handler evil-mc-execute-visual-text-object ()
+  (let* ((limits (funcall (evil-mc-get-command-name)))
          (start (nth 0 limits))
          (end (1- (nth 1 limits))))
     (goto-char end)
-    (setq region (emc-create-region start end 'char))))
+    (setq region (evil-mc-create-region start end 'char))))
 
-(emc-define-handler emc-execute-exchange-point-and-mark ()
-  (let* ((next-region (emc-exchange-region-point-and-mark region))
-         (mark (emc-get-region-mark next-region))
-         (point (emc-get-region-point next-region)))
+(evil-mc-define-handler evil-mc-execute-exchange-point-and-mark ()
+  (let* ((next-region (evil-mc-exchange-region-point-and-mark region))
+         (mark (evil-mc-get-region-mark next-region))
+         (point (evil-mc-get-region-point next-region)))
     (goto-char (if (< mark point) (1- point) point))
     (setq region next-region)))
 
-(emc-define-handler emc-execute-visual-evil-find-char ()
-  (emc-execute-evil-find-char)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-evil-find-char ()
+  (evil-mc-execute-evil-find-char)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-evil-snipe ()
-  (emc-execute-evil-snipe)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-evil-snipe ()
+  (evil-mc-execute-evil-snipe)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-evil-goto-line ()
-  (emc-execute-evil-goto-line)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-evil-goto-line ()
+  (evil-mc-execute-evil-goto-line)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-next-line ()
-  (emc-execute-move-to-line 'next)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-next-line ()
+  (evil-mc-execute-move-to-line 'next)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-prev-line ()
-  (emc-execute-move-to-line 'prev)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-prev-line ()
+  (evil-mc-execute-move-to-line 'prev)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-shift-left ()
-  (emc-execute-evil-shift 'evil-shift-left)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-shift-left ()
+  (evil-mc-execute-evil-shift 'evil-shift-left)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-shift-right ()
-  (emc-execute-evil-shift 'evil-shift-right)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-shift-right ()
+  (evil-mc-execute-evil-shift 'evil-shift-right)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-macro ()
-  (emc-execute-macro)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-macro ()
+  (evil-mc-execute-macro)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-call-with-last-input ()
-  (emc-execute-call-with-last-input)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-call-with-last-input ()
+  (evil-mc-execute-call-with-last-input)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-call ()
-  (emc-execute-call)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-call ()
+  (evil-mc-execute-call)
+  (evil-mc-update-current-region))
 
-(emc-define-handler emc-execute-visual-call-count ()
-  (emc-execute-call-with-count)
-  (emc-update-current-region))
+(evil-mc-define-handler evil-mc-execute-visual-call-count ()
+  (evil-mc-execute-call-with-count)
+  (evil-mc-update-current-region))
 
 ;; ----
 
-(defun emc-get-command-handler (cmd state)
+(defun evil-mc-get-command-handler (cmd state)
   "Get the handler function for CMD and evil STATE."
-  (let* ((handler-data (emc-get-object-property emc-known-commands cmd))
-         (handler (emc-get-object-property handler-data state)))
+  (let* ((handler-data (evil-mc-get-object-property evil-mc-known-commands cmd))
+         (handler (evil-mc-get-object-property handler-data state)))
     (or handler
-        (emc-get-object-property handler-data :default)
+        (evil-mc-get-object-property handler-data :default)
         (cond ((eq (evil-get-command-property cmd :repeat) 'motion)
-               (cond ((eq state :visual) 'emc-execute-visual-call-count)
-                     (t 'emc-execute-normal-call-with-count)))))))
+               (cond ((eq state :visual) 'evil-mc-execute-visual-call-count)
+                     (t 'evil-mc-execute-normal-call-with-count)))))))
 
-(defun emc-get-state-variables (handler)
+(defun evil-mc-get-state-variables (handler)
   "Get all cursor variables required to hold state for HANDLER."
   (let ((names (evil-get-command-property handler :cursor-state)))
     (when (atom names)
@@ -484,75 +484,75 @@ by the value of `evil-this-register'."
     (when (not (memq :default names))
       (push :default names))
     (apply 'append (mapcar (lambda (name)
-                             (emc-get-object-property emc-cursor-state name))
+                             (evil-mc-get-object-property evil-mc-cursor-state name))
                            names))))
 
-(defun emc-get-clear-variables (handler)
+(defun evil-mc-get-clear-variables (handler)
   "Get all cursor variables that should be cleared after HANDLER."
   (let ((names (evil-get-command-property handler :cursor-clear)))
     (if (atom names) (list names) names)))
 
-(defun emc-get-var-name-value (var)
+(defun evil-mc-get-var-name-value (var)
   "Gets the current name and value pair of VAR or nil if it needs to be cleared."
   (list var (unless (memq var clear-variables) (symbol-value var))))
 
-(defun emc-execute-for (cursor state-variables clear-variables)
+(defun evil-mc-execute-for (cursor state-variables clear-variables)
   "Execute the current command for CURSOR in the context of STATE-VARIABLES and
 ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
-  (when (emc-executing-debug-p)
-    (message "Execute %s with %s" (emc-get-command-name) handler))
+  (when (evil-mc-executing-debug-p)
+    (message "Execute %s with %s" (evil-mc-get-command-name) handler))
   (ignore-errors
     (condition-case error
         (cl-progv
             state-variables
-            (emc-get-cursor-properties cursor state-variables)
+            (evil-mc-get-cursor-properties cursor state-variables)
 
-          (goto-char (emc-get-cursor-start cursor))
+          (goto-char (evil-mc-get-cursor-start cursor))
 
           (evil-repeat-pre-hook)
           (funcall handler)
           (evil-repeat-post-hook)
 
-          (emc-delete-cursor-overlay cursor)
-          (emc-delete-region-overlay (emc-get-cursor-region cursor))
-          (apply 'emc-put-cursor-property
-                 (emc-put-cursor-overlay cursor (emc-cursor-overlay-at-pos))
-                 (mapcan 'emc-get-var-name-value state-variables)))
+          (evil-mc-delete-cursor-overlay cursor)
+          (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
+          (apply 'evil-mc-put-cursor-property
+                 (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos))
+                 (mapcan 'evil-mc-get-var-name-value state-variables)))
       (error (message "Failed to execute %s with error %s"
-                      (emc-get-command-name)
+                      (evil-mc-get-command-name)
                       (error-message-string error))
              cursor))))
 
-(defun emc-execute-for-all ()
-  "Execute the current command, stored at `emc-command', for all fake cursors."
-  (when (and (emc-has-command-p)
-             (not (emc-executing-command-p))
-             (not (emc-frozen-p)))
-    (when (emc-executing-debug-p)
-      (message "Execute %s for all cursors" (emc-get-command-name)))
-    (let* ((emc-executing-command t)
+(defun evil-mc-execute-for-all ()
+  "Execute the current command, stored at `evil-mc-command', for all fake cursors."
+  (when (and (evil-mc-has-command-p)
+             (not (evil-mc-executing-command-p))
+             (not (evil-mc-frozen-p)))
+    (when (evil-mc-executing-debug-p)
+      (message "Execute %s for all cursors" (evil-mc-get-command-name)))
+    (let* ((evil-mc-executing-command t)
            (cursor-list nil)
-           (handler (emc-get-command-handler
-                     (emc-get-command-name)
-                     (emc-get-command-state)))
-           (state-variables (emc-get-state-variables handler))
-           (clear-variables (emc-get-clear-variables handler)))
+           (handler (evil-mc-get-command-handler
+                     (evil-mc-get-command-name)
+                     (evil-mc-get-command-state)))
+           (state-variables (evil-mc-get-state-variables handler))
+           (clear-variables (evil-mc-get-clear-variables handler)))
       (unless handler
-        (message "No handler found for command %s" (emc-get-command-name)))
+        (message "No handler found for command %s" (evil-mc-get-command-name)))
       (when handler
         (evil-repeat-post-hook)
-        (emc-remove-last-undo-marker)
+        (evil-mc-remove-last-undo-marker)
         (evil-with-single-undo
           (save-excursion
-            (dolist (cursor emc-cursor-list)
-              (setq cursor-list (emc-insert-cursor-into-list
-                                 (emc-execute-for cursor
+            (dolist (cursor evil-mc-cursor-list)
+              (setq cursor-list (evil-mc-insert-cursor-into-list
+                                 (evil-mc-execute-for cursor
                                                   state-variables
                                                   clear-variables)
                                  cursor-list)))
-            (setq emc-cursor-list cursor-list)))))))
+            (setq evil-mc-cursor-list cursor-list)))))))
 
-(defun emc-remove-last-undo-marker ()
+(defun evil-mc-remove-last-undo-marker ()
   "Remove the last undo marker so that future commands
 are undone in the same step as the current command."
   (let ((undo-list (if (eq buffer-undo-list t)
@@ -568,7 +568,7 @@ are undone in the same step as the current command."
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords
    'emacs-lisp-mode
-   '(("(\\(emc-define-handler\\)" . font-lock-keyword-face))))
+   '(("(\\(evil-mc-define-handler\\)" . font-lock-keyword-face))))
 
 (provide 'evil-mc-command-execute)
 

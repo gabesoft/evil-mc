@@ -1,37 +1,32 @@
-;;; emc-vars.el --- Settings and variables for emc
+;;; evil-mc-vars.el --- Settings and variables for evil-mc
 
 ;;; Commentary:
 
-;; This file contains all variables and settings used by emc
+;; This file contains all variables and settings used by evil-mc
 
 ;;; Code:
 
-;; (defface emc-cursor-default-face
-;;   '((t (:background "#D13A82")))
-;;   "The face used for simple fake cursors."
-;;   :group 'emc)
-
-(defface emc-cursor-default-face
+(defface evil-mc-cursor-default-face
   '((t (:inherit cursor :inverse-video nil)))
-  "The face used for simple fake cursors."
-  :group 'emc)
+  "The face used for fake cursors."
+  :group 'evil-mc)
 
-(defface emc-region-face
+(defface evil-mc-region-face
   '((t :inherit region))
   "The face used for fake regions"
-  :group 'emc)
+  :group 'evil-mc)
 
-(defcustom emc-cursor-overlay-priority 201
+(defcustom evil-mc-cursor-overlay-priority 201
   "The priority of the fake cursors overlay."
   :type 'integer
-  :group 'emc)
+  :group 'evil-mc)
 
-(defcustom emc-region-overlay-priority 99
+(defcustom evil-mc-region-overlay-priority 99
   "The priority of the fake regions overlay."
   :type 'integer
-  :group 'emc)
+  :group 'evil-mc)
 
-(defvar emc-cursor-state
+(defvar evil-mc-cursor-state
   '((:default . (column
                  evil-exchange--overlays
                  evil-exchange--position
@@ -66,299 +61,299 @@
                   dabbrev--last-direction)))
   "State tracked per cursor.")
 
-(defvar emc-known-commands
+(defvar evil-mc-known-commands
   '(
 
-    (backward-delete-char-untabify . ((:default . emc-execute-normal-call-with-count)))
-    (company-complete-selection . ((:default . emc-execute-normal-call)))
-    (company-select-next . ((:default . emc-execute-normal-ignore)))
-    (copy-to-the-end-of-line . ((:default . emc-execute-normal-call)))
-    (delete-backward-char . ((:default . emc-execute-normal-call-with-count)))
-    (electric-newline-and-maybe-indent . ((:default . emc-execute-normal-call)))
-    (evil-a-WORD . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-back-quote . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-bracket . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-curly . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-double-quote . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-paragraph . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-paren . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-sentence . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-single-quote . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-symbol . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-tag . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-a-word . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-an-angle . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-append . ((:default . emc-execute-normal-call-with-count)))
-    (evil-append-line . ((:default . emc-execute-normal-call-with-count)))
-    (evil-beginning-of-line . ((:default . emc-execute-normal-call ) (:visual . emc-execute-visual-call)))
-    (evil-beginning-of-line-or-digit-argument . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-beginning-of-visual-line . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-change . ((:default . emc-execute-normal-evil-change)))
-    (evil-change-line . ((:default . emc-execute-normal-evil-change-line)))
-    (evil-commentary . ((:default . emc-execute-normal-evil-commentary)))
-    (evil-complete-next . ((:default . emc-execute-normal-complete)))
-    (evil-complete-next-line . ((:default . emc-execute-normal-complete)))
-    (evil-complete-previous . ((:default . emc-execute-normal-complete)))
-    (evil-complete-previous-line . ((:default . emc-execute-normal-complete)))
-    (evil-delete . ((:default . emc-execute-normal-evil-delete)))
-    (evil-delete-backward-char-and-join . ((:default . emc-execute-normal-call-with-count)))
-    (evil-delete-backward-word . ((:default . emc-execute-normal-call)))
-    (evil-delete-char . ((:default . emc-execute-normal-evil-delete-char)))
-    (evil-delete-line . ((:default . emc-execute-normal-evil-delete-line)))
-    (evil-digit-argument-or-evil-beginning-of-line . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-downcase . ((:default . emc-execute-normal-evil-downcase)))
-    (evil-exchange-point-and-mark . ((:visual . emc-execute-exchange-point-and-mark)))
-    (evil-find-char . ((:default . emc-execute-normal-evil-find-char) (:visual . emc-execute-visual-evil-find-char)))
-    (evil-find-char-backward . ((:default . emc-execute-normal-evil-find-char) (:visual . emc-execute-visual-evil-find-char)))
-    (evil-find-char-to . ((:default . emc-execute-normal-evil-find-char) (:visual . emc-execute-visual-evil-find-char)))
-    (evil-find-char-to-backward . ((:default . emc-execute-normal-evil-find-char) (:visual . emc-execute-visual-evil-find-char)))
-    (evil-first-non-blank . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-first-non-blank-of-visual-line . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-goto-definition . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-goto-line . ((:default . emc-execute-normal-evil-goto-line) (:visual . emc-execute-visual-evil-goto-line)))
-    (evil-goto-mark . ((:default . emc-execute-normal-call-with-last-input) (:visual . emc-execute-visual-call-with-last-input)))
-    (evil-goto-mark-line . ((:default . emc-execute-normal-call-with-last-input) (:visual . emc-execute-visual-call-with-last-input)))
-    (evil-inner-WORD . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-angle . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-back-quote . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-bracket . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-curly . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-double-quote . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-paragraph . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-paren . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-sentence . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-single-quote . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-symbol . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-tag . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-inner-word . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-insert . ((:default . emc-execute-normal-call-with-count)))
-    (evil-insert-line . ((:default . emc-execute-normal-call-with-count)))
-    (evil-invert-case . ((:default . emc-execute-normal-evil-invert-case)))
-    (evil-invert-char . ((:default . emc-execute-normal-evil-invert-char)))
-    (evil-join . ((:default . emc-execute-normal-evil-join)))
-    (evil-jump-item . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-lookup . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-middle-of-visual-line . ((:default . emc-execute-normal-call) (:visual emc-execute-visual-call)))
-    (evil-next-line . ((:default . emc-execute-normal-next-line) (:visual . emc-execute-visual-next-line)))
-    (evil-next-match . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-normal-state . ((:default . emc-execute-normal-evil-normal-state)))
-    (evil-open-above . ((:default . emc-execute-normal-call-with-count)))
-    (evil-open-below . ((:default . emc-execute-normal-call-with-count)))
-    (evil-paste-after . ((:default . emc-execute-normal-evil-paste)))
-    (evil-paste-before . ((:default . emc-execute-normal-evil-paste)))
-    (evil-previous-line . ((:default . emc-execute-normal-prev-line) (:visual . emc-execute-visual-prev-line)))
-    (evil-previous-match . ((:default . emc-execute-normal-call-with-count) (:visual . emc-execute-visual-text-object)))
-    (evil-repeat . ((:default . emc-execute-normal-call-with-count)))
-    (evil-repeat-pop . ((:default . emc-execute-normal-call-with-count)))
-    (evil-repeat-pop-next . ((:default . emc-execute-normal-call-with-count)))
-    (evil-replace . ((:default . emc-execute-normal-evil-replace)))
-    (evil-exchange . ((:default . emc-execute-normal-evil-exchange)))
-    (evil-search-backward . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-search-forward . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-set-marker . ((:default . emc-execute-normal-call-with-last-input) (:visual . emc-execute-visual-call-with-last-input)))
-    (evil-shift-left . ((:default . emc-execute-normal-evil-shift-left) (:visual . emc-execute-visual-evil-shift-left)))
-    (evil-shift-right . ((:default . emc-execute-normal-evil-shift-right) (:visual . emc-execute-visual-evil-shift-right)))
-    (evil-snipe-F . ((:default . emc-execute-normal-evil-snipe) (:visual . emc-execute-visual-evil-snipe)))
-    (evil-snipe-S . ((:default . emc-execute-normal-evil-snipe) (:visual . emc-execute-visual-evil-snipe)))
-    (evil-snipe-T . ((:default . emc-execute-normal-evil-snipe) (:visual . emc-execute-visual-evil-snipe)))
-    (evil-snipe-f . ((:default . emc-execute-normal-evil-snipe) (:visual . emc-execute-visual-evil-snipe)))
-    (evil-snipe-s . ((:default . emc-execute-normal-evil-snipe) (:visual . emc-execute-visual-evil-snipe)))
-    (evil-snipe-t . ((:default . emc-execute-normal-evil-snipe) (:visual . emc-execute-visual-evil-snipe)))
-    (evil-surround-region . ((:default . emc-execute-normal-evil-surround-region)))
-    (evil-upcase . ((:default . emc-execute-normal-evil-upcase)))
-    (evil-use-register . ((:default . emc-execute-normal-call-with-last-input) (:visual . emc-execute-visual-call-with-last-input)))
-    (evil-visual-block . ((:visual . emc-execute-not-supported)))
-    (evil-visual-char . ((:default . emc-execute-normal-force-normal-state) (:visual . emc-execute-visual-char)))
-    (evil-visual-exchange-corners . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-visual-line . ((:default . emc-execute-normal-force-normal-state) (:visual . emc-execute-visual-line)))
-    (evil-visual-restore . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-window-middle . ((:default . emc-execute-normal-call) (:visual . emc-execute-visual-call)))
-    (evil-yank . ((:default . emc-execute-normal-evil-yank)))
-    (exchange-point-and-mark . ((:visual . emc-execute-exchange-point-and-mark)))
-    (hippie-expand . ((:default . emc-execute-normal-hippie-expand)))
-    (indent-for-tab-command . ((:default . emc-execute-normal-call)))
-    (indent-region-or-buffer . ((:default . emc-execute-normal-ignore)))
-    (keyboard-quit . ((:default . emc-execute-normal-ignore)))
-    (move-text-down . ((:default . emc-execute-normal-call-with-count)))
-    (move-text-up . ((:default . emc-execute-normal-call-with-count)))
-    (newline-and-indent . ((:default . emc-execute-normal-call)))
-    (org-self-insert-command . ((:default . emc-execute-normal-call-with-count)))
-    (orgtbl-self-insert-command . ((:default . emc-execute-normal-call-with-count)))
-    (paste-after-current-line . ((:default . emc-execute-normal-call-with-count)))
-    (paste-before-current-line . ((:default . emc-execute-normal-call-with-count)))
-    (self-insert-command . ((:default . emc-execute-normal-call-with-count)))
-    (spacemacs/evil-numbers-decrease . ((:default . emc-execute-normal-call-with-count)))
-    (spacemacs/evil-numbers-increase . ((:default . emc-execute-normal-call-with-count)))
-    (transpose-chars-before-point . ((:default . emc-execute-normal-call-with-count)))
-    (undo . ((:default . emc-execute-normal-ignore)))
-    (undo-tree-redo . ((:default . emc-execute-normal-ignore)))
-    (undo-tree-undo . ((:default . emc-execute-normal-ignore)))
-    (yaml-electric-backspace . ((:default . emc-execute-normal-call-with-count)))
-    (yaml-electric-bar-and-angle . ((:default . emc-execute-normal-call-with-count)))
-    (yaml-electric-dash-and-dot . ((:default . emc-execute-normal-call-with-count)))
-    (yank . ((:default . emc-execute-normal-call)))
+    (backward-delete-char-untabify . ((:default . evil-mc-execute-normal-call-with-count)))
+    (company-complete-selection . ((:default . evil-mc-execute-normal-call)))
+    (company-select-next . ((:default . evil-mc-execute-normal-ignore)))
+    (copy-to-the-end-of-line . ((:default . evil-mc-execute-normal-call)))
+    (delete-backward-char . ((:default . evil-mc-execute-normal-call-with-count)))
+    (electric-newline-and-maybe-indent . ((:default . evil-mc-execute-normal-call)))
+    (evil-a-WORD . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-back-quote . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-bracket . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-curly . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-double-quote . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-paragraph . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-paren . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-sentence . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-single-quote . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-symbol . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-tag . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-a-word . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-an-angle . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-append . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-append-line . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-beginning-of-line . ((:default . evil-mc-execute-normal-call ) (:visual . evil-mc-execute-visual-call)))
+    (evil-beginning-of-line-or-digit-argument . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-beginning-of-visual-line . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-change . ((:default . evil-mc-execute-normal-evil-change)))
+    (evil-change-line . ((:default . evil-mc-execute-normal-evil-change-line)))
+    (evil-commentary . ((:default . evil-mc-execute-normal-evil-commentary)))
+    (evil-complete-next . ((:default . evil-mc-execute-normal-complete)))
+    (evil-complete-next-line . ((:default . evil-mc-execute-normal-complete)))
+    (evil-complete-previous . ((:default . evil-mc-execute-normal-complete)))
+    (evil-complete-previous-line . ((:default . evil-mc-execute-normal-complete)))
+    (evil-delete . ((:default . evil-mc-execute-normal-evil-delete)))
+    (evil-delete-backward-char-and-join . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-delete-backward-word . ((:default . evil-mc-execute-normal-call)))
+    (evil-delete-char . ((:default . evil-mc-execute-normal-evil-delete-char)))
+    (evil-delete-line . ((:default . evil-mc-execute-normal-evil-delete-line)))
+    (evil-digit-argument-or-evil-beginning-of-line . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-downcase . ((:default . evil-mc-execute-normal-evil-downcase)))
+    (evil-exchange-point-and-mark . ((:visual . evil-mc-execute-exchange-point-and-mark)))
+    (evil-find-char . ((:default . evil-mc-execute-normal-evil-find-char) (:visual . evil-mc-execute-visual-evil-find-char)))
+    (evil-find-char-backward . ((:default . evil-mc-execute-normal-evil-find-char) (:visual . evil-mc-execute-visual-evil-find-char)))
+    (evil-find-char-to . ((:default . evil-mc-execute-normal-evil-find-char) (:visual . evil-mc-execute-visual-evil-find-char)))
+    (evil-find-char-to-backward . ((:default . evil-mc-execute-normal-evil-find-char) (:visual . evil-mc-execute-visual-evil-find-char)))
+    (evil-first-non-blank . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-first-non-blank-of-visual-line . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-goto-definition . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-goto-line . ((:default . evil-mc-execute-normal-evil-goto-line) (:visual . evil-mc-execute-visual-evil-goto-line)))
+    (evil-goto-mark . ((:default . evil-mc-execute-normal-call-with-last-input) (:visual . evil-mc-execute-visual-call-with-last-input)))
+    (evil-goto-mark-line . ((:default . evil-mc-execute-normal-call-with-last-input) (:visual . evil-mc-execute-visual-call-with-last-input)))
+    (evil-inner-WORD . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-angle . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-back-quote . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-bracket . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-curly . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-double-quote . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-paragraph . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-paren . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-sentence . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-single-quote . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-symbol . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-tag . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-inner-word . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-insert . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-insert-line . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-invert-case . ((:default . evil-mc-execute-normal-evil-invert-case)))
+    (evil-invert-char . ((:default . evil-mc-execute-normal-evil-invert-char)))
+    (evil-join . ((:default . evil-mc-execute-normal-evil-join)))
+    (evil-jump-item . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-lookup . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-middle-of-visual-line . ((:default . evil-mc-execute-normal-call) (:visual evil-mc-execute-visual-call)))
+    (evil-next-line . ((:default . evil-mc-execute-normal-next-line) (:visual . evil-mc-execute-visual-next-line)))
+    (evil-next-match . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-normal-state . ((:default . evil-mc-execute-normal-evil-normal-state)))
+    (evil-open-above . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-open-below . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-paste-after . ((:default . evil-mc-execute-normal-evil-paste)))
+    (evil-paste-before . ((:default . evil-mc-execute-normal-evil-paste)))
+    (evil-previous-line . ((:default . evil-mc-execute-normal-prev-line) (:visual . evil-mc-execute-visual-prev-line)))
+    (evil-previous-match . ((:default . evil-mc-execute-normal-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
+    (evil-repeat . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-repeat-pop . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-repeat-pop-next . ((:default . evil-mc-execute-normal-call-with-count)))
+    (evil-replace . ((:default . evil-mc-execute-normal-evil-replace)))
+    (evil-exchange . ((:default . evil-mc-execute-normal-evil-exchange)))
+    (evil-search-backward . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-search-forward . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-set-marker . ((:default . evil-mc-execute-normal-call-with-last-input) (:visual . evil-mc-execute-visual-call-with-last-input)))
+    (evil-shift-left . ((:default . evil-mc-execute-normal-evil-shift-left) (:visual . evil-mc-execute-visual-evil-shift-left)))
+    (evil-shift-right . ((:default . evil-mc-execute-normal-evil-shift-right) (:visual . evil-mc-execute-visual-evil-shift-right)))
+    (evil-snipe-F . ((:default . evil-mc-execute-normal-evil-snipe) (:visual . evil-mc-execute-visual-evil-snipe)))
+    (evil-snipe-S . ((:default . evil-mc-execute-normal-evil-snipe) (:visual . evil-mc-execute-visual-evil-snipe)))
+    (evil-snipe-T . ((:default . evil-mc-execute-normal-evil-snipe) (:visual . evil-mc-execute-visual-evil-snipe)))
+    (evil-snipe-f . ((:default . evil-mc-execute-normal-evil-snipe) (:visual . evil-mc-execute-visual-evil-snipe)))
+    (evil-snipe-s . ((:default . evil-mc-execute-normal-evil-snipe) (:visual . evil-mc-execute-visual-evil-snipe)))
+    (evil-snipe-t . ((:default . evil-mc-execute-normal-evil-snipe) (:visual . evil-mc-execute-visual-evil-snipe)))
+    (evil-surround-region . ((:default . evil-mc-execute-normal-evil-surround-region)))
+    (evil-upcase . ((:default . evil-mc-execute-normal-evil-upcase)))
+    (evil-use-register . ((:default . evil-mc-execute-normal-call-with-last-input) (:visual . evil-mc-execute-visual-call-with-last-input)))
+    (evil-visual-block . ((:visual . evil-mc-execute-not-supported)))
+    (evil-visual-char . ((:default . evil-mc-execute-normal-force-normal-state) (:visual . evil-mc-execute-visual-char)))
+    (evil-visual-exchange-corners . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-visual-line . ((:default . evil-mc-execute-normal-force-normal-state) (:visual . evil-mc-execute-visual-line)))
+    (evil-visual-restore . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-window-middle . ((:default . evil-mc-execute-normal-call) (:visual . evil-mc-execute-visual-call)))
+    (evil-yank . ((:default . evil-mc-execute-normal-evil-yank)))
+    (exchange-point-and-mark . ((:visual . evil-mc-execute-exchange-point-and-mark)))
+    (hippie-expand . ((:default . evil-mc-execute-normal-hippie-expand)))
+    (indent-for-tab-command . ((:default . evil-mc-execute-normal-call)))
+    (indent-region-or-buffer . ((:default . evil-mc-execute-normal-ignore)))
+    (keyboard-quit . ((:default . evil-mc-execute-normal-ignore)))
+    (move-text-down . ((:default . evil-mc-execute-normal-call-with-count)))
+    (move-text-up . ((:default . evil-mc-execute-normal-call-with-count)))
+    (newline-and-indent . ((:default . evil-mc-execute-normal-call)))
+    (org-self-insert-command . ((:default . evil-mc-execute-normal-call-with-count)))
+    (orgtbl-self-insert-command . ((:default . evil-mc-execute-normal-call-with-count)))
+    (paste-after-current-line . ((:default . evil-mc-execute-normal-call-with-count)))
+    (paste-before-current-line . ((:default . evil-mc-execute-normal-call-with-count)))
+    (self-insert-command . ((:default . evil-mc-execute-normal-call-with-count)))
+    (spacemacs/evil-numbers-decrease . ((:default . evil-mc-execute-normal-call-with-count)))
+    (spacemacs/evil-numbers-increase . ((:default . evil-mc-execute-normal-call-with-count)))
+    (transpose-chars-before-point . ((:default . evil-mc-execute-normal-call-with-count)))
+    (undo . ((:default . evil-mc-execute-normal-ignore)))
+    (undo-tree-redo . ((:default . evil-mc-execute-normal-ignore)))
+    (undo-tree-undo . ((:default . evil-mc-execute-normal-ignore)))
+    (yaml-electric-backspace . ((:default . evil-mc-execute-normal-call-with-count)))
+    (yaml-electric-bar-and-angle . ((:default . evil-mc-execute-normal-call-with-count)))
+    (yaml-electric-dash-and-dot . ((:default . evil-mc-execute-normal-call-with-count)))
+    (yank . ((:default . evil-mc-execute-normal-call)))
 
     )
   "A list of the supported commands and their handlers")
 
-(evil-define-local-var emc-executing-command nil
+(evil-define-local-var evil-mc-executing-command nil
   "True when executing a command for all cursors.")
 
-(evil-define-local-var emc-recording-command nil
+(evil-define-local-var evil-mc-recording-command nil
   "True when recording `this-command' data.")
 
-(evil-define-local-var emc-cursor-command nil
-  "True if the current command is an emc cursor command.")
+(evil-define-local-var evil-mc-cursor-command nil
+  "True if the current command is an evil-mc cursor command.")
 
-(evil-define-local-var emc-cursor-current-face nil
+(evil-define-local-var evil-mc-cursor-current-face nil
   "The face to use when making fake cursors.")
 
-(evil-define-local-var emc-cursor-list nil
+(evil-define-local-var evil-mc-cursor-list nil
   "The list of current fake cursors")
 
-(evil-define-local-var emc-frozen nil
+(evil-define-local-var evil-mc-frozen nil
   "If true the fake cursors are frozen.")
 
-(evil-define-local-var emc-pattern nil
+(evil-define-local-var evil-mc-pattern nil
   "The current pattern")
 
-(evil-define-local-var emc-command nil
+(evil-define-local-var evil-mc-command nil
   "Data for the current command to be executed by the fake cursors.")
 
-(evil-define-local-var emc-executing-debug nil
+(evil-define-local-var evil-mc-executing-debug nil
   "If true display debug messages during the execution of a command.")
 
-(evil-define-local-var emc-recording-debug nil
+(evil-define-local-var evil-mc-recording-debug nil
   "If true display debug messages during the recording of a command.")
 
-(defun emc-known-command-p (cmd)
+(defun evil-mc-known-command-p (cmd)
   "True if CMD is a supported command"
-  (or (not (null (assq cmd emc-known-commands)))
+  (or (not (null (assq cmd evil-mc-known-commands)))
       (eq (evil-get-command-property cmd :repeat) 'motion)))
 
-(defun emc-has-cursors-p ()
+(defun evil-mc-has-cursors-p ()
   "True if there are any fake cursors."
-  (not (null emc-cursor-list)))
+  (not (null evil-mc-cursor-list)))
 
-(defun emc-has-command-p ()
+(defun evil-mc-has-command-p ()
   "True if there is data saved for the current command."
-  (not (null emc-command)))
+  (not (null evil-mc-command)))
 
-(defun emc-has-pattern-p ()
+(defun evil-mc-has-pattern-p ()
   "True if there is a saved pattern."
-  (not (null emc-pattern)))
+  (not (null evil-mc-pattern)))
 
-(defun emc-executing-command-p ()
+(defun evil-mc-executing-command-p ()
   "True when executing a command for all fake cursors."
-  (eq emc-executing-command t))
+  (eq evil-mc-executing-command t))
 
-(defun emc-recording-command-p ()
+(defun evil-mc-recording-command-p ()
   "True when recording a command."
-  (eq emc-recording-command t))
+  (eq evil-mc-recording-command t))
 
-(defun emc-executing-debug-p ()
+(defun evil-mc-executing-debug-p ()
   "True if debugging is enabled during the execution of a command."
-  (eq emc-executing-debug t))
+  (eq evil-mc-executing-debug t))
 
-(defun emc-recording-debug-p ()
+(defun evil-mc-recording-debug-p ()
   "True if debugging is enabled during the recording of a command."
-  (eq emc-recording-debug t))
+  (eq evil-mc-recording-debug t))
 
-(defun emc-debug (state executing recording)
+(defun evil-mc-debug (state executing recording)
   "Enable debugging according to STATE for command EXECUTING or RECORDING or both."
-  (when recording (setq emc-recording-debug state))
-  (when executing (setq emc-executing-debug state)))
+  (when recording (setq evil-mc-recording-debug state))
+  (when executing (setq evil-mc-executing-debug state)))
 
-(defun emc-executing-debug-on ()
+(defun evil-mc-executing-debug-on ()
   "Turn debug on while executing a command."
   (interactive)
-  (emc-debug t t nil))
+  (evil-mc-debug t t nil))
 
-(defun emc-executing-debug-off ()
+(defun evil-mc-executing-debug-off ()
   "Turn debug off while executing a command."
   (interactive)
-  (emc-debug nil t nil))
+  (evil-mc-debug nil t nil))
 
-(defun emc-recording-debug-on ()
+(defun evil-mc-recording-debug-on ()
   "Turn debug on while recording a command."
   (interactive)
-  (emc-debug t nil t))
+  (evil-mc-debug t nil t))
 
-(defun emc-recording-debug-off ()
+(defun evil-mc-recording-debug-off ()
   "Turn debug off while recording a command."
   (interactive)
-  (emc-debug nil nil t))
+  (evil-mc-debug nil nil t))
 
-(defun emc-all-debug-on ()
+(defun evil-mc-all-debug-on ()
   "Turn all debug on."
   (interactive)
-  (emc-debug t t t))
+  (evil-mc-debug t t t))
 
-(defun emc-all-debug-off ()
+(defun evil-mc-all-debug-off ()
   "Turn all debug off."
   (interactive)
-  (emc-debug nil t t))
+  (evil-mc-debug nil t t))
 
-(defun emc-print-pattern ()
+(defun evil-mc-print-pattern ()
   "Print the curent pattern."
   (interactive)
-  (message "%s" emc-pattern))
+  (message "%s" evil-mc-pattern))
 
-(defun emc-print-cursor-list ()
+(defun evil-mc-print-cursor-list ()
   "Return the cursor list."
   (interactive)
-  (if emc-cursor-list
-      (message "%s: %s" (length emc-cursor-list) emc-cursor-list)
+  (if evil-mc-cursor-list
+      (message "%s: %s" (length evil-mc-cursor-list) evil-mc-cursor-list)
     (message "No cursors found")))
 
-(defun emc-print-command ()
+(defun evil-mc-print-command ()
   "Print the information saved for the current command."
   (interactive)
-  (message "%s" emc-command))
+  (message "%s" evil-mc-command))
 
-(defun emc-frozen-p ()
+(defun evil-mc-frozen-p ()
   "True if the fake cursors are frozen."
-  (eq emc-frozen t))
+  (eq evil-mc-frozen t))
 
-(defun emc-pause-cursors ()
+(defun evil-mc-pause-cursors ()
   "Freeze the fake cursors."
   (interactive)
-  (setq emc-frozen t))
+  (setq evil-mc-frozen t))
 
-(defun emc-resume-cursors ()
+(defun evil-mc-resume-cursors ()
   "Unfreeze the fake cursors."
   (interactive)
-  (setq emc-frozen nil))
+  (setq evil-mc-frozen nil))
 
-(defun emc-clear-pattern ()
+(defun evil-mc-clear-pattern ()
   "Clear the currently saved pattern."
-  (setq emc-pattern nil))
+  (setq evil-mc-pattern nil))
 
-(defun emc-clear-cursors ()
+(defun evil-mc-clear-cursors ()
   "Clear the cursor list."
-  (setq emc-cursor-list nil))
+  (setq evil-mc-cursor-list nil))
 
-(defun emc-get-pattern ()
+(defun evil-mc-get-pattern ()
   "Return the current pattern."
-  (when emc-pattern (car emc-pattern)))
+  (when evil-mc-pattern (car evil-mc-pattern)))
 
-(defun emc-get-pattern-text ()
+(defun evil-mc-get-pattern-text ()
   "Return the current pattern text."
-  (when emc-pattern (car (emc-get-pattern))))
+  (when evil-mc-pattern (car (evil-mc-get-pattern))))
 
-(defun emc-get-pattern-start ()
+(defun evil-mc-get-pattern-start ()
   "Return the current pattern start position."
-  (when emc-pattern (nth 1 emc-pattern)))
+  (when evil-mc-pattern (nth 1 evil-mc-pattern)))
 
-(defun emc-get-pattern-end ()
+(defun evil-mc-get-pattern-end ()
   "Return the current pattern end position."
-  (when emc-pattern (nth 2 emc-pattern)))
+  (when evil-mc-pattern (nth 2 evil-mc-pattern)))
 
-(defun emc-get-pattern-length ()
+(defun evil-mc-get-pattern-length ()
   "Return the current pattern length."
-  (when emc-pattern
-    (- (emc-get-pattern-end) (emc-get-pattern-start))))
+  (when evil-mc-pattern
+    (- (evil-mc-get-pattern-end) (evil-mc-get-pattern-start))))
 
 (provide'evil-mc-vars)
 
-;;; emc-vars.el ends here
+;;; evil-mc-vars.el ends here

@@ -4,22 +4,22 @@
 
 (Then "^The recorded command name should be \"\\([^\"]+\\)\"$"
       (lambda (cmd)
-        (should (eq (emc-get-command-name) (intern cmd)))))
+        (should (eq (evil-mc-get-command-name) (intern cmd)))))
 
 (And "^The recorded command keys should be \"\\([^\"]+\\)\"$"
      (lambda (keys)
-       (should (equal (emc-get-command-keys-string :keys) keys))))
+       (should (equal (evil-mc-get-command-keys-string :keys) keys))))
 
 (Given "^I have at least one cursor$"
        (lambda ()
-         (emc-make-cursor-at-pos)))
+         (evil-mc-make-cursor-at-pos)))
 
 (Given "^I have one cursor at \"\\([^\"]+\\)\" in \"\\([^\"]+\\)\"$"
        (lambda (pattern text)
          (insert text)
          (goto-char (point-min))
          (search-forward pattern)
-         (emc-make-cursor-at-pos)))
+         (evil-mc-make-cursor-at-pos)))
 
 (When "^These examples should pass:$"
       (lambda (table) (run-and-verify table)))
@@ -31,7 +31,7 @@
      (lambda () (goto-char (point-min))))
 
 (And "^The cursors are frozen$"
-     (lambda () (emc-pause-cursors)))
+     (lambda () (evil-mc-pause-cursors)))
 
 (defun run-and-verify (table &optional undo)
   "Runs all the key sequences in TABLE and verifies them,

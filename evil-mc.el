@@ -2,8 +2,8 @@
 
 ;; Author: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Version: 0.0.1
-;; Keywords: evil editing cursors vim evil-multiple-cursors emc evil-mc
-;; Package-Requires ((emacs "24") (evil "1.2.3"))
+;; Keywords: evil editing cursors vim evil-multiple-cursors evil-mc evil-mc
+;; Package-Requires ((emacs "24") (evil "1.2.5"))
 ;; Homepage: https://github.com/gabesoft/evil-mc
 ;;
 ;; This file is not part of GNU Emacs.
@@ -30,84 +30,78 @@
   :group 'evil)
 
 (define-minor-mode evil-mc-mode
-  "Minor mode for evil multiple cursors."
+  "Minor mode for evil multiple cursors in a single buffer."
   :group 'evil-mc
   :init-value nil
   :lighter " mc"
   (cond (evil-mc-mode
-         ;; Turn on here
-         )
+         (evil-mc-initialize-keys)
+         (evil-mc-initialize-hooks))
         (t
-         ;; Turn off here
-         )))
+         (evil-mc-teardown-keys)
+         (evil-mc-teardown-hooks))))
+
+(put 'evil-mc-mode 'permanent-local t)
+
+(define-globalized-minor-mode global-evil-mc-mode
+  evil-mc-mode evil-mc-initialize)
+
+(defun evil-mc-initialize ()
+  "Enable `evil-mc-mode' in the current buffer."
+  (evil-mc-mode 1))
 
 (defun turn-on-evil-mc-mode (&optional arg)
   "Turn on evil-mc mode in the current buffer."
   (interactive)
   (evil-mc-mode (or arg 1)))
 
-(defun turn-on-evil-mc-mode (&optional arg)
+(defun turn-off-evil-mc-mode (&optional arg)
   "Turn off evil-mc mode in the current buffer."
   (interactive)
   (evil-mc-mode (or arg -1)))
 
-(defvar evil-multiple-cursors-mode-map
-  (let ((map (make-sparse-keymap)))
-    ;; TODO: find better keys
-    ;; maybe try something like
-    ;; - gcn     - next
-    ;; - gcp/gcu - unod
-    ;; - gcx     - skip
-    ;; - gcr     - remove
-    ;; - gch     - cursor here (would need to have a cursor create mode to avoid moving existing cursors)
-    (evil-define-key 'visual map (kbd "C-n") 'emc-make-next-cursor)
-    (evil-define-key 'normal map (kbd "C-n") 'emc-make-next-cursor)
+(defvar evil-mc-keys
+  '(("grm" . 'evil-mc-make-all-cursors)
+    ("gru" . 'evil-mc-undo-all-cursors)
+    ("grp" . 'evil-mc-pause-cursors)
+    ("grr" . 'evil-mc-resume-cursors)
+    ("grf" . 'evil-mc-make-and-goto-first-cursor)
+    ("grl" . 'evil-mc-make-and-goto-last-cursor)
+    ("grh" . 'evil-mc-make-cursor-here)
+    ("C-m" . 'evil-mc-make-and-goto-next-cursor)
+    (",m" . 'evil-mc-skip-and-goto-next-cursor)
+    ("C-l" . 'evil-mc-make-and-goto-prev-cursor)
+    (",l" . 'evil-mc-skip-and-goto-prev-cursor)
+    ("C-n" . 'evil-mc-make-and-goto-next-match)
+    (",n" . 'evil-mc-skip-and-goto-next-match)
+    ("C-t" . 'evil-mc-skip-and-goto-next-match)
+    ("C-p" . 'evil-mc-make-and-goto-prev-match)
+    (",p" . 'evil-mc-skip-and-goto-prev-match))
+  "Association list of key maps.
+Entries have the form (KEY . DEF), where KEY is the key
+that would trigger the evil-mc DEF. The keys defined here
+will be set up in `normal' and `visual' mode.")
 
-    (evil-define-key 'visual map (kbd "C-t") 'emc-skip-next-cursor)
-    (evil-define-key 'normal map (kbd "C-t") 'emc-skip-next-cursor)
+(defun evil-mc-initialize-keys ()
+  "Initialize the `evil-mc' keys."
+  (dolist (key evil-mc-keys)
+    (evil-local-set-key 'normal (kbd (car key)) (cdr key))
+    (evil-local-set-key 'visual (kbd (car key)) (cdr key))))
 
-    (evil-define-key 'visual map (kbd "C-p") 'emc-undo-prev-cursor)
-    (evil-define-key 'normal map (kbd "C-p") 'emc-undo-prev-cursor)
+(defun evil-mc-teardown-keys ()
+  "Initialize the `evil-mc' keys."
+  (dolist (key evil-mc-keys)
+    (evil-local-set-key 'normal (kbd (car key)) nil)
+    (evil-local-set-key 'visual (kbd (car key)) nil)))
 
-    (evil-define-key 'visual map (kbd "C-P") 'emc-make-prev-cursor)
-    (evil-define-key 'normal map (kbd "C-P") 'emc-make-prev-cursor)
+(defun evil-mc-initialize-hooks ()
+  "Initializes all hooks used by `evil-mc'."
+  (message "TODO: implement"))
 
-    ;; this should be bound to ESC
-    (evil-define-key 'normal map (kbd "C-,") 'emc-remove-all-cursors)
-    map))
-
-;; TODO: see evil-snipe for examples on defining custom variables
-;; TODO: check evil-multiple-cursors-mode before doing anything in pre/post command hooks
-
-;;;###autoload
-(define-minor-mode evil-multiple-cursors-mode
-  "evil-multiple-cursors minor mode."
-  :global t
-  :lighter " emc"
-  :keymap evil-multiple-cursors-mode-map
-  :group 'evil-multiple-cursors
-  (if evil-multiple-cursors
-      (turn-on-evil-multiple-cursors-mode t)
-    (turn-off-evil-multiple-cursors-mode t)))
-
-;;;###autoload
-(defun turn-on-evil-multiple-cursors-mode (&optional internal)
-  "Enable evil-multiple-cursors-mode in the current buffer."
-  (unless internal (evil-multiple-cursors-mode 1))
-  (when (fboundp 'advice-add)
-    (advice-add 'evil-force-normal-state :before 'evil-multiple-cursors--pre-command))
-  (add-hook 'evil-insert-state-entry-hook 'evil-multiple-cursors--disable-transient-map))
-
-;;;###autoload
-(defun turn-off-evil-multiple-cursors-mode (&optional internal)
-  "Disable evil-multiple-cursors-mode in the current buffer."
-  (when (fboundp 'advice-remove)
-    (advice-remove 'evil-force-normal-state 'evil-multiple-cursors--pre-command))
-  (remove-hook 'evil-insert-state-entry-hook 'evil-multiple-cursors--disable-transient-map)
-  (unless internal (evil-multiple-cursors-mode -1))
-  (evil-multiple-cursors-override-mode -1))
-
+(defun evil-mc-teardown-hooks ()
+  "Teardown all hooks used by `evil-mc'."
+  (message "TODO: implement"))
 
 (provide 'evil-mc)
 
-;;; evil-mc-mode.el ends here
+;;; evil-mc.el ends here
