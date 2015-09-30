@@ -265,12 +265,12 @@ by the value of `evil-this-register'."
 
 (evil-mc-define-handler evil-mc-execute-normal-complete ()
   :cursor-clear (region column)
-  :cursor-state :complete
+  :cursor-state :dabbrev
   (evil-mc-execute-call))
 
 (evil-mc-define-handler evil-mc-execute-normal-hippie-expand ()
   :cursor-clear (region column)
-  :cursor-state :complete
+  :cursor-state :dabbrev
   (hippie-expand 1))
 
 (evil-mc-define-handler evil-mc-execute-normal-evil-find-char ()

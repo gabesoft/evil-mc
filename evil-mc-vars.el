@@ -50,15 +50,15 @@
                  mark-ring
                  region
                  register-alist))
-    (:complete . (dabbrev--friend-buffer-list
-                  dabbrev--last-buffer
-                  dabbrev--last-buffer-found
-                  dabbrev--last-table
-                  dabbrev--last-abbrev-location
-                  dabbrev--last-abbreviation
-                  dabbrev--last-expansion
-                  dabbrev--last-expansion-location
-                  dabbrev--last-direction)))
+    (:dabbrev . (dabbrev--friend-buffer-list
+                 dabbrev--last-buffer
+                 dabbrev--last-buffer-found
+                 dabbrev--last-table
+                 dabbrev--last-abbrev-location
+                 dabbrev--last-abbreviation
+                 dabbrev--last-expansion
+                 dabbrev--last-expansion-location
+                 dabbrev--last-direction)))
   "State tracked per cursor.")
 
 (defvar evil-mc-known-commands
