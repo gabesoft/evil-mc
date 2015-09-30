@@ -172,6 +172,8 @@
     (exchange-point-and-mark . ((:visual . evil-mc-execute-exchange-point-and-mark)))
     (hippie-expand . ((:default . evil-mc-execute-normal-hippie-expand)))
     (indent-for-tab-command . ((:default . evil-mc-execute-normal-call)))
+    (unimpaired/paste-below . ((:default . evil-mc-execute-normal-call)))
+    (unimpaired/paste-above . ((:default . evil-mc-execute-normal-call)))
     (indent-region-or-buffer . ((:default . evil-mc-execute-normal-ignore)))
     (keyboard-quit . ((:default . evil-mc-execute-normal-ignore)))
     (move-text-down . ((:default . evil-mc-execute-normal-call-with-count)))
