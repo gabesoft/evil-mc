@@ -33,8 +33,9 @@
   "Minor mode for evil multiple cursors in a single buffer."
   :group 'evil-mc
   :init-value nil
-  :lighter " mc"
+  :lighter " emc"
   (cond (evil-mc-mode
+         (evil-mc-initialize-vars)
          (evil-mc-initialize-keys)
          (evil-mc-initialize-hooks))
         (t
@@ -79,8 +80,19 @@
     (",p" . 'evil-mc-skip-and-goto-prev-match))
   "Association list of key maps.
 Entries have the form (KEY . DEF), where KEY is the key
-that would trigger the evil-mc DEF.  The keys defined here
+that would trigger the `evil-mc' DEF.  The keys defined here
 will be set up in `normal' and `visual' mode.")
+
+(defun evil-mc-initialize-vars ()
+  "Initialize all variables used by `evil-mc'."
+  (evil-mc-clear-pattern)
+  (evil-mc-clear-command)
+  (evil-mc-clear-executing-command)
+  (evil-mc-clear-recording-command)
+  (evil-mc-clear-executing-debug)
+  (evil-mc-clear-recording-debug)
+  (evil-mc-clear-cursor-list)
+  (evil-mc-resume-cursors))
 
 (defun evil-mc-initialize-keys ()
   "Initialize the `evil-mc' keys."
@@ -96,11 +108,19 @@ will be set up in `normal' and `visual' mode.")
 
 (defun evil-mc-initialize-hooks ()
   "Initialize all hooks used by `evil-mc'."
-  (message "TODO: implement"))
+  (add-hook 'pre-command-hook 'evil-mc-begin-command-save nil t)
+  (add-hook 'post-command-hook 'evil-mc-finish-command-save t t)
+  (add-hook 'post-command-hook 'evil-mc-execute-for-all t t)
+  (advice-add 'evil-repeat-keystrokes :before #'evil-mc-save-keys-motion)
+  (advice-add 'evil-repeat-motion :before #'evil-mc-save-keys-operator))
 
 (defun evil-mc-teardown-hooks ()
   "Teardown all hooks used by `evil-mc'."
-  (message "TODO: implement"))
+  (remove-hook 'pre-command-hook 'evil-mc-begin-command-save t)
+  (remove-hook 'post-command-hook 'evil-mc-finish-command-save t)
+  (remove-hook 'post-command-hook 'evil-mc-execute-for-all t)
+  (advice-remove 'evil-repeat-keystrokes #'evil-mc-save-keys-motion)
+  (advice-remove 'evil-repeat-motion #'evil-mc-save-keys-operator))
 
 (provide 'evil-mc)
 

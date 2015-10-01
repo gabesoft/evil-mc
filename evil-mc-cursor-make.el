@@ -328,7 +328,7 @@ closest to it when searching forwards."
 (defun evil-mc-cursors-after ()
   "Actions to be executed after all cursors are deleted."
   (evil-mc-clear-pattern)
-  (evil-mc-clear-cursors)
+  (evil-mc-clear-cursor-list)
   (run-hooks 'evil-mc-after-cursors-deleted)
   (message "All cursors cleared"))
 

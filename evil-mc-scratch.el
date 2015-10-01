@@ -1378,7 +1378,8 @@ otherwise execute BODY."
   (add-hook 'pre-command-hook 'evil-mc-begin-command-save nil t)
   (add-hook 'post-command-hook 'evil-mc-finish-command-save t t)
   (advice-add 'evil-repeat-keystrokes :before #'evil-mc-save-keys-motion)
-  (advice-add 'evil-repeat-motion :before #'evil-mc-save-keys-operator))
+  (advice-add 'evil-repeat-motion :before #'evil-mc-save-keys-operator)
+  )
 
 (defun evil-mc-remove-command-hooks ()
   "Remove hooks used for saving the current command."
@@ -1397,7 +1398,8 @@ otherwise execute BODY."
   ;; (add-hook 'post-command-hook 'evil-mc-run-command-for-all-cursors t t)
   (add-hook 'post-command-hook 'evil-mc-execute-for-all t t)
   (add-hook 'evil-mc-after-cursors-deleted 'evil-mc-after-cursors-teardown-hook)
-  (add-hook 'evil-mc-before-cursors-created 'evil-mc-before-cursors-setup-hook))
+  (add-hook 'evil-mc-before-cursors-created 'evil-mc-before-cursors-setup-hook)
+  )
 
 (defun evil-mc-remove-hooks ()
   "Removes all evil-mc related hooks."

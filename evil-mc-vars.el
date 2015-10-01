@@ -332,9 +332,29 @@
   "Clear the currently saved pattern."
   (setq evil-mc-pattern nil))
 
-(defun evil-mc-clear-cursors ()
+(defun evil-mc-clear-command ()
+  "Clear the current command."
+  (setq evil-mc-command nil))
+
+(defun evil-mc-clear-cursor-list ()
   "Clear the cursor list."
   (setq evil-mc-cursor-list nil))
+
+(defun evil-mc-clear-executing-command ()
+  "Clear the `evil-mc-executing-command' variable."
+  (setq evil-mc-executing-command nil))
+
+(defun evil-mc-clear-recording-command ()
+  "Clear the `evil-mc-recording-command' variable."
+  (setq evil-mc-recording-command nil))
+
+(defun evil-mc-clear-executing-debug ()
+  "Clear the `evil-mc-executing-debug' variable."
+  (setq evil-mc-executing-debug nil))
+
+(defun evil-mc-clear-recording-debug ()
+  "Clear the `evil-mc-recording-debug' variable."
+  (setq evil-mc-recording-debug nil))
 
 (defun evil-mc-get-pattern ()
   "Return the current pattern."
