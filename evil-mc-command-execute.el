@@ -232,7 +232,7 @@ to the keys vector"
 (defun evil-mc-execute-not-supported ()
   "Throw an error for a not supported command."
   (evil-force-normal-state)
-  (error ("%s is not supported" (evil-mc-get-command-name))))
+  (error (message "%s is not supported" (evil-mc-get-command-name))))
 
 (defun evil-mc-clear-current-region ()
   "Clears the current region."
@@ -261,140 +261,140 @@ by the value of `evil-this-register'."
     (evil-mc-get-command-keys-vector)))
 
 
-;; handlers for normal state
+;; default handlers
 
-(evil-mc-define-handler evil-mc-execute-normal-complete ()
+(evil-mc-define-handler evil-mc-execute-default-complete ()
   :cursor-clear (region column)
   :cursor-state :dabbrev
   (evil-mc-execute-call))
 
-(evil-mc-define-handler evil-mc-execute-normal-hippie-expand ()
+(evil-mc-define-handler evil-mc-execute-default-hippie-expand ()
   :cursor-clear (region column)
   :cursor-state :dabbrev
   (hippie-expand 1))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-find-char ()
+(evil-mc-define-handler evil-mc-execute-default-evil-find-char ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-find-char))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-snipe ()
+(evil-mc-define-handler evil-mc-execute-default-evil-snipe ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-snipe))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-commentary ()
+(evil-mc-define-handler evil-mc-execute-default-evil-commentary ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-commentary))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-join ()
+(evil-mc-define-handler evil-mc-execute-default-evil-join ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-join))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-shift-left ()
+(evil-mc-define-handler evil-mc-execute-default-evil-shift-left ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-shift 'evil-shift-left))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-shift-right ()
+(evil-mc-define-handler evil-mc-execute-default-evil-shift-right ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-shift 'evil-shift-right))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-surround-region ()
+(evil-mc-define-handler evil-mc-execute-default-evil-surround-region ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-surround-region))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-replace ()
+(evil-mc-define-handler evil-mc-execute-default-evil-replace ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-replace))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-exchange ()
+(evil-mc-define-handler evil-mc-execute-default-evil-exchange ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-exchange))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-delete ()
+(evil-mc-define-handler evil-mc-execute-default-evil-delete ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-delete))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-yank ()
+(evil-mc-define-handler evil-mc-execute-default-evil-yank ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-yank))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-change ()
+(evil-mc-define-handler evil-mc-execute-default-evil-change ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-change))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-paste ()
+(evil-mc-define-handler evil-mc-execute-default-evil-paste ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-paste))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-invert-char ()
+(evil-mc-define-handler evil-mc-execute-default-evil-invert-char ()
   :cursor-clear (region column)
   (evil-mc-execute-change-case 'evil-invert-char))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-invert-case ()
+(evil-mc-define-handler evil-mc-execute-default-evil-invert-case ()
   :cursor-clear (region column)
   (evil-mc-execute-change-case 'evil-invert-case))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-upcase ()
+(evil-mc-define-handler evil-mc-execute-default-evil-upcase ()
   :cursor-clear (region column)
   (evil-mc-execute-change-case 'evil-upcase))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-downcase ()
+(evil-mc-define-handler evil-mc-execute-default-evil-downcase ()
   :cursor-clear (region column)
   (evil-mc-execute-change-case 'evil-downcase))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-delete-char ()
+(evil-mc-define-handler evil-mc-execute-default-evil-delete-char ()
   :cursor-clear (region column)
   (evil-mc-execute-with-region-and-register 'evil-delete-char))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-delete-line ()
+(evil-mc-define-handler evil-mc-execute-default-evil-delete-line ()
   :cursor-clear (region column)
   (evil-mc-execute-with-region-and-register 'evil-delete-line))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-change-line ()
+(evil-mc-define-handler evil-mc-execute-default-evil-change-line ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-change-line))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-goto-line ()
+(evil-mc-define-handler evil-mc-execute-default-evil-goto-line ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-goto-line))
 
-(evil-mc-define-handler evil-mc-execute-normal-next-line ()
+(evil-mc-define-handler evil-mc-execute-default-next-line ()
   :cursor-clear region
   (evil-mc-execute-move-to-line 'next))
 
-(evil-mc-define-handler evil-mc-execute-normal-prev-line ()
+(evil-mc-define-handler evil-mc-execute-default-prev-line ()
   :cursor-clear region
   (evil-mc-execute-move-to-line 'prev))
 
-(evil-mc-define-handler evil-mc-execute-normal-force-normal-state ()
+(evil-mc-define-handler evil-mc-execute-default-force-normal-state ()
   :cursor-clear region
   (evil-force-normal-state))
 
-(evil-mc-define-handler evil-mc-execute-normal-evil-normal-state ()
+(evil-mc-define-handler evil-mc-execute-default-evil-normal-state ()
   :cursor-clear region
   (evil-insert 1)
   (evil-normal-state))
 
-(evil-mc-define-handler evil-mc-execute-normal-macro ()
+(evil-mc-define-handler evil-mc-execute-default-macro ()
   :cursor-clear (region column)
   (evil-mc-execute-macro))
 
-(evil-mc-define-handler evil-mc-execute-normal-call ()
+(evil-mc-define-handler evil-mc-execute-default-call ()
   :cursor-clear (region column)
   (evil-mc-execute-call))
 
-(evil-mc-define-handler evil-mc-execute-normal-call-with-last-input ()
+(evil-mc-define-handler evil-mc-execute-default-call-with-last-input ()
   :cursor-clear (region column)
   (evil-mc-execute-call-with-last-input))
 
-(evil-mc-define-handler evil-mc-execute-normal-call-with-count ()
+(evil-mc-define-handler evil-mc-execute-default-call-with-count ()
   :cursor-clear (region column)
   (evil-mc-execute-call-with-count))
 
-(evil-mc-define-handler evil-mc-execute-normal-ignore ()
+(evil-mc-define-handler evil-mc-execute-default-ignore ()
   :cursor-clear (region column)
   (ignore))
 
-(evil-mc-define-handler evil-mc-execute-normal-not-supported ()
+(evil-mc-define-handler evil-mc-execute-default-not-supported ()
   :cursor-clear (region column)
   (evil-mc-execute-not-supported))
 
@@ -413,7 +413,7 @@ by the value of `evil-this-register'."
     (goto-char end)
     (setq region (evil-mc-create-region start end 'char))))
 
-(evil-mc-define-handler evil-mc-execute-exchange-point-and-mark ()
+(evil-mc-define-handler evil-mc-execute-visual-exchange-point-and-mark ()
   (let* ((next-region (evil-mc-exchange-region-point-and-mark region))
          (mark (evil-mc-get-region-mark next-region))
          (point (evil-mc-get-region-point next-region)))
@@ -474,7 +474,7 @@ by the value of `evil-this-register'."
         (evil-mc-get-object-property handler-data :default)
         (cond ((eq (evil-get-command-property cmd :repeat) 'motion)
                (cond ((eq state :visual) 'evil-mc-execute-visual-call-count)
-                     (t 'evil-mc-execute-normal-call-with-count)))))))
+                     (t 'evil-mc-execute-default-call-with-count)))))))
 
 (defun evil-mc-get-state-variables (handler)
   "Get all cursor variables required to hold state for HANDLER."
