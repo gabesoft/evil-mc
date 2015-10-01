@@ -79,7 +79,7 @@
     (",p" . 'evil-mc-skip-and-goto-prev-match))
   "Association list of key maps.
 Entries have the form (KEY . DEF), where KEY is the key
-that would trigger the evil-mc DEF. The keys defined here
+that would trigger the evil-mc DEF.  The keys defined here
 will be set up in `normal' and `visual' mode.")
 
 (defun evil-mc-initialize-keys ()
@@ -95,7 +95,7 @@ will be set up in `normal' and `visual' mode.")
     (evil-local-set-key 'visual (kbd (car key)) nil)))
 
 (defun evil-mc-initialize-hooks ()
-  "Initializes all hooks used by `evil-mc'."
+  "Initialize all hooks used by `evil-mc'."
   (message "TODO: implement"))
 
 (defun evil-mc-teardown-hooks ()
