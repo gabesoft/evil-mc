@@ -167,9 +167,9 @@ the cursors are ordered by the cursor overlay start position."
 
 (defun evil-mc-make-pattern (text whole-word)
   "Make a search pattern for TEXT, that optionally matches only WHOLE-WORDs."
-  (evil-ex-make-search-pattern (if whole-word
-                                   (concat "\\_<" text "\\_>")
-                                 text)))
+  (let ((literal (regexp-quote text)))
+    (evil-ex-make-search-pattern
+     (if whole-word (concat "\\_<" literal "\\_>") literal))))
 
 (defun evil-mc-set-pattern-for-range (range whole-word)
   "Set `evil-mc-pattern' to the text given by RANGE, optionally matching only WHOLE-WORDs."
@@ -178,10 +178,8 @@ the cursors are ordered by the cursor overlay start position."
              (>= (point-max) end)
              (< start end))
         (setq evil-mc-pattern
-              (cons (evil-mc-make-pattern
-                     (regexp-quote (buffer-substring-no-properties
-                                    start end))
-                     whole-word)
+              (cons (evil-mc-make-pattern (buffer-substring-no-properties start end)
+                                          whole-word)
                     range))
       (error "Invalid range %s" range))))
 
