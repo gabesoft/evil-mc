@@ -148,6 +148,7 @@
     (evil-repeat-pop-next . ((:default . evil-mc-execute-default-call-with-count)))
     (evil-replace . ((:default . evil-mc-execute-default-evil-replace)))
     (evil-exchange . ((:default . evil-mc-execute-default-evil-exchange)))
+    (evil-exchange-cancel . ((:default . evil-mc-execute-default-call)))
     (evil-search-backward . ((:default . evil-mc-execute-default-call) (:visual . evil-mc-execute-visual-call)))
     (evil-search-forward . ((:default . evil-mc-execute-default-call) (:visual . evil-mc-execute-visual-call)))
     (evil-set-marker . ((:default . evil-mc-execute-default-call-with-last-input) (:visual . evil-mc-execute-visual-call-with-last-input)))

@@ -284,11 +284,18 @@ CLOSED: [2015-09-14 Mon 21:12]
 ** TODO Refactor command run functions
 *** extract to own file
 ** TODO Test with various modes (org, js2, ruby, etc)
-** TODO Insertion of characters takes a while to display the last char for fake cursors
+** DONE Insertion of characters takes a while to display the last char for fake cursors
+CLOSED: [2015-09-30 Wed 22:43]
+*** was due to aggressive indent
 ** DONE Fix pattern 
-CLOSED: [2015-09-28 Mon 21:44]
-*** when selecting a quote or square bracket creating cursors errors out with invalid pattern
-** Rename emc to evil-mc
+CLOSED: [2015-09-30 Wed 22:42]
+*** DONE when selecting a quote or square bracket creating cursors errors out with invalid pattern
+CLOSED: [2015-09-30 Wed 21:32]
+*** DONE when looking at a ( or ; in normal mode create next cursor jumps to the beginning of buffer, it should not move
+CLOSED: [2015-09-30 Wed 22:42]
+
+** DONE Rename emc to evil-mc
+CLOSED: [2015-09-30 Wed 22:43]
 *** prefixes
 *** file names
 *** project name

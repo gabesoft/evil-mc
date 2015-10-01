@@ -50,6 +50,16 @@
          (apply #'evil-set-command-properties func ',keys)
          func))))
 
+(defmacro evil-mc-define-visual-handler (command &rest body)
+  "Define a visual COMMAND handler with BODY that updates the
+current region after executing BODY.
+
+  \(fn COMMAND BODY ...)"
+  (declare (indent 2) (debug t))
+  `(evil-mc-define-handler ,command ()
+     (ignore-errors ,@body)
+     (evil-mc-update-current-region)))
+
 (defmacro evil-mc-with-region (region form &rest body)
   "Execute FORM if there is a REGION. Otherwise execute BODY."
   (declare (indent 2) (debug t))
@@ -420,49 +430,38 @@ by the value of `evil-this-register'."
     (goto-char (if (< mark point) (1- point) point))
     (setq region next-region)))
 
-(evil-mc-define-handler evil-mc-execute-visual-evil-find-char ()
-  (evil-mc-execute-evil-find-char)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-evil-find-char ()
+  (evil-mc-execute-evil-find-char))
 
-(evil-mc-define-handler evil-mc-execute-visual-evil-snipe ()
-  (evil-mc-execute-evil-snipe)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-evil-snipe ()
+  (evil-mc-execute-evil-snipe))
 
-(evil-mc-define-handler evil-mc-execute-visual-evil-goto-line ()
-  (evil-mc-execute-evil-goto-line)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-evil-goto-line ()
+  (evil-mc-execute-evil-goto-line))
 
-(evil-mc-define-handler evil-mc-execute-visual-next-line ()
-  (evil-mc-execute-move-to-line 'next)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-next-line ()
+  (evil-mc-execute-move-to-line 'next))
 
-(evil-mc-define-handler evil-mc-execute-visual-prev-line ()
-  (evil-mc-execute-move-to-line 'prev)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-prev-line ()
+  (evil-mc-execute-move-to-line 'prev))
 
-(evil-mc-define-handler evil-mc-execute-visual-shift-left ()
-  (evil-mc-execute-evil-shift 'evil-shift-left)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-shift-left ()
+  (evil-mc-execute-evil-shift 'evil-shift-left))
 
-(evil-mc-define-handler evil-mc-execute-visual-shift-right ()
-  (evil-mc-execute-evil-shift 'evil-shift-right)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-shift-right ()
+  (evil-mc-execute-evil-shift 'evil-shift-right))
 
-(evil-mc-define-handler evil-mc-execute-visual-macro ()
-  (evil-mc-execute-macro)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-macro ()
+  (evil-mc-execute-macro))
 
-(evil-mc-define-handler evil-mc-execute-visual-call-with-last-input ()
-  (evil-mc-execute-call-with-last-input)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-call-with-last-input ()
+  (evil-mc-execute-call-with-last-input))
 
-(evil-mc-define-handler evil-mc-execute-visual-call ()
-  (evil-mc-execute-call)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-call ()
+  (evil-mc-execute-call))
 
-(evil-mc-define-handler evil-mc-execute-visual-call-count ()
-  (evil-mc-execute-call-with-count)
-  (evil-mc-update-current-region))
+(evil-mc-define-visual-handler evil-mc-execute-visual-call-count ()
+  (evil-mc-execute-call-with-count))
 
 ;; ----
 
@@ -521,7 +520,10 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
       (error (message "Failed to execute %s with error %s"
                       (evil-mc-get-command-name)
                       (error-message-string error))
-             cursor))))
+             (cond ((eq :normal (evil-mc-get-command-state))
+                    (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
+                    (evil-mc-put-cursor-region cursor nil))
+                   (t cursor))))))
 
 (defun evil-mc-execute-for-all ()
   "Execute the current command, stored at `evil-mc-command', for all fake cursors."
@@ -547,8 +549,8 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
             (dolist (cursor evil-mc-cursor-list)
               (setq cursor-list (evil-mc-insert-cursor-into-list
                                  (evil-mc-execute-for cursor
-                                                  state-variables
-                                                  clear-variables)
+                                                      state-variables
+                                                      clear-variables)
                                  cursor-list)))
             (setq evil-mc-cursor-list cursor-list)))))))
 
@@ -568,7 +570,7 @@ are undone in the same step as the current command."
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords
    'emacs-lisp-mode
-   '(("(\\(evil-mc-define-handler\\)" . font-lock-keyword-face))))
+   '(("(\\(evil-mc-define-handler\\|evil-mc-define-visual-handler\\)" . font-lock-keyword-face))))
 
 (provide 'evil-mc-command-execute)
 

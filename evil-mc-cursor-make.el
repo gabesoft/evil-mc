@@ -85,8 +85,8 @@ the cursors are ordered by the cursor overlay start position."
   "Insert CURSOR into `evil-mc-cursor-list' at the correct location so that
 the cursors are ordered by the cursor overlay start position."
   (setq evil-mc-cursor-list (evil-mc-insert-cursor-into-list
-                         cursor
-                         evil-mc-cursor-list)))
+                             cursor
+                             evil-mc-cursor-list)))
 
 (defun evil-mc-delete-cursor (cursor)
   "Delete all overlays associated with CURSOR."
@@ -233,12 +233,16 @@ and optionally CREATE a cursor at point."
              (when (and found (eq direction 'backward))
                (setq found (evil-ex-find-next (evil-mc-get-pattern) direction nil))
                (setq found (evil-ex-find-next (evil-mc-get-pattern) 'forward nil)))))
-      (goto-char (1- (point)))
+      (if found
+          (goto-char (1- (point)))
+        (goto-char point)
+        (message "No more matches found for %s" (evil-mc-get-pattern-text)))
       (when (and found create (/= point (point)))
         (evil-mc-make-cursor-at-pos point))
       (evil-mc-undo-cursor-at-pos)
       (unless (evil-mc-has-cursors-p) (evil-mc-clear-pattern))
-      (when (and had-cursors (not (evil-mc-has-cursors-p))) (evil-mc-cursors-after)))))
+      (when (and had-cursors (not (evil-mc-has-cursors-p)))
+        (evil-mc-cursors-after)))))
 
 (defun evil-mc-find-and-goto-cursor (find create)
   "FIND a cursor, go to it, and optionally CREATE a cursor at point."
