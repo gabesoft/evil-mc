@@ -293,12 +293,12 @@ CLOSED: [2015-09-30 Wed 22:42]
 CLOSED: [2015-09-30 Wed 21:32]
 *** DONE when looking at a ( or ; in normal mode create next cursor jumps to the beginning of buffer, it should not move
 CLOSED: [2015-09-30 Wed 22:42]
-
 ** DONE Rename emc to evil-mc
 CLOSED: [2015-09-30 Wed 22:43]
 *** prefixes
 *** file names
 *** project name
 *** documentation
+** TODO Rename private methods with --
 
 

@@ -1,4 +1,4 @@
-;;; evil-mc-mode.el --- Multiple cursors minor mode for evil
+;;; evil-mc.el --- Multiple cursors minor mode for evil
 
 ;; Author: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Version: 0.0.1
@@ -61,29 +61,6 @@
   (interactive)
   (evil-mc-mode (or arg -1)))
 
-;; TODO move to vars
-(defvar evil-mc-keys
-  '(("grm" . evil-mc-make-all-cursors)
-    ("gru" . evil-mc-undo-all-cursors)
-    ("grp" . evil-mc-pause-cursors)
-    ("grr" . evil-mc-resume-cursors)
-    ("grf" . evil-mc-make-and-goto-first-cursor)
-    ("grl" . evil-mc-make-and-goto-last-cursor)
-    ("grh" . evil-mc-make-cursor-here)
-    ("C-m" . evil-mc-make-and-goto-next-cursor)
-    (",m" . evil-mc-skip-and-goto-next-cursor)
-    ("C-l" . evil-mc-make-and-goto-prev-cursor)
-    (",l" . evil-mc-skip-and-goto-prev-cursor)
-    ("C-n" . evil-mc-make-and-goto-next-match)
-    (",n" . evil-mc-skip-and-goto-next-match)
-    ("C-t" . evil-mc-skip-and-goto-next-match)
-    ("C-p" . evil-mc-make-and-goto-prev-match)
-    (",p" . evil-mc-skip-and-goto-prev-match))
-  "Association list of key maps.
-Entries have the form (KEY . DEF), where KEY is the key
-that would trigger the `evil-mc' DEF.  The keys defined here
-will be set up in `normal' and `visual' mode.")
-
 (defun evil-mc-initialize-vars ()
   "Initialize all variables used by `evil-mc'."
   (evil-mc-clear-pattern)
@@ -96,8 +73,8 @@ will be set up in `normal' and `visual' mode.")
   (evil-mc-resume-cursors))
 
 (defun evil-mc-define-key (map key def)
-  "TODO: document"
-  (when (and (boundp map) (symbol-value map))
+  "In MAP define key sequence KEY as DEF."
+  (when (and (boundp map) (keymapp (symbol-value map)))
     (define-key (symbol-value map) key def)))
 
 (defun evil-mc-initialize-keys ()

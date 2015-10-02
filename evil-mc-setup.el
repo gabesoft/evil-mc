@@ -41,6 +41,8 @@
   (dolist (fn evil-mc-paused-modes) (funcall fn))
   (setq evil-mc-paused-modes nil))
 
+(add-hook 'evil-mc-after-cursors-deleted 'evil-mc-after-cursors-teardown-hook)
+(add-hook 'evil-mc-before-cursors-created 'evil-mc-before-cursors-setup-hook)
 
 ;; (evil-mc-mode 1)
 ;; (global-evil-mc-mode 1)

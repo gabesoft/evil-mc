@@ -26,6 +26,28 @@
   :type 'integer
   :group 'evil-mc)
 
+(defvar evil-mc-keys
+  '(("grm" . evil-mc-make-all-cursors)
+    ("gru" . evil-mc-undo-all-cursors)
+    ("grp" . evil-mc-pause-cursors)
+    ("grr" . evil-mc-resume-cursors)
+    ("grf" . evil-mc-make-and-goto-first-cursor)
+    ("grl" . evil-mc-make-and-goto-last-cursor)
+    ("grh" . evil-mc-make-cursor-here)
+    ("C-m" . evil-mc-make-and-goto-next-cursor)
+    (",m" . evil-mc-skip-and-goto-next-cursor)
+    ("C-l" . evil-mc-make-and-goto-prev-cursor)
+    (",l" . evil-mc-skip-and-goto-prev-cursor)
+    ("C-n" . evil-mc-make-and-goto-next-match)
+    (",n" . evil-mc-skip-and-goto-next-match)
+    ("C-t" . evil-mc-skip-and-goto-next-match)
+    ("C-p" . evil-mc-make-and-goto-prev-match)
+    (",p" . evil-mc-skip-and-goto-prev-match))
+  "Association list of key maps.
+Entries have the form (KEY . DEF), where KEY is the key
+that would trigger the `evil-mc' DEF.  The keys defined here
+will be set up in `normal' and `visual' mode.")
+
 (defvar evil-mc-cursor-state
   '((:default . (column
                  evil-exchange--overlays
