@@ -29,11 +29,22 @@
   :prefix "evil-mc-"
   :group 'evil)
 
+(defcustom evil-mc-mode-line
+  `(:eval (if (> (evil-mc-get-cursor-count) 1)
+              (format ,(propertize " %s:%d" 'face 'cursor)
+                      evil-mc-mode-line-prefix
+                      (evil-mc-get-cursor-count))
+            (format ,(propertize " %s") evil-mc-mode-line-prefix)))
+  "Cursors indicator in the mode line."
+  :group 'evil-mc)
+
+(put 'evil-mc-mode-line 'risky-local-variable t)
+
 (define-minor-mode evil-mc-mode
-  "Minor mode for evil multiple cursors in a single buffer."
+  "Minor mode for evil multiple cursors in a single uuffer."
   :group 'evil-mc
   :init-value nil
-  :lighter " emc"
+  :lighter evil-mc-mode-line
   (cond (evil-mc-mode
          (evil-mc-initialize-vars)
          (evil-mc-initialize-keys)
@@ -63,6 +74,10 @@
 
 (defun evil-mc-initialize-vars ()
   "Initialize all variables used by `evil-mc'."
+
+  (defvar evil-mc-mode-line-prefix "emc"
+    "The string used in the mode line to identify `evil-mc-mode'.")
+
   (evil-mc-clear-pattern)
   (evil-mc-clear-command)
   (evil-mc-clear-executing-command)

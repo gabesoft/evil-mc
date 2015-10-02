@@ -300,5 +300,6 @@ CLOSED: [2015-09-30 Wed 22:43]
 *** project name
 *** documentation
 ** TODO Rename private methods with --
+** TODO Formalize disabled minor modes
 
 

@@ -34,9 +34,9 @@
     ("grf" . evil-mc-make-and-goto-first-cursor)
     ("grl" . evil-mc-make-and-goto-last-cursor)
     ("grh" . evil-mc-make-cursor-here)
-    ("C-m" . evil-mc-make-and-goto-next-cursor)
+    ("M-m" . evil-mc-make-and-goto-next-cursor)
     (",m" . evil-mc-skip-and-goto-next-cursor)
-    ("C-l" . evil-mc-make-and-goto-prev-cursor)
+    ("M-l" . evil-mc-make-and-goto-prev-cursor)
     (",l" . evil-mc-skip-and-goto-prev-cursor)
     ("C-n" . evil-mc-make-and-goto-next-match)
     (",n" . evil-mc-skip-and-goto-next-match)
@@ -398,6 +398,11 @@ will be set up in `normal' and `visual' mode.")
   "Return the current pattern length."
   (when evil-mc-pattern
     (- (evil-mc-get-pattern-end) (evil-mc-get-pattern-start))))
+
+(defun evil-mc-get-cursor-count ()
+  "Return the count of active cursors."
+  (1+ (length evil-mc-cursor-list)))
+
 
 (provide'evil-mc-vars)
 
