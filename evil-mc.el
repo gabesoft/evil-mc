@@ -94,6 +94,30 @@
 
 (defun evil-mc-initialize-keys ()
   "Setup the `evil-mc' keys for normal and visual states."
+
+  (defvar evil-mc-keys
+    '(("grm" . evil-mc-make-all-cursors)
+      ("gru" . evil-mc-undo-all-cursors)
+      ("grp" . evil-mc-pause-cursors)
+      ("grr" . evil-mc-resume-cursors)
+      ("grf" . evil-mc-make-and-goto-first-cursor)
+      ("grl" . evil-mc-make-and-goto-last-cursor)
+      ("grh" . evil-mc-make-cursor-here)
+      ("M-m" . evil-mc-make-and-goto-next-cursor)
+      (",m" . evil-mc-skip-and-goto-next-cursor)
+      ("M-l" . evil-mc-make-and-goto-prev-cursor)
+      (",l" . evil-mc-skip-and-goto-prev-cursor)
+      ("C-n" . evil-mc-make-and-goto-next-match)
+      (",n" . evil-mc-skip-and-goto-next-match)
+      ("C-t" . evil-mc-skip-and-goto-next-match)
+      ("C-p" . evil-mc-make-and-goto-prev-match)
+      (",p" . evil-mc-skip-and-goto-prev-match))
+    "Association list of key maps.
+Entries have the form (KEY . DEF), where KEY is the key
+that would trigger the `evil-mc' DEF.  The keys defined here
+will be set up in `normal' and `visual' mode. This can be
+overriden before enabling `evil-mc-mode' the first time.")
+
   (when (bound-and-true-p evil-mode)
     (dolist (key evil-mc-keys)
       (evil-mc-define-key 'evil-normal-state-local-map (kbd (car key)) (cdr key))
@@ -101,7 +125,7 @@
 
 (defun evil-mc-teardown-keys ()
   "Remove the `evil-mc' keys for normal and visual states."
-  (when (bound-and-true-p evil-mode)
+  (when (and (bound-and-true-p evil-mode) (boundp 'evil-mc-keys))
     (dolist (key evil-mc-keys)
       (evil-mc-define-key 'evil-normal-state-local-map (kbd (car key)) nil)
       (evil-mc-define-key 'evil-visual-state-local-map (kbd (car key)) nil))))

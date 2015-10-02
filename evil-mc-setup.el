@@ -21,6 +21,8 @@
 Can be used to temporarily disable minor modes that don't play
 well with `evil-mc'."
   (evil-mc-clear-paused-modes)
+
+  ;; TODO formalize disabling of unsupported minor modes
   (when (bound-and-true-p flyspell-mode)
     (flyspell-mode -1)
     (push (lambda () (flyspell-mode 1)) evil-mc-custom-paused-modes))
@@ -28,11 +30,11 @@ well with `evil-mc'."
     (aggressive-indent-mode -1)
     (push (lambda () (aggressive-indent-mode 1)) evil-mc-custom-paused-modes))
   (when (bound-and-true-p evil-jumper-mode)
-    (evil-jumper-mode 0)
-    (push (lambda () (evil-jumper-mode t)) evil-mc-custom-paused-modes))
+    (evil-jumper-mode -1)
+    (push (lambda () (evil-jumper-mode 1)) evil-mc-custom-paused-modes))
   (when (bound-and-true-p yas-minor-mode)
-    (yas-minor-mode 0)
-    (push (lambda () (yas-minor-mode t)) evil-mc-custom-paused-modes ))
+    (yas-minor-mode -1)
+    (push (lambda () (yas-minor-mode 1)) evil-mc-custom-paused-modes ))
   (when (or (bound-and-true-p web-mode) (eq major-mode 'web-mode))
     (smartchr/undo-web-mode)
     (push (lambda () (smartchr/init-web-mode)) evil-mc-custom-paused-modes))
