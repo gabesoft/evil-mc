@@ -61,23 +61,24 @@
   (interactive)
   (evil-mc-mode (or arg -1)))
 
+;; TODO move to vars
 (defvar evil-mc-keys
-  '(("grm" . 'evil-mc-make-all-cursors)
-    ("gru" . 'evil-mc-undo-all-cursors)
-    ("grp" . 'evil-mc-pause-cursors)
-    ("grr" . 'evil-mc-resume-cursors)
-    ("grf" . 'evil-mc-make-and-goto-first-cursor)
-    ("grl" . 'evil-mc-make-and-goto-last-cursor)
-    ("grh" . 'evil-mc-make-cursor-here)
-    ("C-m" . 'evil-mc-make-and-goto-next-cursor)
-    (",m" . 'evil-mc-skip-and-goto-next-cursor)
-    ("C-l" . 'evil-mc-make-and-goto-prev-cursor)
-    (",l" . 'evil-mc-skip-and-goto-prev-cursor)
-    ("C-n" . 'evil-mc-make-and-goto-next-match)
-    (",n" . 'evil-mc-skip-and-goto-next-match)
-    ("C-t" . 'evil-mc-skip-and-goto-next-match)
-    ("C-p" . 'evil-mc-make-and-goto-prev-match)
-    (",p" . 'evil-mc-skip-and-goto-prev-match))
+  '(("grm" . evil-mc-make-all-cursors)
+    ("gru" . evil-mc-undo-all-cursors)
+    ("grp" . evil-mc-pause-cursors)
+    ("grr" . evil-mc-resume-cursors)
+    ("grf" . evil-mc-make-and-goto-first-cursor)
+    ("grl" . evil-mc-make-and-goto-last-cursor)
+    ("grh" . evil-mc-make-cursor-here)
+    ("C-m" . evil-mc-make-and-goto-next-cursor)
+    (",m" . evil-mc-skip-and-goto-next-cursor)
+    ("C-l" . evil-mc-make-and-goto-prev-cursor)
+    (",l" . evil-mc-skip-and-goto-prev-cursor)
+    ("C-n" . evil-mc-make-and-goto-next-match)
+    (",n" . evil-mc-skip-and-goto-next-match)
+    ("C-t" . evil-mc-skip-and-goto-next-match)
+    ("C-p" . evil-mc-make-and-goto-prev-match)
+    (",p" . evil-mc-skip-and-goto-prev-match))
   "Association list of key maps.
 Entries have the form (KEY . DEF), where KEY is the key
 that would trigger the `evil-mc' DEF.  The keys defined here
@@ -94,33 +95,42 @@ will be set up in `normal' and `visual' mode.")
   (evil-mc-clear-cursor-list)
   (evil-mc-resume-cursors))
 
+(defun evil-mc-define-key (map key def)
+  "TODO: document"
+  (when (and (boundp map) (symbol-value map))
+    (define-key (symbol-value map) key def)))
+
 (defun evil-mc-initialize-keys ()
-  "Initialize the `evil-mc' keys."
-  (dolist (key evil-mc-keys)
-    (evil-local-set-key 'normal (kbd (car key)) (cdr key))
-    (evil-local-set-key 'visual (kbd (car key)) (cdr key))))
+  "Setup the `evil-mc' keys for normal and visual states."
+  (when (bound-and-true-p evil-mode)
+    (dolist (key evil-mc-keys)
+      (evil-mc-define-key 'evil-normal-state-local-map (kbd (car key)) (cdr key))
+      (evil-mc-define-key 'evil-visual-state-local-map (kbd (car key)) (cdr key)))))
 
 (defun evil-mc-teardown-keys ()
-  "Initialize the `evil-mc' keys."
-  (dolist (key evil-mc-keys)
-    (evil-local-set-key 'normal (kbd (car key)) nil)
-    (evil-local-set-key 'visual (kbd (car key)) nil)))
+  "Remove the `evil-mc' keys for normal and visual states."
+  (when (bound-and-true-p evil-mode)
+    (dolist (key evil-mc-keys)
+      (evil-mc-define-key 'evil-normal-state-local-map (kbd (car key)) nil)
+      (evil-mc-define-key 'evil-visual-state-local-map (kbd (car key)) nil))))
 
 (defun evil-mc-initialize-hooks ()
   "Initialize all hooks used by `evil-mc'."
-  (add-hook 'pre-command-hook 'evil-mc-begin-command-save nil t)
-  (add-hook 'post-command-hook 'evil-mc-finish-command-save t t)
-  (add-hook 'post-command-hook 'evil-mc-execute-for-all t t)
-  (advice-add 'evil-repeat-keystrokes :before #'evil-mc-save-keys-motion)
-  (advice-add 'evil-repeat-motion :before #'evil-mc-save-keys-operator))
+  (when (bound-and-true-p evil-mode)
+    (add-hook 'pre-command-hook 'evil-mc-begin-command-save nil t)
+    (add-hook 'post-command-hook 'evil-mc-finish-command-save t t)
+    (add-hook 'post-command-hook 'evil-mc-execute-for-all t t)
+    (advice-add 'evil-repeat-keystrokes :before #'evil-mc-save-keys-motion)
+    (advice-add 'evil-repeat-motion :before #'evil-mc-save-keys-operator)))
 
 (defun evil-mc-teardown-hooks ()
   "Teardown all hooks used by `evil-mc'."
-  (remove-hook 'pre-command-hook 'evil-mc-begin-command-save t)
-  (remove-hook 'post-command-hook 'evil-mc-finish-command-save t)
-  (remove-hook 'post-command-hook 'evil-mc-execute-for-all t)
-  (advice-remove 'evil-repeat-keystrokes #'evil-mc-save-keys-motion)
-  (advice-remove 'evil-repeat-motion #'evil-mc-save-keys-operator))
+  (when (bound-and-true-p evil-mode)
+    (remove-hook 'pre-command-hook 'evil-mc-begin-command-save t)
+    (remove-hook 'post-command-hook 'evil-mc-finish-command-save t)
+    (remove-hook 'post-command-hook 'evil-mc-execute-for-all t)
+    (advice-remove 'evil-repeat-keystrokes #'evil-mc-save-keys-motion)
+    (advice-remove 'evil-repeat-motion #'evil-mc-save-keys-operator)))
 
 (provide 'evil-mc)
 
