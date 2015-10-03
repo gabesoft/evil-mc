@@ -20,21 +20,6 @@
   "Hook to run before any cursor is created.
 Can be used to temporarily disable minor modes that don't play
 well with `evil-mc'."
-  (evil-mc-clear-paused-modes)
-
-  ;; TODO formalize disabling of unsupported minor modes
-  (when (bound-and-true-p flyspell-mode)
-    (flyspell-mode -1)
-    (push (lambda () (flyspell-mode 1)) evil-mc-custom-paused-modes))
-  (when (bound-and-true-p aggressive-indent-mode)
-    (aggressive-indent-mode -1)
-    (push (lambda () (aggressive-indent-mode 1)) evil-mc-custom-paused-modes))
-  (when (bound-and-true-p evil-jumper-mode)
-    (evil-jumper-mode -1)
-    (push (lambda () (evil-jumper-mode 1)) evil-mc-custom-paused-modes))
-  (when (bound-and-true-p yas-minor-mode)
-    (yas-minor-mode -1)
-    (push (lambda () (yas-minor-mode 1)) evil-mc-custom-paused-modes ))
   (when (or (bound-and-true-p web-mode) (eq major-mode 'web-mode))
     (smartchr/undo-web-mode)
     (push (lambda () (smartchr/init-web-mode)) evil-mc-custom-paused-modes))
@@ -47,11 +32,15 @@ well with `evil-mc'."
   (dolist (fn evil-mc-custom-paused-modes) (funcall fn))
   (evil-mc-clear-paused-modes))
 
-(add-hook 'evil-mc-after-cursors-deleted 'evil-mc-after-cursors-teardown-hook)
 (add-hook 'evil-mc-before-cursors-created 'evil-mc-before-cursors-setup-hook)
+(add-hook 'evil-mc-after-cursors-deleted 'evil-mc-after-cursors-teardown-hook)
 
 (defvar evil-mc-mode-line-prefix "€"
   "Override of the default mode line string for `evil-mc-mode'.")
+
+(defvar evil-mc-incompatible-minor-modes
+  '(flyspell-mode aggressive-indent-mode yas-minor-mode evil-jumper-mode)
+  "Override minor modes that are incompatible with `evil-mc-mode'.")
 
 (global-evil-mc-mode 1)
 

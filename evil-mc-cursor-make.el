@@ -4,12 +4,12 @@
 
 ;; This file contains functions for creating and deleting fake cursors
 
+;;; Code:
+
 (require 'evil-mc-common)
 (require 'evil-mc-vars)
 (require 'evil-mc-cursor-state)
 (require 'evil-mc-region)
-
-;;; Code:
 
 (defun evil-mc-get-cursor-face ()
   "Get the current cursor face."
@@ -119,11 +119,20 @@ the cursors are ordered by the cursor overlay start position."
                    'column (evil-mc-column-number pos)
                    'evil-markers-alist (default-value 'evil-markers-alist)
                    'evil-repeat-ring (make-ring 10)
-                   'kill-ring (copy-sequence kill-ring)
+                   'kill-ring (copy-tree kill-ring)
                    'kill-ring-yank-pointer nil
                    'overlay (evil-mc-cursor-overlay-at-pos pos))))
       (evil-mc-insert-cursor cursor)
       cursor)))
+
+;; (defun evil-mc-copy-real-cursor-state-to-cursor (cursor)
+;;   "Copies the real cursor state to CURSOR."
+;;   )
+
+;; (defun evil-mc-copy-cursor-state-to-real-cursor (cursor)
+;;   "Copies CURSOR state to the real cursor."
+;;   )
+
 
 (defun evil-mc-undo-cursor-at-pos (&optional pos)
   "Delete the cursor at POS from `evil-mc-cursor-list' and remove its overlay."

@@ -181,7 +181,7 @@ or `evil-downcase' command."
                   evil-this-register))
         ((evil-mc-char-region-p region)
          (let (new-kill-ring new-kill-ring-yank-pointer)
-           (let ((kill-ring (copy-sequence kill-ring))
+           (let ((kill-ring (copy-tree kill-ring))
                  (kill-ring-yank-pointer nil))
 
              (evil-mc-execute-evil-delete)

@@ -1,4 +1,6 @@
-;;; evil-mc.el --- Multiple cursors minor mode for evil
+;;; evil-mc.el --- Multiple cursors mode for evil
+
+;; Copyright © 2015 Gabriel Adomnicai <gabesoft@gmail.com>
 
 ;; Author: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Version: 0.0.1
@@ -6,9 +8,15 @@
 ;; Package-Requires ((emacs "24") (evil "1.2.5"))
 ;; Homepage: https://github.com/gabesoft/evil-mc
 ;;
-;; This file is not part of GNU Emacs.
+;; This file is NOT part of GNU Emacs.
 
 ;;; Commentary:
+
+;; This library provides multiple cursors functionality for evil-mode
+;;
+;; See documentation at https://github.com/gabesoft/evil-mc/blob/master/README.org
+
+;;; Code:
 
 (require 'evil)
 
@@ -22,13 +30,6 @@
 
 (eval-when-compile (require 'cl-lib))
 
-;;; Code:
-
-(defgroup evil-mc nil
-  "Multiple cursors implementation for evil mode."
-  :prefix "evil-mc-"
-  :group 'evil)
-
 (defcustom evil-mc-mode-line
   `(:eval (if (> (evil-mc-get-cursor-count) 1)
               (format ,(propertize " %s:%d" 'face 'cursor)
@@ -41,7 +42,7 @@
 (put 'evil-mc-mode-line 'risky-local-variable t)
 
 (define-minor-mode evil-mc-mode
-  "Minor mode for evil multiple cursors in a single uuffer."
+  "Minor mode for evil multiple cursors in a single buffer."
   :group 'evil-mc
   :init-value nil
   :lighter evil-mc-mode-line
@@ -77,6 +78,10 @@
 
   (defvar evil-mc-mode-line-prefix "emc"
     "The string used in the mode line to identify `evil-mc-mode'.")
+
+  (defvar evil-mc-incompatible-minor-modes
+    '(flyspell-mode aggressive-indent-mode yas-minor-mode)
+    "Minor modes that are incompatible with `evil-mc-mode'.")
 
   (evil-mc-clear-pattern)
   (evil-mc-clear-command)
@@ -130,12 +135,26 @@ overriden before enabling `evil-mc-mode' the first time.")
       (evil-mc-define-key 'evil-normal-state-local-map (kbd (car key)) nil)
       (evil-mc-define-key 'evil-visual-state-local-map (kbd (car key)) nil))))
 
+(defun evil-mc-pause-incompatible-modes ()
+  "Temporarily disable incompatible minor modes."
+  (dolist (mode evil-mc-incompatible-minor-modes)
+    (when (and (boundp mode) (eval mode))
+      (push mode evil-mc-paused-modes)
+      (funcall mode -1))))
+
+(defun evil-mc-resume-incompatible-modes ()
+  "Re-enable incompatible minor modes."
+  (dolist (mode evil-mc-paused-modes) (funcall mode 1))
+  (evil-mc-clear-paused-modes))
+
 (defun evil-mc-initialize-hooks ()
   "Initialize all hooks used by `evil-mc'."
   (when (bound-and-true-p evil-mode)
     (add-hook 'pre-command-hook 'evil-mc-begin-command-save nil t)
     (add-hook 'post-command-hook 'evil-mc-finish-command-save t t)
     (add-hook 'post-command-hook 'evil-mc-execute-for-all t t)
+    (add-hook 'evil-mc-before-cursors-created 'evil-mc-pause-incompatible-modes t t)
+    (add-hook 'evil-mc-after-cursors-deleted 'evil-mc-resume-incompatible-modes t t)
     (advice-add 'evil-repeat-keystrokes :before #'evil-mc-save-keys-motion)
     (advice-add 'evil-repeat-motion :before #'evil-mc-save-keys-operator)))
 
@@ -145,6 +164,8 @@ overriden before enabling `evil-mc-mode' the first time.")
     (remove-hook 'pre-command-hook 'evil-mc-begin-command-save t)
     (remove-hook 'post-command-hook 'evil-mc-finish-command-save t)
     (remove-hook 'post-command-hook 'evil-mc-execute-for-all t)
+    (remove-hook 'evil-mc-before-cursors-created 'evil-mc-pause-incompatible-modes t)
+    (remove-hook 'evil-mc-after-cursors-deleted 'evil-mc-resume-incompatible-modes t)
     (advice-remove 'evil-repeat-keystrokes #'evil-mc-save-keys-motion)
     (advice-remove 'evil-repeat-motion #'evil-mc-save-keys-operator)))
 

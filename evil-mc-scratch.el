@@ -211,7 +211,7 @@
 ;;   (setq evil-mc-cursor-list
 ;;         (cons (evil-mc-put-cursor-property nil
 ;;                                        'overlay overlay
-;;                                        'kill-ring (copy-sequence kill-ring)
+;;                                        'kill-ring (copy-tree kill-ring)
 ;;                                        'kill-ring-yank-pointer nil)
 ;;               evil-mc-cursor-list)))
 
@@ -1018,7 +1018,7 @@ otherwise execute BODY."
                   (funcall cmd keys-count evil-this-register))
                  ((evil-mc-char-region-p region)
                   (let (new-kill-ring new-kill-ring-yank-pointer)
-                    (let ((kill-ring (copy-sequence kill-ring))
+                    (let ((kill-ring (copy-tree kill-ring))
                           (kill-ring-yank-pointer nil))
 
                       (evil-mc-with-region-old region 'evil-delete)

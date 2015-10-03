@@ -6,6 +6,11 @@
 
 ;;; Code:
 
+(defgroup evil-mc nil
+  "Multiple cursors implementation for evil mode."
+  :prefix "evil-mc-"
+  :group 'evil)
+
 (defface evil-mc-cursor-default-face
   '((t (:inherit cursor :inverse-video nil)))
   "The face used for fake cursors."
@@ -229,6 +234,9 @@
 (evil-define-local-var evil-mc-recording-debug nil
   "If true display debug messages during the recording of a command.")
 
+(evil-define-local-var evil-mc-paused-modes nil
+  "List of temporarily disabled minor modes.")
+
 (defun evil-mc-known-command-p (cmd)
   "True if CMD is a supported command"
   (or (not (null (assq cmd evil-mc-known-commands)))
@@ -355,6 +363,10 @@
 (defun evil-mc-clear-recording-debug ()
   "Clear the `evil-mc-recording-debug' variable."
   (setq evil-mc-recording-debug nil))
+
+(defun evil-mc-clear-paused-modes ()
+  "Clear the `evil-mc-paused-modes' variable."
+  (setq evil-mc-paused-modes nil))
 
 (defun evil-mc-get-pattern ()
   "Return the current pattern."
