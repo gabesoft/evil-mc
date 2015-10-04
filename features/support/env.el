@@ -14,8 +14,7 @@
 (require 'cl)
 (require 'evil)
 (require 'evil-surround)
-;; (require 'evil-mc)
-(require 'evil-mc-scratch)
+(require 'evil-mc)
 (require 'espuds)
 (require 'ert)
 
@@ -27,13 +26,13 @@
  (switch-to-buffer (get-buffer-create "*evil-mc*"))
  (evil-surround-mode 1)
  (evil-mode 1)
- (evil-mc-init-mode)
+ (evil-mc-mode 1)
  (erase-buffer)
  (transient-mark-mode 1)
  (deactivate-mark))
 
 (After
- (evil-mc-remove-hooks)
+ (evil-mc-mode -1)
  )
 
 (Teardown
