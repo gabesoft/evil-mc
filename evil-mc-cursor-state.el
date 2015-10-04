@@ -8,6 +8,19 @@
 
 ;;; Code:
 
+(defun evil-mc-get-cursor-state-names (&optional categories)
+  "Gets the cursor state names for CATEGORIES.
+If categories is nil return all cursor state names."
+  (cond ((null categories)
+         (apply 'append (mapcar 'cdr evil-mc-cursor-state-names)))
+        ((atom categories)
+         (evil-mc-get-object-property evil-mc-cursor-state-names categories))
+        (t (apply 'append (mapcar (lambda (category)
+                                    (evil-mc-get-object-property
+                                     evil-mc-cursor-state-names
+                                     category))
+                                  categories)))))
+
 (defun evil-mc-get-cursor-property (cursor name)
   "Return the value of the CURSOR property with NAME."
   (when cursor (evil-mc-get-object-property cursor name)))

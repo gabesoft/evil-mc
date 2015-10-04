@@ -42,11 +42,12 @@
 (put 'evil-mc-mode-line 'risky-local-variable t)
 
 (define-minor-mode evil-mc-mode
-  "Minor mode for evil multiple cursors in a single buffer."
+  "Toggle evil multiple cursors in a single buffer."
   :group 'evil-mc
   :init-value nil
   :lighter evil-mc-mode-line
   (cond (evil-mc-mode
+         (evil-mc-define-vars)
          (evil-mc-initialize-vars)
          (evil-mc-initialize-keys)
          (evil-mc-initialize-hooks))
@@ -63,18 +64,18 @@
   "Enable `evil-mc-mode' in the current buffer."
   (evil-mc-mode 1))
 
-(defun turn-on-evil-mc-mode (&optional arg)
+(defun turn-on-evil-mc-mode ()
   "Turn on evil-mc mode in the current buffer."
   (interactive)
-  (evil-mc-mode (or arg 1)))
+  (evil-mc-mode 1))
 
-(defun turn-off-evil-mc-mode (&optional arg)
+(defun turn-off-evil-mc-mode ()
   "Turn off evil-mc mode in the current buffer."
   (interactive)
-  (evil-mc-mode (or arg -1)))
+  (evil-mc-mode -1))
 
-(defun evil-mc-initialize-vars ()
-  "Initialize all variables used by `evil-mc'."
+(defun evil-mc-define-vars ()
+  "Define vars that can be overridden before enabling `evil-mc-mode'."
 
   (defvar evil-mc-mode-line-prefix "emc"
     "The string used in the mode line to identify `evil-mc-mode'.")
@@ -83,6 +84,32 @@
     '(flyspell-mode aggressive-indent-mode yas-minor-mode)
     "Minor modes that are incompatible with `evil-mc-mode'.")
 
+  ;; TODO find better keys for skip-and-goto-next-cursor/skip-and-goto-prev-cursor
+  (defvar evil-mc-keys
+    '(("grm" . evil-mc-make-all-cursors)
+      ("gru" . evil-mc-undo-all-cursors)
+      ("grp" . evil-mc-pause-cursors)
+      ("grr" . evil-mc-resume-cursors)
+      ("grf" . evil-mc-make-and-goto-first-cursor)
+      ("grl" . evil-mc-make-and-goto-last-cursor)
+      ("grh" . evil-mc-make-cursor-here)
+      ("M-n" . evil-mc-make-and-goto-next-cursor)
+      (",m" . evil-mc-skip-and-goto-next-cursor)
+      ("M-p" . evil-mc-make-and-goto-prev-cursor)
+      (",l" . evil-mc-skip-and-goto-prev-cursor)
+      ("C-n" . evil-mc-make-and-goto-next-match)
+      (",n" . evil-mc-skip-and-goto-next-match)
+      ("C-t" . evil-mc-skip-and-goto-next-match)
+      ("C-p" . evil-mc-make-and-goto-prev-match)
+      (",p" . evil-mc-skip-and-goto-prev-match))
+    "Association list of key maps.
+Entries have the form (KEY . DEF), where KEY is the key
+that would trigger the `evil-mc' DEF.  The keys defined here
+will be set up in `normal' and `visual' mode. This can be
+overridden before enabling `evil-mc-mode' the first time."))
+
+(defun evil-mc-initialize-vars ()
+  "Initialize all variables used by `evil-mc'."
   (evil-mc-clear-pattern)
   (evil-mc-clear-command)
   (evil-mc-clear-executing-command)
@@ -99,29 +126,6 @@
 
 (defun evil-mc-initialize-keys ()
   "Setup the `evil-mc' keys for normal and visual states."
-
-  (defvar evil-mc-keys
-    '(("grm" . evil-mc-make-all-cursors)
-      ("gru" . evil-mc-undo-all-cursors)
-      ("grp" . evil-mc-pause-cursors)
-      ("grr" . evil-mc-resume-cursors)
-      ("grf" . evil-mc-make-and-goto-first-cursor)
-      ("grl" . evil-mc-make-and-goto-last-cursor)
-      ("grh" . evil-mc-make-cursor-here)
-      ("M-m" . evil-mc-make-and-goto-next-cursor)
-      (",m" . evil-mc-skip-and-goto-next-cursor)
-      ("M-l" . evil-mc-make-and-goto-prev-cursor)
-      (",l" . evil-mc-skip-and-goto-prev-cursor)
-      ("C-n" . evil-mc-make-and-goto-next-match)
-      (",n" . evil-mc-skip-and-goto-next-match)
-      ("C-t" . evil-mc-skip-and-goto-next-match)
-      ("C-p" . evil-mc-make-and-goto-prev-match)
-      (",p" . evil-mc-skip-and-goto-prev-match))
-    "Association list of key maps.
-Entries have the form (KEY . DEF), where KEY is the key
-that would trigger the `evil-mc' DEF.  The keys defined here
-will be set up in `normal' and `visual' mode. This can be
-overriden before enabling `evil-mc-mode' the first time.")
 
   (when (bound-and-true-p evil-mode)
     (dolist (key evil-mc-keys)

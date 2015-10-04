@@ -31,10 +31,12 @@
   :type 'integer
   :group 'evil-mc)
 
-(defvar evil-mc-cursor-state
+(defvar evil-mc-cursor-state-names
   '((:default . (column
                  evil-exchange--overlays
                  evil-exchange--position
+                 evil-jumper--window-jumps
+                 evil-jumper--jumping
                  evil-jump-list
                  evil-last-paste
                  evil-last-register
@@ -64,7 +66,7 @@
                  dabbrev--last-expansion
                  dabbrev--last-expansion-location
                  dabbrev--last-direction)))
-  "State tracked per cursor.")
+  "Names of variables tracked per cursor categorized by mode or set of commands.")
 
 (defvar evil-mc-known-commands
   '(
@@ -148,6 +150,7 @@
     (evil-open-below . ((:default . evil-mc-execute-default-call-with-count)))
     (evil-paste-after . ((:default . evil-mc-execute-default-evil-paste)))
     (evil-paste-before . ((:default . evil-mc-execute-default-evil-paste)))
+    (evil-paste-from-register . ((:default . evil-mc-execute-default-macro)))
     (evil-previous-line . ((:default . evil-mc-execute-default-prev-line) (:visual . evil-mc-execute-visual-prev-line)))
     (evil-previous-match . ((:default . evil-mc-execute-default-call-with-count) (:visual . evil-mc-execute-visual-text-object)))
     (evil-repeat . ((:default . evil-mc-execute-default-call-with-count)))
@@ -203,6 +206,9 @@
 
     )
   "A list of the supported commands and their handlers")
+
+(evil-define-local-var evil-mc-cursor-state nil
+  "Real cursor saved state.")
 
 (evil-define-local-var evil-mc-executing-command nil
   "True when executing a command for all cursors.")
@@ -367,6 +373,10 @@
 (defun evil-mc-clear-paused-modes ()
   "Clear the `evil-mc-paused-modes' variable."
   (setq evil-mc-paused-modes nil))
+
+(defun evil-mc-clear-cursor-state ()
+  "Clear the `evil-mc-cursor-state' variable."
+  (setq evil-mc-cursor-state nil))
 
 (defun evil-mc-get-pattern ()
   "Return the current pattern."

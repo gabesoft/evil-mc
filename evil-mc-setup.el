@@ -18,8 +18,8 @@
 
 (defun evil-mc-before-cursors-setup-hook ()
   "Hook to run before any cursor is created.
-Can be used to temporarily disable minor modes that don't play
-well with `evil-mc'."
+Can be used to temporarily disable any functionality that doesn't
+play well with `evil-mc'."
   (when (or (bound-and-true-p web-mode) (eq major-mode 'web-mode))
     (smartchr/undo-web-mode)
     (push (lambda () (smartchr/init-web-mode)) evil-mc-custom-paused-modes))
@@ -37,10 +37,6 @@ well with `evil-mc'."
 
 (defvar evil-mc-mode-line-prefix "€"
   "Override of the default mode line string for `evil-mc-mode'.")
-
-(defvar evil-mc-incompatible-minor-modes
-  '(flyspell-mode aggressive-indent-mode yas-minor-mode evil-jumper-mode)
-  "Override minor modes that are incompatible with `evil-mc-mode'.")
 
 (global-evil-mc-mode 1)
 

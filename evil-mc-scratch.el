@@ -961,10 +961,10 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-commentary)
            (evil-mc-with-region-old region
-                                (lambda (start end)
-                                  (goto-char start)
-                                  (evil-commentary start end))
-                                (execute-kbd-macro keys-vector)))
+                                    (lambda (start end)
+                                      (goto-char start)
+                                      (evil-commentary start end))
+                                    (execute-kbd-macro keys-vector)))
 
           ((eq cmd 'evil-find-char) (evil-repeat-find-char))
           ((eq cmd 'newline-and-indent) (newline-and-indent))
@@ -979,18 +979,18 @@ otherwise execute BODY."
 
           ((eq cmd 'evil-delete-char)
            (evil-mc-with-region-old region 'evil-delete-char
-                                (execute-kbd-macro keys-vector-with-register)))
+                                    (execute-kbd-macro keys-vector-with-register)))
 
           ((eq cmd 'evil-delete-line)
            (evil-mc-with-region-old region 'evil-delete-line
-                                (execute-kbd-macro keys-vector-with-register)))
+                                    (execute-kbd-macro keys-vector-with-register)))
 
           ((eq cmd 'evil-join)
            (evil-mc-with-region-old region
-                                (lambda (start end)
-                                  (goto-char start)
-                                  (evil-join start end))
-                                (execute-kbd-macro keys-vector-with-register)))
+                                    (lambda (start end)
+                                      (goto-char start)
+                                      (evil-join start end))
+                                    (execute-kbd-macro keys-vector-with-register)))
 
           ((eq cmd 'electric-newline-and-maybe-indent) (electric-newline-and-maybe-indent))
 
@@ -1058,9 +1058,16 @@ otherwise execute BODY."
           ;; ((eq cmd 'evil-goto-mark-line) (evil-goto-mark-line last-input))
 
           ;; (evil-mc-get-property-region 6)
+          ;; copied - (evil-mc-get-property-region 6)
+          ;; set marker set last property
           ;; (evil-mc-get-overlay-cursor 6)
+          ;; copied - (evil-mc-get-overlay-cursor 6)
+          ;; goto mark goto last overlay
           ;; (evil-mc-get-property-region 5)
+          ;; copied - (evil-mc-get-property-region 5)
+          ;; goto mark goto last property
           ;; (evil-mc-get-overlay-cursor 5)
+          ;; copied - (evil-mc-get-overlay-cursor 5)
 
           ((eq cmd 'evil-normal-state)
            (evil-insert 1)
@@ -1089,14 +1096,14 @@ otherwise execute BODY."
                   (execute-kbd-macro keys-vector-with-register))
                  (t
                   (evil-mc-with-region-old region
-                                       (lambda (start end)
-                                         (goto-char (min (evil-mc-get-region-mark region)
-                                                         (evil-mc-get-region-point region)))
-                                         (evil-yank
-                                          start
-                                          end
-                                          region-type
-                                          evil-this-register))))
+                                           (lambda (start end)
+                                             (goto-char (min (evil-mc-get-region-mark region)
+                                                             (evil-mc-get-region-point region)))
+                                             (evil-yank
+                                              start
+                                              end
+                                              region-type
+                                              evil-this-register))))
                  ;; ((evil-mc-line-region-p region)
                  ;;  (execute-kbd-macro (vconcat keys-register [?y ?y])))
                  ))
@@ -1106,12 +1113,12 @@ otherwise execute BODY."
                   (execute-kbd-macro keys-vector-with-register))
                  (t
                   (evil-mc-with-region-old region
-                                       (lambda (start end)
-                                         (evil-delete
-                                          start
-                                          end
-                                          region-type
-                                          evil-this-register)))))
+                                           (lambda (start end)
+                                             (evil-delete
+                                              start
+                                              end
+                                              region-type
+                                              evil-this-register)))))
            ;; ((evil-mc-line-region-p region)
            ;;  (execute-kbd-macro (vconcat keys-register [?d ?d]))))
            (when (eolp) (evil-end-of-line)))
@@ -1125,13 +1132,13 @@ otherwise execute BODY."
                       (execute-kbd-macro keys-vector-with-register))
                      (t
                       (evil-mc-with-region-old region
-                                           (lambda (start end)
-                                             (evil-forward-char)
-                                             (evil-delete
-                                              start
-                                              end
-                                              region-type
-                                              evil-this-register))))))))
+                                               (lambda (start end)
+                                                 (evil-forward-char)
+                                                 (evil-delete
+                                                  start
+                                                  end
+                                                  region-type
+                                                  evil-this-register))))))))
           ;; ((evil-mc-line-region-p region)
           ;;  (evil-forward-char)
           ;;  (execute-kbd-macro (vconcat keys-register [?c ?c])))))))
@@ -1184,28 +1191,28 @@ otherwise execute BODY."
     ;; (message "after %s evil-this-register %s" (evil-mc-get-cursor-start cursor) evil-this-register)
     ;; (message "after %s register-alist %s" (evil-mc-get-cursor-start cursor) register-alist)
     (evil-mc-put-cursor-property cursor
-                             'column next-column
-                             'evil-markers-alist evil-markers-alist
-                             'evil-jump-list evil-jump-list
-                             'mark-ring mark-ring
-                             'mark-evil-active mark-active
-                             'dabbrev--friend-buffer-list dabbrev--friend-buffer-list
-                             'dabbrev--last-buffer dabbrev--last-buffer
-                             'dabbrev--last-buffer-found dabbrev--last-buffer-found
-                             'dabbrev--last-table dabbrev--last-table
-                             'dabbrev--last-abbrev-location dabbrev--last-abbrev-location
-                             'dabbrev--last-abbreviation dabbrev--last-abbreviation
-                             'dabbrev--last-expansion dabbrev--last-expansion
-                             'dabbrev--last-expansion-location dabbrev--last-expansion-location
-                             'dabbrev--last-direction dabbrev--last-direction
-                             'evil-last-paste evil-last-paste
-                             'evil-last-register evil-last-register
-                             'evil-this-register evil-this-register
-                             'evil-was-yanked-without-register evil-was-yanked-without-register
-                             'register-alist register-alist
-                             'kill-ring kill-ring
-                             'kill-ring-yank-pointer kill-ring-yank-pointer
-                             'region nil)))
+                                 'column next-column
+                                 'evil-markers-alist evil-markers-alist
+                                 'evil-jump-list evil-jump-list
+                                 'mark-ring mark-ring
+                                 'mark-evil-active mark-active
+                                 'dabbrev--friend-buffer-list dabbrev--friend-buffer-list
+                                 'dabbrev--last-buffer dabbrev--last-buffer
+                                 'dabbrev--last-buffer-found dabbrev--last-buffer-found
+                                 'dabbrev--last-table dabbrev--last-table
+                                 'dabbrev--last-abbrev-location dabbrev--last-abbrev-location
+                                 'dabbrev--last-abbreviation dabbrev--last-abbreviation
+                                 'dabbrev--last-expansion dabbrev--last-expansion
+                                 'dabbrev--last-expansion-location dabbrev--last-expansion-location
+                                 'dabbrev--last-direction dabbrev--last-direction
+                                 'evil-last-paste evil-last-paste
+                                 'evil-last-register evil-last-register
+                                 'evil-this-register evil-this-register
+                                 'evil-was-yanked-without-register evil-was-yanked-without-register
+                                 'register-alist register-alist
+                                 'kill-ring kill-ring
+                                 'kill-ring-yank-pointer kill-ring-yank-pointer
+                                 'region nil)))
 
 ;; (defun evil-mc-process-last-command-result (input)
 ;;   "Convert the INPUT of the last command into the expected format."

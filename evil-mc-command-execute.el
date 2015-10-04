@@ -477,14 +477,10 @@ by the value of `evil-this-register'."
 
 (defun evil-mc-get-state-variables (handler)
   "Get all cursor variables required to hold state for HANDLER."
-  (let ((names (evil-get-command-property handler :cursor-state)))
-    (when (atom names)
-      (setq names (list names)))
-    (when (not (memq :default names))
-      (push :default names))
-    (apply 'append (mapcar (lambda (name)
-                             (evil-mc-get-object-property evil-mc-cursor-state name))
-                           names))))
+  (let ((categories (evil-get-command-property handler :cursor-state)))
+    (when (atom categories) (setq categories (list categories)))
+    (when (not (memq :default categories)) (push :default categories))
+    (evil-mc-get-cursor-state-names categories)))
 
 (defun evil-mc-get-clear-variables (handler)
   "Get all cursor variables that should be cleared after HANDLER."
@@ -508,6 +504,7 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
 
           (goto-char (evil-mc-get-cursor-start cursor))
 
+          (evil-jump-hook (evil-mc-get-command-name))
           (evil-repeat-pre-hook)
           (funcall handler)
           (evil-repeat-post-hook)

@@ -65,6 +65,33 @@
                 (< (evil-mc-get-cursor-start x)
                    (evil-mc-get-cursor-start y))))))
 
+(defun evil-mc-copy-cursor-state (from &optional to)
+  "Copy all state FROM cursor to TO cursor."
+  (let ((names (evil-mc-get-cursor-state-names)))
+    (dolist (name names)
+      (setq to (evil-mc-put-cursor-property
+                to
+                name
+                (copy-tree (evil-mc-get-cursor-property from name)))))
+    to))
+
+(defun evil-mc-read-cursor-state (&optional state)
+  "Read the state of the real cursor into STATE."
+  (let ((names (evil-mc-get-cursor-state-names)))
+    (dolist (name names)
+      (when (boundp name)
+        (setq state (evil-mc-put-cursor-property state
+                                                 name
+                                                 (symbol-value name)))))
+    state))
+
+(defun evil-mc-write-cursor-state (state)
+  "Write the state of the real cursor with values from STATE."
+  (let ((names (evil-mc-get-cursor-state-names)))
+    (dolist (name names)
+      (when (boundp name)
+        (set name (evil-mc-get-cursor-property state name))))))
+
 (defun evil-mc-insert-cursor-into-list (cursor cursor-list)
   "Insert CURSOR into CURSOR-LIST at the correct location so that
 the cursors are ordered by the cursor overlay start position."
@@ -106,45 +133,46 @@ the cursors are ordered by the cursor overlay start position."
     (let ((start (evil-mc-get-cursor-start cursor)))
       (evil-mc-delete-cursor cursor)
       (setq evil-mc-cursor-list (delq cursor evil-mc-cursor-list))
-      start)))
+      cursor)))
 
-(defun evil-mc-make-cursor-at-pos (&optional pos)
-  "Make a cursor at POS and add it to `evil-mc-cursor-list'."
+(defun evil-mc-get-default-cursor ()
+  "Return a new cursor with all default properties initialized."
+  (evil-mc-put-cursor-property
+   nil
+   'evil-markers-alist (default-value 'evil-markers-alist)
+   'evil-repeat-ring (make-ring 10)
+   'evil-jumper--window-jumps (make-hash-table)
+   'kill-ring (copy-tree kill-ring)))
+
+(defun evil-mc-make-cursor-at-pos (pos &optional source-cursor)
+  "Make a cursor at POS and add it to `evil-mc-cursor-list'.
+If SOURCE-CURSOR is specified copy its state onto the new cursor"
   (let ((evil-jump-list nil)
-        (first-cursor (not (evil-mc-has-cursors-p)))
-        (pos (or pos (point))))
+        (first-cursor (not (evil-mc-has-cursors-p))))
     (when first-cursor (evil-mc-cursors-before))
-    (let ((cursor (evil-mc-put-cursor-property
-                   nil
-                   'column (evil-mc-column-number pos)
-                   'evil-markers-alist (default-value 'evil-markers-alist)
-                   'evil-repeat-ring (make-ring 10)
-                   'kill-ring (copy-tree kill-ring)
-                   'kill-ring-yank-pointer nil
-                   'overlay (evil-mc-cursor-overlay-at-pos pos))))
+    (let* ((source (evil-mc-copy-cursor-state
+                    (or source-cursor (evil-mc-get-default-cursor))))
+           (cursor (evil-mc-put-cursor-property
+                    source
+                    'column (evil-mc-column-number pos)
+                    'overlay (evil-mc-cursor-overlay-at-pos pos))))
       (evil-mc-insert-cursor cursor)
       cursor)))
 
-;; (defun evil-mc-copy-real-cursor-state-to-cursor (cursor)
-;;   "Copies the real cursor state to CURSOR."
-;;   )
-
-;; (defun evil-mc-copy-cursor-state-to-real-cursor (cursor)
-;;   "Copies CURSOR state to the real cursor."
-;;   )
-
-
-(defun evil-mc-undo-cursor-at-pos (&optional pos)
-  "Delete the cursor at POS from `evil-mc-cursor-list' and remove its overlay."
-  (interactive)
-  (let ((pos (or pos (point))))
+(defun evil-mc-undo-cursor-at-pos (pos)
+  "Delete the cursor at POS from `evil-mc-cursor-list' and remove its overlay.
+Return the deleted cursor."
+  (let ((pos (or pos (point)))
+        (found nil))
     (when evil-mc-cursor-list
       (setq evil-mc-cursor-list
             (remove-if (lambda (cursor)
-                         (let* ((overlay (evil-mc-get-cursor-overlay cursor))
-                                (match (eq pos (overlay-start overlay))))
-                           (when match (delete-overlay overlay) t)))
-                       evil-mc-cursor-list)))))
+                         (when (eq pos (evil-mc-get-cursor-start cursor))
+                           (evil-mc-delete-cursor cursor)
+                           (setq found cursor)
+                           t))
+                       evil-mc-cursor-list)))
+    found))
 
 (defun evil-mc-find-prev-cursor (&optional pos)
   "Find the cursor closest to POS when searching backwards."
@@ -209,7 +237,7 @@ the cursors are ordered by the cursor overlay start position."
         (goto-char (point-min))
         (while (eq (evil-ex-find-next (evil-mc-get-pattern) 'forward t) t)
           (goto-char (1- (point)))
-          (when (/= point (point)) (evil-mc-make-cursor-at-pos))
+          (when (/= point (point)) (evil-mc-make-cursor-at-pos (point)))
           (goto-char (1+ (point))))))))
 
 (defun evil-mc-goto-cursor (cursor create)
@@ -219,8 +247,9 @@ the cursors are ordered by the cursor overlay start position."
           (point (point)))
       (when (and cursor (/= start point))
         (goto-char start)
-        (when create (evil-mc-make-cursor-at-pos point))
-        (evil-mc-undo-cursor cursor)
+        (when create
+          (evil-mc-make-cursor-at-pos point (evil-mc-read-cursor-state)))
+        (evil-mc-write-cursor-state (evil-mc-undo-cursor cursor))
         (unless (evil-mc-has-cursors-p) (evil-mc-cursors-after))))))
 
 (defun evil-mc-goto-match (direction create)
@@ -245,8 +274,9 @@ and optionally CREATE a cursor at point."
         (goto-char point)
         (message "No more matches found for %s" (evil-mc-get-pattern-text)))
       (when (and found create (/= point (point)))
-        (evil-mc-make-cursor-at-pos point))
-      (evil-mc-undo-cursor-at-pos)
+        (evil-mc-make-cursor-at-pos point (evil-mc-read-cursor-state)))
+      (evil-mc-write-cursor-state (or (evil-mc-undo-cursor-at-pos (point))
+                                      (evil-mc-get-default-cursor)))
       (unless (evil-mc-has-cursors-p) (evil-mc-clear-pattern))
       (when (and had-cursors (not (evil-mc-has-cursors-p)))
         (evil-mc-cursors-after)))))
@@ -276,7 +306,7 @@ and optionally CREATE a cursor at point."
 (evil-define-command evil-mc-make-cursor-here ()
   "Create a cursor at point."
   :repeat ignore
-  (evil-mc-make-cursor-at-pos))
+  (evil-mc-make-cursor-at-pos (point)))
 
 (evil-define-command evil-mc-make-and-goto-first-cursor ()
   "Make a cursor at point and move point to the cursor with the lowest position."
@@ -332,14 +362,17 @@ closest to it when searching forwards."
 
 (defun evil-mc-cursors-before ()
   "Actions to be executed before any cursors are created."
+  (setq evil-mc-cursor-state (evil-mc-read-cursor-state nil))
+  (evil-mc-write-cursor-state (evil-mc-get-default-cursor))
   (run-hooks 'evil-mc-before-cursors-created))
 
 (defun evil-mc-cursors-after ()
   "Actions to be executed after all cursors are deleted."
+  (evil-mc-write-cursor-state evil-mc-cursor-state)
   (evil-mc-clear-pattern)
   (evil-mc-clear-cursor-list)
-  (run-hooks 'evil-mc-after-cursors-deleted)
-  (message "All cursors cleared"))
+  (evil-mc-clear-cursor-state)
+  (run-hooks 'evil-mc-after-cursors-deleted))
 
 (evil-define-command evil-mc-undo-all-cursors ()
   "Delete all cursors and remove them from `evil-mc-cursor-list'."
