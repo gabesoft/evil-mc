@@ -467,6 +467,7 @@ by the value of `evil-this-register'."
 
 (defun evil-mc-get-command-handler (cmd state)
   "Get the handler function for CMD and evil STATE."
+  (when (symbolp cmd) (setq cmd (intern (symbol-name cmd))))
   (let* ((handler-data (evil-mc-get-object-property evil-mc-known-commands cmd))
          (handler (evil-mc-get-object-property handler-data state)))
     (or handler

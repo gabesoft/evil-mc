@@ -300,6 +300,10 @@ CLOSED: [2015-09-30 Wed 22:43]
 *** project name
 *** documentation
 ** TODO Rename private methods with --
-** TODO Formalize disabled minor modes
+** DONE Formalize disabled minor modes
+CLOSED: [2015-10-04 Sun 12:29]
+** TODO Implement evil-paste-pop and evil-paste-pop-next
+*** this cannot be implemented until there's undo per cursor
+- see evil-undo-pop used by evil-paste-pop
 
 

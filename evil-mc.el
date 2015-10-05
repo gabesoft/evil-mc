@@ -84,6 +84,9 @@
     '(flyspell-mode aggressive-indent-mode yas-minor-mode)
     "Minor modes that are incompatible with `evil-mc-mode'.")
 
+  (defvar evil-mc-custom-known-commands nil
+    "TODO: doc")
+
   ;; TODO find better keys for skip-and-goto-next-cursor/skip-and-goto-prev-cursor
   (defvar evil-mc-keys
     '(("grm" . evil-mc-make-all-cursors)
