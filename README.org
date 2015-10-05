@@ -12,3 +12,10 @@
 #+TITLE: evil-mc
 
 ** Multiple cursors implementation for evil-mode
+*** Synopsis
+*** Usage
+**** Local Setup
+**** Global Setup
+**** Commands
+**** Customization
+*** Limitations

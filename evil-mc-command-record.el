@@ -16,6 +16,7 @@
   (setq evil-mc-command nil)
   (setq evil-mc-recording-command nil))
 
+;; TODO use `evil-state' and remove this method
 (defun evil-mc-get-evil-state ()
   "Get the current evil state."
   (cond ((evil-insert-state-p) :insert)
