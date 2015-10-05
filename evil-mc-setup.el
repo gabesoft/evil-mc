@@ -9,12 +9,8 @@
 
 (require 'evil-mc)
 
-(evil-define-local-var evil-mc-temporarily-disabled-functionality nil
-  "Store for temporarily disabled functionality when there are multiple cursors active.")
-
-(defun evil-mc-clear-paused-modes ()
-  "Clear the `evil-mc-temporarily-disabled-functionality' variable."
-  (setq evil-mc-temporarily-disabled-functionality nil))
+(evil-define-local-var evil-mc-custom-paused nil
+  "Custom paused functionality when there are multiple cursors active.")
 
 (defun evil-mc-before-cursors-setup-hook ()
   "Hook to run before any cursor is created.
@@ -22,17 +18,15 @@ Can be used to temporarily disable any functionality that doesn't
 play well with `evil-mc'."
   (when (or (bound-and-true-p web-mode) (eq major-mode 'web-mode))
     (smartchr/undo-web-mode)
-    (push (lambda () (smartchr/init-web-mode)) evil-mc-temporarily-disabled-functionality))
+    (push (lambda () (smartchr/init-web-mode)) evil-mc-custom-paused))
   (when (or (bound-and-true-p js2-mode) (eq major-mode 'js2-mode))
     (smartchr/undo-js2-mode)
-    (push (lambda () (smartchr/init-js2-mode)) evil-mc-temporarily-disabled-functionality)))
-
-;; TODO temporarily disable the paste micro state
+    (push (lambda () (smartchr/init-js2-mode)) evil-mc-custom-paused)))
 
 (defun evil-mc-after-cursors-teardown-hook ()
   "Hook to run after all cursors are deleted."
-  (dolist (fn evil-mc-temporarily-disabled-functionality) (funcall fn))
-  (evil-mc-clear-paused-modes))
+  (dolist (fn evil-mc-custom-paused) (funcall fn))
+  (setq evil-mc-custom-paused nil))
 
 (add-hook 'evil-mc-before-cursors-created 'evil-mc-before-cursors-setup-hook)
 (add-hook 'evil-mc-after-cursors-deleted 'evil-mc-after-cursors-teardown-hook)

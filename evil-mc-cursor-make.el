@@ -142,22 +142,20 @@ the cursors are ordered by the cursor overlay start position."
    'evil-markers-alist (default-value 'evil-markers-alist)
    'evil-repeat-ring (make-ring 10)
    'evil-jumper--window-jumps (make-hash-table)
+   'evil-jump-list nil
    'kill-ring (copy-tree kill-ring)))
 
 (defun evil-mc-make-cursor-at-pos (pos &optional source-cursor)
   "Make a cursor at POS and add it to `evil-mc-cursor-list'.
 If SOURCE-CURSOR is specified copy its state onto the new cursor"
-  (let ((evil-jump-list nil)
-        (first-cursor (not (evil-mc-has-cursors-p))))
-    (when first-cursor (evil-mc-cursors-before))
-    (let* ((source (evil-mc-copy-cursor-state
-                    (or source-cursor (evil-mc-get-default-cursor))))
-           (cursor (evil-mc-put-cursor-property
-                    source
-                    'column (evil-mc-column-number pos)
-                    'overlay (evil-mc-cursor-overlay-at-pos pos))))
-      (evil-mc-insert-cursor cursor)
-      cursor)))
+  (let* ((source (evil-mc-copy-cursor-state
+                  (or source-cursor (evil-mc-get-default-cursor))))
+         (cursor (evil-mc-put-cursor-property
+                  source
+                  'column (evil-mc-column-number pos)
+                  'overlay (evil-mc-cursor-overlay-at-pos pos))))
+    (evil-mc-insert-cursor cursor)
+    cursor))
 
 (defun evil-mc-undo-cursor-at-pos (pos)
   "Delete the cursor at POS from `evil-mc-cursor-list' and remove its overlay.
@@ -237,7 +235,9 @@ Return the deleted cursor."
         (goto-char (point-min))
         (while (eq (evil-ex-find-next (evil-mc-get-pattern) 'forward t) t)
           (goto-char (1- (point)))
-          (when (/= point (point)) (evil-mc-make-cursor-at-pos (point)))
+          (when (/= point (point))
+            (evil-mc-run-cursors-before)
+            (evil-mc-make-cursor-at-pos (point)))
           (goto-char (1+ (point))))))))
 
 (defun evil-mc-goto-cursor (cursor create)
@@ -248,9 +248,10 @@ Return the deleted cursor."
       (when (and cursor (/= start point))
         (goto-char start)
         (when create
+          (evil-mc-run-cursors-before)
           (evil-mc-make-cursor-at-pos point (evil-mc-read-cursor-state)))
         (evil-mc-write-cursor-state (evil-mc-undo-cursor cursor))
-        (unless (evil-mc-has-cursors-p) (evil-mc-cursors-after))))))
+        (evil-mc-run-cursors-after t)))))
 
 (defun evil-mc-goto-match (direction create)
   "Move point to the next match according to DIRECTION
@@ -274,12 +275,12 @@ and optionally CREATE a cursor at point."
         (goto-char point)
         (message "No more matches found for %s" (evil-mc-get-pattern-text)))
       (when (and found create (/= point (point)))
+        (evil-mc-run-cursors-before)
         (evil-mc-make-cursor-at-pos point (evil-mc-read-cursor-state)))
       (evil-mc-write-cursor-state (or (evil-mc-undo-cursor-at-pos (point))
                                       (evil-mc-get-default-cursor)))
       (unless (evil-mc-has-cursors-p) (evil-mc-clear-pattern))
-      (when (and had-cursors (not (evil-mc-has-cursors-p)))
-        (evil-mc-cursors-after)))))
+      (evil-mc-run-cursors-after had-cursors))))
 
 (defun evil-mc-find-and-goto-cursor (find create)
   "FIND a cursor, go to it, and optionally CREATE a cursor at point."
@@ -360,6 +361,16 @@ closest to it when searching forwards."
   :repeat ignore
   (evil-mc-find-and-goto-match 'backward t))
 
+(defun evil-mc-run-cursors-before ()
+  "Runs `evil-mc-cursors-before' if there are no cursors created yet."
+  (when (not (evil-mc-has-cursors-p))
+    (evil-mc-cursors-before)))
+
+(defun evil-mc-run-cursors-after (had-cursors)
+  "Runs `evil-mc-cursors-after' if HAD-CURSORS and there are no more cursors."
+  (when (and had-cursors (not (evil-mc-has-cursors-p)))
+    (evil-mc-cursors-after)))
+
 (defun evil-mc-cursors-before ()
   "Actions to be executed before any cursors are created."
   (setq evil-mc-cursor-state (evil-mc-read-cursor-state nil))
@@ -368,7 +379,6 @@ closest to it when searching forwards."
 
 (defun evil-mc-cursors-after ()
   "Actions to be executed after all cursors are deleted."
-  (evil-mc-write-cursor-state evil-mc-cursor-state)
   (evil-mc-clear-pattern)
   (evil-mc-clear-cursor-list)
   (evil-mc-clear-cursor-state)

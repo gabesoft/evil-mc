@@ -85,9 +85,11 @@
     "Minor modes that are incompatible with `evil-mc-mode'.")
 
   (defvar evil-mc-custom-known-commands nil
-    "TODO: doc")
+    "Custom command handlers. The entries here should have
+the same form as those in `evil-mc-known-commands'.
+This variable can be used to override default command handlers
+implementations.")
 
-  ;; TODO find better keys for skip-and-goto-next-cursor/skip-and-goto-prev-cursor
   (defvar evil-mc-keys
     '(("grm" . evil-mc-make-all-cursors)
       ("gru" . evil-mc-undo-all-cursors)
@@ -97,9 +99,9 @@
       ("grl" . evil-mc-make-and-goto-last-cursor)
       ("grh" . evil-mc-make-cursor-here)
       ("M-n" . evil-mc-make-and-goto-next-cursor)
-      (",m" . evil-mc-skip-and-goto-next-cursor)
+      (",N" . evil-mc-skip-and-goto-next-cursor)
       ("M-p" . evil-mc-make-and-goto-prev-cursor)
-      (",l" . evil-mc-skip-and-goto-prev-cursor)
+      (",P" . evil-mc-skip-and-goto-prev-cursor)
       ("C-n" . evil-mc-make-and-goto-next-match)
       (",n" . evil-mc-skip-and-goto-next-match)
       ("C-t" . evil-mc-skip-and-goto-next-match)
@@ -108,8 +110,7 @@
     "Association list of key maps.
 Entries have the form (KEY . DEF), where KEY is the key
 that would trigger the `evil-mc' DEF.  The keys defined here
-will be set up in `normal' and `visual' mode. This can be
-overridden before enabling `evil-mc-mode' the first time."))
+will be set up in `normal' and `visual' mode."))
 
 (defun evil-mc-initialize-vars ()
   "Initialize all variables used by `evil-mc'."

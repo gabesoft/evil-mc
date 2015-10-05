@@ -69,9 +69,7 @@
   "Names of variables tracked per cursor categorized by mode or set of commands.")
 
 (defvar evil-mc-known-commands
-  '(
-
-    (backward-delete-char-untabify . ((:default . evil-mc-execute-default-call-with-count)))
+  '((backward-delete-char-untabify . ((:default . evil-mc-execute-default-call-with-count)))
     (company-complete-selection . ((:default . evil-mc-execute-default-call)))
     (company-select-next . ((:default . evil-mc-execute-default-ignore)))
     (copy-to-the-end-of-line . ((:default . evil-mc-execute-default-call)))
@@ -214,11 +212,11 @@
     (yaml-electric-backspace . ((:default . evil-mc-execute-default-call-with-count)))
     (yaml-electric-bar-and-angle . ((:default . evil-mc-execute-default-call-with-count)))
     (yaml-electric-dash-and-dot . ((:default . evil-mc-execute-default-call-with-count)))
-    (yank . ((:default . evil-mc-execute-default-call)))
-
-
-    )
-  "A list of the supported commands and their handlers")
+    (yank . ((:default . evil-mc-execute-default-call))))
+  "A list of the supported commands and their handlers.
+Entries have the form (NAME . HANDLERS), where handlers is a list of entries of
+the form (STATE . HANDLER).  The state can be any evil state name or `:default'
+which will be used if no entry matching the current state is found.")
 
 (evil-define-local-var evil-mc-cursor-state nil
   "Real cursor saved state.")

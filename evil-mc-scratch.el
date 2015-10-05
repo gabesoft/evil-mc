@@ -1054,9 +1054,13 @@ otherwise execute BODY."
           ;; see evil-jump-backward/evil-jump-forward
           ;; - disable evil-jumper-mode
           ;; ((eq cmd 'evil-set-marker) (evil-set-marker last-input))
+          ;; "eq cmd 'evil-set-marker"[ eq cmd 'evil-set-marker ]
           ;; ((eq cmd 'evil-goto-mark) (evil-goto-mark last-input))
+          ;; "eq cmd 'evil-goto-mark"[ eq cmd 'evil-goto-mark ]
           ;; ((eq cmd 'evil-goto-mark-line) (evil-goto-mark-line last-input))
+          ;; "eq cmd 'evil-goto-mark-line"[ eq cmd 'evil-goto-mark-line ]
 
+          ;; evil-jumper--window-jumps
           ;; (evil-mc-get-property-region 6)
           ;; copied - (evil-mc-get-property-region 6)
           ;; set marker set last property
