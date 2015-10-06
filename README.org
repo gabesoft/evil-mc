@@ -20,13 +20,13 @@ Start with:
  (require 'evil-mc)
 #+END_SRC
 **** Local Setup
-To enable or disable *evil-mc mode* for a single buffer use:\\
+To enable or disable *evil-mc* mode for a single buffer use:\\
 (/Use a positive number to enable it or a negative one to disable it/)
 #+BEGIN_SRC emacs-lisp
 (evil-mc-mode 1)
 #+END_SRC
 **** Global Setup
-To enable or disable *evil-mc mode* for all buffers use:\\
+To enable or disable *evil-mc* mode for all buffers use:\\
 (/Use a positive number to enable it or a negative one to disable it/)
 #+BEGIN_SRC emacs-lisp
 (global-evil-mc-mode 1)
@@ -40,7 +40,22 @@ evil-mc-make-all-cursors
 
 evil-mc-undo-all-cursors
 ;; removes all cursors
+
+evil-mc-make-and-goto-next-match
+;; makes a cursor at point and goes to the next match of the 
+;; selected region or the symbol under cursor
+
+evil-mc-skip-and-goto-next-match
+;; goes to the next match of the selected region or the symbol under 
+;; cursor without creating a cursor at point
 #+END_SRC
+
+*evil-mc* comes with some default key bindings for the above commands, 
+specified in the ~evil-mc-keys~ variable. That variable can be defined
+just before enabling the mode for the first time with the key bindings of
+your liking.
+
+For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
 **** Commands
 **** Customization
 *** Limitations
