@@ -86,12 +86,6 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 ;; without making a cursor at point. This command can be used to
 ;; remove unwanted cursors.
 
-(evil-mc-make-and-goto-first-cursor)
-;; Make a cursor at point and move point to the cursor at the first position.
-
-(evil-mc-make-and-goto-last-cursor)
-;; Make a cursor at point and move point to the cursor at the last position.
-
 (evil-mc-make-and-goto-prev-cursor)
 ;; Make a cursor at point and move point to the cursor
 ;; closest to it when searching backwards.
@@ -110,8 +104,14 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 ;; without making a cursor at point. This command can be used to
 ;; remove unwanted cursors.
 
+(evil-mc-make-and-goto-first-cursor)
+;; Make a cursor at point and move point to the cursor at the first position.
+
+(evil-mc-make-and-goto-last-cursor)
+;; Make a cursor at point and move point to the cursor at the last position.
+
 (evil-mc-make-cursor-here)
-;; Create a cursor at point.
+;; Create a cursor at point. This command should be used with `evil-mc-pause-cursors'.
 
 (evil-mc-pause-cursors)
 ;; Pause all fake cursors. This can be used with `evil-mc-make-cursor-here'
@@ -147,8 +147,8 @@ work. Issues and pull requests are welcome.
 **** Known issues
 - Paste will not work when spacemacs' paste micro state is enabled.
   This is due to the fact that ~evil-paste-pop~ and ~evil-paste-pop-next~ 
-  commands are not suported.
-- Only named commands can be executed
+  commands are not supported.
+- Only named commands can be executed by the fake cursors.
 - Undo should work properly, but redo may not always succeed.
 - There is a performance penalty when there are too many cursors (20+)
 - Jumps work if *evil-jumper* mode is enabled
