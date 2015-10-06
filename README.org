@@ -13,6 +13,7 @@
 
 ** Multiple cursors implementation for evil-mode
 *** Synopsis
+*evil-mc* provides multiple cursors functionality for Emacs when used with *evil-mode* 
 *** Usage
 **** Local Setup
 **** Global Setup
