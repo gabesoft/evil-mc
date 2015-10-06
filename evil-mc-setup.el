@@ -31,7 +31,7 @@ play well with `evil-mc'."
 (add-hook 'evil-mc-before-cursors-created 'evil-mc-before-cursors-setup-hook)
 (add-hook 'evil-mc-after-cursors-deleted 'evil-mc-after-cursors-teardown-hook)
 
-(defvar evil-mc-mode-line-prefix "€"
+(defvar evil-mc-mode-line-prefix "ⓜ"
   "Override of the default mode line string for `evil-mc-mode'.")
 
 (global-evil-mc-mode 1)

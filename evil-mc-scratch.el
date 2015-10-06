@@ -1238,7 +1238,7 @@ otherwise execute BODY."
           (progn
             ;; (run-hooks 'pre-command-hook)
             ;; (run-hooks 'evil-jump-hook)
-            (if (eq :visual (evil-mc-get-command-state))
+            (if (eq 'visual (evil-mc-get-command-state))
                 (evil-mc-run-last-command-visual cursor)
               (evil-mc-run-last-command cursor))
             ;; (run-hooks 'post-command-hook)

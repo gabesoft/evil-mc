@@ -16,17 +16,6 @@
   (setq evil-mc-command nil)
   (setq evil-mc-recording-command nil))
 
-;; TODO use `evil-state' and remove this method
-(defun evil-mc-get-evil-state ()
-  "Get the current evil state."
-  (cond ((evil-insert-state-p) :insert)
-        ((evil-motion-state-p) :motion)
-        ((evil-visual-state-p) :visual)
-        ((evil-normal-state-p) :normal)
-        ((evil-replace-state-p) :replace)
-        ((evil-operator-state-p) :operator)
-        ((evil-emacs-state-p) :emacs)))
-
 (defun evil-mc-get-command-property (name)
   "Return the current command property with NAME."
   (evil-mc-get-object-property evil-mc-command name))
@@ -34,7 +23,7 @@
 (defun evil-mc-set-command-property (&rest properties)
   "Set one or more command PROPERTIES and their values into `evil-mc-command'."
   (setq evil-mc-command (apply 'evil-mc-put-object-property
-                           (cons evil-mc-command properties))))
+                               (cons evil-mc-command properties))))
 
 (defun evil-mc-add-command-property (&rest properties)
   "Append to values of one or more PROPERTIES into `evil-mc-command'."
@@ -100,8 +89,8 @@
                (evil-mc-known-command-p this-command))
       (setq evil-mc-recording-command t)
       (evil-mc-set-command-property :name this-command
-                                :keys-pre (this-command-keys-vector)
-                                :evil-state-begin (evil-mc-get-evil-state))
+                                    :keys-pre (this-command-keys-vector)
+                                    :evil-state-begin evil-state)
       (when (evil-mc-recording-debug-p) (message "Record-begin %s" evil-mc-command)))))
 (put 'evil-mc-begin-command-save 'permanent-local-hook t)
 
@@ -109,9 +98,9 @@
   "Save the current evil motion key sequence."
   (when (evil-mc-recording-command-p)
     (evil-mc-save-keys flag
-                   :keys-motion-pre
-                   :keys-motion-post
-                   (this-command-keys-vector))
+                       :keys-motion-pre
+                       :keys-motion-post
+                       (this-command-keys-vector))
     (when (evil-mc-recording-debug-p)
       (message "Record-motion %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
@@ -121,9 +110,9 @@
   (when (and (evil-mc-recording-command-p)
              (memq evil-state '(operator)))
     (evil-mc-save-keys flag
-                   :keys-operator-pre
-                   :keys-operator-post
-                   (this-command-keys-vector))
+                       :keys-operator-pre
+                       :keys-operator-post
+                       (this-command-keys-vector))
     (when (evil-mc-recording-debug-p)
       (message "Record-operator %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
@@ -131,10 +120,10 @@
 (defun evil-mc-finish-command-save ()
   "Completes the save of a command."
   (when (evil-mc-recording-command-p)
-    (evil-mc-set-command-property :evil-state-end (evil-mc-get-evil-state)
-                              :last-input last-input-event
-                              :keys-post (this-command-keys-vector)
-                              :keys-post-raw (this-single-command-raw-keys))
+    (evil-mc-set-command-property :evil-state-end evil-state
+                                  :last-input last-input-event
+                                  :keys-post (this-command-keys-vector)
+                                  :keys-post-raw (this-single-command-raw-keys))
     (when (evil-mc-recording-debug-p)
       (message "Record-finish %s %s" evil-mc-command this-command))
     (ignore-errors

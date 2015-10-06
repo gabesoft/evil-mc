@@ -475,7 +475,7 @@ by the value of `evil-this-register'."
     (or handler
         (evil-mc-get-object-property handler-data :default)
         (cond ((eq (evil-get-command-property cmd :repeat) 'motion)
-               (cond ((eq state :visual) 'evil-mc-execute-visual-call-count)
+               (cond ((eq state 'visual) 'evil-mc-execute-visual-call-count)
                      (t 'evil-mc-execute-default-call-with-count)))))))
 
 (defun evil-mc-get-state-variables (handler)
