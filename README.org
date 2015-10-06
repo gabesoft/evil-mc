@@ -145,11 +145,11 @@ Currently *evil-mc* is in a very early beta stage so not every command will
 work. Issues and pull requests are welcome. 
 
 **** Known issues
-- Paste will not work when spacemacs' paste micro state is enabled.
+- Paste will not work when [[https://github.com/syl20bnr/spacemacs][spacemacs]]' paste micro state is enabled.
   This is due to the fact that ~evil-paste-pop~ and ~evil-paste-pop-next~ 
   commands are not supported.
 - Only named commands can be executed by the fake cursors.
 - Undo should work properly, but redo may not always succeed.
 - There is a performance penalty when there are too many cursors (20+)
-- Jumps work if *evil-jumper* mode is enabled
+- Jumps work if [[https://github.com/bling/evil-jumper][evil-jumper]] mode is enabled
 - ~evil-repeat~ works only for some commands. In particular it doesn't work for delete
