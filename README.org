@@ -31,6 +31,16 @@ To enable or disable *evil-mc mode* for all buffers use:\\
 #+BEGIN_SRC emacs-lisp
 (global-evil-mc-mode 1)
 #+END_SRC
+**** Basic Usage
+The main commands used to create cursors are 
+#+BEGIN_SRC emacs-lisp
+evil-mc-make-all-cursors
+;; creates cursors for all strings that match the selected 
+;; region or the symbol under cursor
+
+evil-mc-undo-all-cursors
+;; removes all cursors
+#+END_SRC
 **** Commands
 **** Customization
 *** Limitations
