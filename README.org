@@ -21,15 +21,15 @@ Start with:
 #+END_SRC
 **** Local Setup
 To enable or disable *evil-mc* mode for a single buffer use:\\
-(/Use a positive argument to enable it and a negative one to disable it/)
 #+BEGIN_SRC emacs-lisp
-(evil-mc-mode 1)
+(evil-mc-mode  1) ;; enable
+(evil-mc-mode -1) ;; disable
 #+END_SRC
 **** Global Setup
 To enable or disable *evil-mc* mode for all buffers use:\\
-(/Use a positive argument to enable it and a negative one to disable it/)
 #+BEGIN_SRC emacs-lisp
-(global-evil-mc-mode 1)
+(global-evil-mc-mode  1) ;; enable
+(global-evil-mc-mode -1) ;; disable
 #+END_SRC
 **** Basic Usage
 The main commands used to create or delete cursors are:
