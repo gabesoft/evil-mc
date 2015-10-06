@@ -475,8 +475,12 @@ by the value of `evil-this-register'."
     (or handler
         (evil-mc-get-object-property handler-data :default)
         (cond ((eq (evil-get-command-property cmd :repeat) 'motion)
-               (cond ((eq state 'visual) 'evil-mc-execute-visual-call-count)
-                     (t 'evil-mc-execute-default-call-with-count)))))))
+               (if (eq state 'visual)
+                   'evil-mc-execute-visual-call-count
+                 'evil-mc-execute-default-call-with-count))
+              (t
+               (when (not (eq state 'visual))
+                 'evil-mc-execute-default-macro))))))
 
 (defun evil-mc-get-state-variables (handler)
   "Get all cursor variables required to hold state for HANDLER."
