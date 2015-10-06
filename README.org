@@ -53,7 +53,7 @@ The main commands used to create or delete cursors are:
 
 The above commands, as well as others detailed below, are setup with key bindings
 when enabling the *evil-mc* mode. All key bindings can be overridden or removed by
-defining a variable named ~evil-mc-keys~ with the keybindings of your liking. 
+defining a variable named ~evil-mc-keys~ with the key bindings of your liking. 
 See the definition of that variable in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] for more info.
 
 For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
