@@ -152,4 +152,4 @@ work. Issues and pull requests are welcome.
   This is due to the fact that ~evil-paste-pop~ and ~evil-paste-pop-next~ 
   commands are not supported.
 - Jumps work if [[https://github.com/bling/evil-jumper][evil-jumper]] mode is enabled
-- ~evil-repeat~ works only for some commands. In particular it doesn't work for delete
+- ~evil-repeat~ works only for some commands. In particular it doesn't work for delete.
