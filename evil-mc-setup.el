@@ -10,7 +10,7 @@
 (require 'evil-mc)
 
 (evil-define-local-var evil-mc-custom-paused nil
-  "Custom paused functionality when there are multiple cursors active.")
+  "Paused functionality when there are multiple cursors active.")
 
 (defun evil-mc-before-cursors-setup-hook ()
   "Hook to run before any cursor is created.
