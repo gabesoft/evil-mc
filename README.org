@@ -32,7 +32,8 @@ To enable or disable *evil-mc* mode for all buffers use:\\
 (global-evil-mc-mode 1)
 #+END_SRC
 **** Basic Usage
-The main commands used to create cursors are:
+The main commands used to create or delete cursors are:
+
 #+BEGIN_SRC emacs-lisp
 evil-mc-make-all-cursors
 ;; creates cursors for all strings that match the selected 
@@ -50,10 +51,10 @@ evil-mc-skip-and-goto-next-match
 ;; cursor without creating a cursor at point
 #+END_SRC
 
-*evil-mc* comes with some default key bindings for the above commands, 
-specified in the src_emacs-lisp{evil-mc-keys} variable. That variable can be defined,
-just before enabling the mode for the first time, with the key bindings of
-your liking.
+The above commands, as well as others detailed below, are setup with key bindings
+when enabling the *evil-mc* mode. All key bindings can be overridden or removed by
+defining a variable named ~evil-mc-keys~ with the keybindings of your liking. 
+See the definition of the above variable in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] for more info.
 
 For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
 **** Commands
