@@ -58,10 +58,66 @@ See the definition of the above variable in [[https://github.com/gabesoft/evil-m
 
 For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
 **** Commands
-Here's a detailed list of all commands used to create, navigate through, or delete cursors:
+Here's a detailed list of all commands used to create, navigate through, or delete cursors:\\
+/All the commands below assume that there is a real cursor and possibly some fake cursors./
 
 #+BEGIN_SRC emacs-lisp
+(evil-mc-make-all-cursors)
+;; Make a cursor for every match of the selected region or the symbol at point.
 
+(evil-mc-undo-all-cursors)
+;; Remove all cursors.
+
+(evil-mc-make-and-goto-next-match)
+;; Make a cursor at point, and go to the next match of the 
+;; selected region or the symbol at point.
+
+(evil-mc-make-and-goto-prev-match)
+;; Make a cursor at point, and go to the previous match of the 
+;; selected region or the symbol at point.
+
+(evil-mc-skip-and-goto-next-match)
+;; Go to the next match of the selected region or symbol at point
+;; without making a cursor at point. This command can be used to
+;; remove unwanted cursors.
+
+(evil-mc-skip-and-goto-prev-match)
+;; Go to the previous match of the selected region or symbol at point
+;; without making a cursor at point. This command can be used to
+;; remove unwanted cursors.
+
+(evil-mc-make-and-goto-first-cursor)
+;; Make a cursor at point and move point to the cursor at the first position.
+
+(evil-mc-make-and-goto-last-cursor)
+;; Make a cursor at point and move point to the cursor at the last position.
+
+(evil-mc-make-and-goto-prev-cursor)
+;; Make a cursor at point and move point to the cursor
+;; closest to it when searching backwards.
+
+(evil-mc-make-and-goto-next-cursor)
+;; Make a cursor at point and move point to the cursor
+;; closest to it when searching forwards.
+
+(evil-mc-skip-and-goto-prev-cursor)
+;; Move point to the cursor closest to it when searching backwards
+;; without making a cursor at point. This command can be used to
+;; remove unwanted cursors.
+
+(evil-mc-skip-and-goto-next-cursor)
+;; Move point to the cursor closest to it when searching forwards
+;; without making a cursor at point. This command can be used to
+;; remove unwanted cursors.
+
+(evil-mc-make-cursor-here)
+;; Create a cursor at point.
+
+(evil-mc-pause-cursors)
+;; Pause all fake cursors. This can be used with `evil-mc-make-cursor-here'
+
+(evil-mc-resume-cursors)
+;; Call to resume paused cursors.
 #+END_SRC
 
 **** Customization
@@ -69,13 +125,13 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 
 - The key bindings can be set in ~evil-mc-keys~ as mentioned above.
 - Every known command is executed using a command handler defined in a variable
-  called ~evil-mc-known-commands~. Those can be overridden by defining a the 
-  ~evil-mc-custom-known-commands~ variable. See the documentation of that variable 
-  in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] for more info.
+  called ~evil-mc-known-commands~ in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-vars.el][evil-mc-vars.el]]. Those can be overridden by 
+  defining the ~evil-mc-custom-known-commands~ variable. See the documentation of 
+  that variable in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] for more info.
 - Some minor modes are incompatible with *evil-mc*. Those modes are defined in 
   ~evil-mc-incompatible-minor-modes~ and can be overridden by defining that variable.
 - In addition there are two hooks that can be used to temporarily disable or enable 
-  additional functionality
+  additional functionality while there are multiple cursors active
   #+BEGIN_SRC emacs-lisp
   evil-mc-before-cursors-created
   ;; this hook runs just before the first cursor is created
@@ -92,6 +148,7 @@ work. Issues and pull requests are welcome.
 - Paste will not work when spacemacs' paste micro state is enabled.
   This is due to the fact that ~evil-paste-pop~ and ~evil-paste-pop-next~ 
   commands are not suported.
+- Only named commands can be executed
 - Undo should work properly, but redo may not always succeed.
 - There is a performance penalty when there are too many cursors (20+)
 - Jumps work if *evil-jumper* mode is enabled

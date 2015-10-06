@@ -304,6 +304,29 @@ and optionally CREATE a cursor at point."
   (evil-mc-goto-match direction create)
   (evil-mc-print-cursors-info))
 
+(defun evil-mc-run-cursors-before ()
+  "Runs `evil-mc-cursors-before' if there are no cursors created yet."
+  (when (not (evil-mc-has-cursors-p))
+    (evil-mc-cursors-before)))
+
+(defun evil-mc-run-cursors-after (had-cursors)
+  "Runs `evil-mc-cursors-after' if HAD-CURSORS and there are no more cursors."
+  (when (and had-cursors (not (evil-mc-has-cursors-p)))
+    (evil-mc-cursors-after)))
+
+(defun evil-mc-cursors-before ()
+  "Actions to be executed before any cursors are created."
+  (setq evil-mc-cursor-state (evil-mc-read-cursor-state nil))
+  (evil-mc-write-cursor-state (evil-mc-get-default-cursor))
+  (run-hooks 'evil-mc-before-cursors-created))
+
+(defun evil-mc-cursors-after ()
+  "Actions to be executed after all cursors are deleted."
+  (evil-mc-clear-pattern)
+  (evil-mc-clear-cursor-list)
+  (evil-mc-clear-cursor-state)
+  (run-hooks 'evil-mc-after-cursors-deleted))
+
 (evil-define-command evil-mc-make-cursor-here ()
   "Create a cursor at point."
   :repeat ignore
@@ -360,29 +383,6 @@ closest to it when searching forwards."
   "Initialize `evil-mc-pattern', make a cursor at point, and go to the previous match."
   :repeat ignore
   (evil-mc-find-and-goto-match 'backward t))
-
-(defun evil-mc-run-cursors-before ()
-  "Runs `evil-mc-cursors-before' if there are no cursors created yet."
-  (when (not (evil-mc-has-cursors-p))
-    (evil-mc-cursors-before)))
-
-(defun evil-mc-run-cursors-after (had-cursors)
-  "Runs `evil-mc-cursors-after' if HAD-CURSORS and there are no more cursors."
-  (when (and had-cursors (not (evil-mc-has-cursors-p)))
-    (evil-mc-cursors-after)))
-
-(defun evil-mc-cursors-before ()
-  "Actions to be executed before any cursors are created."
-  (setq evil-mc-cursor-state (evil-mc-read-cursor-state nil))
-  (evil-mc-write-cursor-state (evil-mc-get-default-cursor))
-  (run-hooks 'evil-mc-before-cursors-created))
-
-(defun evil-mc-cursors-after ()
-  "Actions to be executed after all cursors are deleted."
-  (evil-mc-clear-pattern)
-  (evil-mc-clear-cursor-list)
-  (evil-mc-clear-cursor-state)
-  (run-hooks 'evil-mc-after-cursors-deleted))
 
 (evil-define-command evil-mc-undo-all-cursors ()
   "Delete all cursors and remove them from `evil-mc-cursor-list'."

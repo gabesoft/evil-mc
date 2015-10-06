@@ -196,6 +196,7 @@
     (move-text-down . ((:default . evil-mc-execute-default-call-with-count)))
     (move-text-up . ((:default . evil-mc-execute-default-call-with-count)))
     (newline-and-indent . ((:default . evil-mc-execute-default-call)))
+    (org-return . ((:default . evil-mc-execute-default-call)))
     (org-self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
     (orgtbl-self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
     (paste-after-current-line . ((:default . evil-mc-execute-default-call-with-count)))
