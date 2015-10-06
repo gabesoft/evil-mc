@@ -20,12 +20,17 @@ Start with:
  (require 'evil-mc)
 #+END_SRC
 **** Local Setup
-To enable or disable evil-mc mode for a single buffer use:
+To enable or disable *evil-mc mode* for a single buffer use:
+/Use a positive number to enable it or a negative one to disable it/
 #+BEGIN_SRC emacs-lisp
 (evil-mc-mode 1)
 #+END_SRC
-Use a positive number to enable it or a negative one to disable it
 **** Global Setup
+To enable or disable *evil-mc mode* for all buffers use:
+/Use a positive number to enable it or a negative one to disable it/
+#+BEGIN_SRC emacs-lisp
+(global-evil-mc-mode 1)
+#+END_SRC
 **** Commands
 **** Customization
 *** Limitations
