@@ -6,8 +6,6 @@
 
 ;;; Code:
 
-;; TODO replace these with
-;; evil-put-property evil-get-property
 (defun evil-mc-get-object-property (obj prop)
   "Get the value of PROP from OBJ."
   (let ((item (assq prop obj)))
@@ -19,8 +17,8 @@
     (setq obj (cons (cons prop val) obj))
     (while properties
       (setq obj (evil-mc-put-object-property obj
-                                         (pop properties)
-                                         (pop properties))))
+                                             (pop properties)
+                                             (pop properties))))
     obj))
 
 (defun evil-mc-put-object-properties (obj &rest properties)

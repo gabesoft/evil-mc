@@ -165,6 +165,14 @@ or `evil-downcase' command."
   "Execute an `evil-delete' comand."
   (evil-mc-execute-with-region-and-register 'evil-delete))
 
+(defun evil-mc-execute-evil-substitute ()
+  "Execute an `evil-substitute' comand."
+   (let ((point (point)))
+    (evil-with-state normal
+      (unless (and region (eq point (point-at-bol)))
+        (evil-forward-char))
+      (evil-mc-execute-with-region-and-register 'evil-substitute))))
+
 (defun evil-mc-execute-evil-change ()
   "Execute an `evil-change' comand."
   (let ((point (point)))
@@ -322,6 +330,10 @@ by the value of `evil-this-register'."
 (evil-mc-define-handler evil-mc-execute-default-evil-delete ()
   :cursor-clear (region column)
   (evil-mc-execute-evil-delete))
+
+(evil-mc-define-handler evil-mc-execute-default-evil-substitute ()
+  :cursor-clear (region column)
+  (evil-mc-execute-evil-substitute))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-yank ()
   :cursor-clear (region column)
@@ -487,7 +499,7 @@ by the value of `evil-this-register'."
   (let ((categories (evil-get-command-property handler :cursor-state)))
     (when (atom categories) (setq categories (list categories)))
     (when (not (memq :default categories)) (push :default categories))
-    (evil-mc-get-cursor-state-names categories)))
+    (evil-mc-get-cursor-variables categories)))
 
 (defun evil-mc-get-clear-variables (handler)
   "Get all cursor variables that should be cleared after HANDLER."

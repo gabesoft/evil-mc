@@ -67,7 +67,7 @@
 
 (defun evil-mc-copy-cursor-state (from &optional to)
   "Copy all state FROM cursor to TO cursor."
-  (let ((names (evil-mc-get-cursor-state-names)))
+  (let ((names (evil-mc-get-cursor-variables)))
     (dolist (name names)
       (setq to (evil-mc-put-cursor-property
                 to
@@ -77,7 +77,7 @@
 
 (defun evil-mc-read-cursor-state (&optional state)
   "Read the state of the real cursor into STATE."
-  (let ((names (evil-mc-get-cursor-state-names)))
+  (let ((names (evil-mc-get-cursor-variables)))
     (dolist (name names)
       (when (boundp name)
         (setq state (evil-mc-put-cursor-property state
@@ -87,7 +87,7 @@
 
 (defun evil-mc-write-cursor-state (state)
   "Write the state of the real cursor with values from STATE."
-  (let ((names (evil-mc-get-cursor-state-names)))
+  (let ((names (evil-mc-get-cursor-variables)))
     (dolist (name names)
       (when (boundp name)
         (set name (evil-mc-get-cursor-property state name))))))

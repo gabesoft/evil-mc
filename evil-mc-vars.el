@@ -1,8 +1,8 @@
-;;; evil-mc-vars.el --- Settings and variables for evil-mc
+;;; evil-mc-vars.el --- Variables for evil-mc
 
 ;;; Commentary:
 
-;; This file contains all variables and settings used by evil-mc
+;; This file contains variables used by evil-mc
 
 ;;; Code:
 
@@ -31,7 +31,7 @@
   :type 'integer
   :group 'evil-mc)
 
-(defvar evil-mc-cursor-state-names
+(defvar evil-mc-cursor-variables
   '((:default . (column
                  evil-exchange--overlays
                  evil-exchange--position
@@ -66,7 +66,7 @@
                  dabbrev--last-expansion
                  dabbrev--last-expansion-location
                  dabbrev--last-direction)))
-  "Names of variables tracked per cursor categorized by mode or set of commands.")
+  "Names of variables tracked per cursor during the execution of a command.")
 
 (defvar evil-mc-known-commands
   '((backward-delete-char-untabify . ((:default . evil-mc-execute-default-call-with-count)))
@@ -178,6 +178,7 @@
     (evil-snipe-f . ((:default . evil-mc-execute-default-evil-snipe) (visual . evil-mc-execute-visual-evil-snipe)))
     (evil-snipe-s . ((:default . evil-mc-execute-default-evil-snipe) (visual . evil-mc-execute-visual-evil-snipe)))
     (evil-snipe-t . ((:default . evil-mc-execute-default-evil-snipe) (visual . evil-mc-execute-visual-evil-snipe)))
+    (evil-substitute . ((:default . evil-mc-execute-default-evil-substitute)))
     (evil-surround-region . ((:default . evil-mc-execute-default-evil-surround-region)))
     (evil-upcase . ((:default . evil-mc-execute-default-evil-upcase)))
     (evil-use-register . ((:default . evil-mc-execute-default-call-with-last-input) (visual . evil-mc-execute-visual-call-with-last-input)))
@@ -195,6 +196,7 @@
     (keyboard-quit . ((:default . evil-mc-execute-default-ignore)))
     (move-text-down . ((:default . evil-mc-execute-default-call-with-count)))
     (move-text-up . ((:default . evil-mc-execute-default-call-with-count)))
+    (newline . ((:default . evil-mc-execute-default-call)))
     (newline-and-indent . ((:default . evil-mc-execute-default-call)))
     (org-return . ((:default . evil-mc-execute-default-call)))
     (org-self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
@@ -220,7 +222,7 @@ the form (STATE . HANDLER).  The state can be any evil state name or `:default'
 which will be used if no entry matching the current state is found.")
 
 (evil-define-local-var evil-mc-cursor-state nil
-  "Real cursor saved state.")
+  "The state of the real cursor saved while there are active cursors.")
 
 (evil-define-local-var evil-mc-executing-command nil
   "True when executing a command for all cursors.")
