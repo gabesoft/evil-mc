@@ -36,25 +36,25 @@ The main commands used to create or delete cursors are:
 
 #+BEGIN_SRC emacs-lisp
 (evil-mc-make-all-cursors)
-;; creates cursors for all strings that match the selected 
-;; region or the symbol under cursor
+;; Create cursors for all strings that match the selected 
+;; region or the symbol under cursor.
 
 (evil-mc-undo-all-cursors)
-;; removes all cursors
+;; Remove all cursors.
 
 (evil-mc-make-and-goto-next-match)
-;; makes a cursor at point and goes to the next match of the 
-;; selected region or the symbol under cursor
+;; Make a cursor at point and go to the next match of the 
+;; selected region or the symbol under cursor.
 
 (evil-mc-skip-and-goto-next-match)
-;; goes to the next match of the selected region or the symbol under 
-;; cursor without creating a cursor at point
+;; Go to the next match of the selected region or the symbol under 
+;; cursor without creating a cursor at point.
 #+END_SRC
 
 The above commands, as well as others detailed below, are setup with key bindings
 when enabling the *evil-mc* mode. All key bindings can be overridden or removed by
 defining a variable named ~evil-mc-keys~ with the keybindings of your liking. 
-See the definition of the above variable in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] for more info.
+See the definition of that variable in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] for more info.
 
 For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
 **** Commands
