@@ -16,7 +16,9 @@
 *evil-mc* provides multiple cursors functionality for Emacs when used with *evil-mode* 
 *** Usage
 Start with:
- ~(require 'evil-mc)~
+#+BEGIN_SRC emacs-lisp
+ (require 'evil-mc)
+#+END_SRC
 **** Local Setup
 To enable for a single buffer use:
 ~(evil-mc-mode 1)~
