@@ -35,18 +35,18 @@ To enable or disable *evil-mc* mode for all buffers use:\\
 The main commands used to create or delete cursors are:
 
 #+BEGIN_SRC emacs-lisp
-evil-mc-make-all-cursors
+(evil-mc-make-all-cursors)
 ;; creates cursors for all strings that match the selected 
 ;; region or the symbol under cursor
 
-evil-mc-undo-all-cursors
+(evil-mc-undo-all-cursors)
 ;; removes all cursors
 
-evil-mc-make-and-goto-next-match
+(evil-mc-make-and-goto-next-match)
 ;; makes a cursor at point and goes to the next match of the 
 ;; selected region or the symbol under cursor
 
-evil-mc-skip-and-goto-next-match
+(evil-mc-skip-and-goto-next-match)
 ;; goes to the next match of the selected region or the symbol under 
 ;; cursor without creating a cursor at point
 #+END_SRC
@@ -58,7 +58,32 @@ See the definition of the above variable in [[https://github.com/gabesoft/evil-m
 
 For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
 **** Commands
+Here's a detailed list of all commands used to create, navigate through, or delete cursors:
+
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
 **** Customization
+*evil-mc* can be customized in several ways:
+
+- The key bindings can be set in ~evil-mc-keys~ as mentioned above.
+- Every known command is executed using a command handler defined in a variable
+  called ~evil-mc-known-commands~. Those can be overridden by defining a the 
+  ~evil-mc-custom-known-commands~ variable. See the documentation of that variable 
+  in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] for more info.
+- Some minor modes are incompatible with *evil-mc*. Those modes are defined in 
+  ~evil-mc-incompatible-minor-modes~ and can be overridden by defining that variable.
+- In addition there are two hooks that can be used to temporarily disable or enable 
+  additional functionality
+  #+BEGIN_SRC emacs-lisp
+  evil-mc-before-cursors-created
+  ;; this hook runs just before the first cursor is created
+
+  evil-mc-after-cursors-created
+  ;; this hook runs just after the last cursor is deleted
+  #+END_SRC
+
 *** Limitations
 Currently *evil-mc* is in a very early beta stage so not every command will 
 work. Issues and pull requests are welcome. 
