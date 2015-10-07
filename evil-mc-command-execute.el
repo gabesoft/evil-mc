@@ -4,7 +4,7 @@
 
 ;; This file contains functions for executing a command for every fake cursor
 
-(require 'cl)
+(require 'cl-lib)
 (require 'evil)
 (require 'evil-mc-common)
 (require 'evil-mc-vars)
@@ -242,7 +242,7 @@ to the keys vector"
 (defun evil-mc-execute-move-to-line (dir)
   "Execute a move to line command in DIR."
   (let* ((keys-count (evil-mc-get-command-keys-count))
-         (count (ecase dir (next keys-count) (prev (- keys-count)))))
+         (count (cl-ecase dir (next keys-count) (prev (- keys-count)))))
     (setq column (or column (evil-mc-column-number (point))))
     (forward-line count)
     (goto-char (min (+ (point) column) (point-at-eol)))))
@@ -532,7 +532,7 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
           (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
           (apply 'evil-mc-put-cursor-property
                  (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos))
-                 (mapcan 'evil-mc-get-var-name-value state-variables)))
+                 (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
       (error (evil-mc-message "Failed to execute %s with error %s"
                       (evil-mc-get-command-name)
                       (error-message-string error))

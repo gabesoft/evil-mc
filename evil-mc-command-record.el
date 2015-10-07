@@ -5,7 +5,7 @@
 ;; This file contains functions for recording information about
 ;; the currently running command
 
-(require 'cl)
+(require 'cl-lib)
 (require 'evil)
 (require 'evil-mc-common)
 
@@ -78,7 +78,7 @@
 
 (defun evil-mc-save-keys (flag pre-name post-name keys)
   "Save KEYS at PRE-NAME or POST-NAME according to FLAG."
-  (ecase flag
+  (cl-ecase flag
     (pre (evil-mc-add-command-property pre-name keys))
     (post (evil-mc-add-command-property post-name keys))))
 
