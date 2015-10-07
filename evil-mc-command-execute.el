@@ -559,7 +559,11 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
         (evil-mc-message "No handler found for command %s" (evil-mc-get-command-name)))
       (when handler
         (evil-repeat-post-hook)
-        (evil-mc-remove-last-undo-marker)
+        (when (memq (evil-mc-get-command-name) '(evil-paste-from-register
+                                                 evil-paste-after
+                                                 evil-paste-before
+                                                 yank))
+          (evil-mc-remove-last-undo-marker))
         (evil-with-single-undo
           (save-excursion
             (dolist (cursor evil-mc-cursor-list)

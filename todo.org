@@ -1,0 +1,13 @@
+* Items left to do as of 09/06/2015
+** TODO Make undo work per cursor
+*** Track undo data per cursor
+*** Return cursors to their original position after an undo
+*** Implement handlers for evil-paste-pop and evil-paste-pop-next
+*** Ensure spacemacs/paste-micro-state works
+** TODO Make evil-repeat work for all commands
+** TODO Fix move-text-up/down
+*** Currently it only works only for non-consecutive lines
+** TODO Maybe have a default for unknown commands
+*** Default could be evil-mc-execute-macro but need to initialize the correct evil state
+*** This would allow supporting unnamed commands
+** TODO Add tests
