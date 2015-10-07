@@ -15,7 +15,19 @@
 
 ;; This library provides multiple cursors functionality for evil-mode
 ;;
-;; See documentation at https://github.com/gabesoft/evil-mc/blob/master/README.org
+;; Install:
+;;
+;; (require 'evil-mc)
+;;
+;;
+;; Usage:
+;;
+;; (evil-mc-mode 1)        ; enable for a single buffer
+;;
+;; (global-evil-mc-mode 1) ; enable for all buffers
+;;
+;;
+;; See the README for more details
 
 ;;; Code:
 
@@ -42,6 +54,7 @@
 
 (put 'evil-mc-mode-line 'risky-local-variable t)
 
+;;;###autoload
 (define-minor-mode evil-mc-mode
   "Toggle evil multiple cursors in a single buffer."
   :group 'evil-mc
@@ -58,18 +71,22 @@
 
 (put 'evil-mc-mode 'permanent-local t)
 
+;;;###autoload
 (define-globalized-minor-mode global-evil-mc-mode
   evil-mc-mode evil-mc-initialize)
 
+;;;###autoload
 (defun evil-mc-initialize ()
   "Enable `evil-mc-mode' in the current buffer."
   (evil-mc-mode 1))
 
+;;;###autoload
 (defun turn-on-evil-mc-mode ()
   "Turn on evil-mc mode in the current buffer."
   (interactive)
   (evil-mc-mode 1))
 
+;;;###autoload
 (defun turn-off-evil-mc-mode ()
   "Turn off evil-mc mode in the current buffer."
   (interactive)
