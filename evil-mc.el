@@ -6,8 +6,8 @@
 ;; Maintainer: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Version: 0.0.1
 ;; Keywords: evil editing multiple-cursors vim evil-multiple-cursors evil-mc evil-mc
-;; Package-Requires ((emacs "24") (evil "1.2.5"))
 ;; Homepage: https://github.com/gabesoft/evil-mc
+;; Package-Requires: ((emacs "24") (evil "1.2.5"))
 ;;
 ;; This file is NOT part of GNU Emacs.
 
