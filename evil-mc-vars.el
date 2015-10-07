@@ -230,23 +230,20 @@ which will be used if no entry matching the current state is found.")
 (evil-define-local-var evil-mc-recording-command nil
   "True when recording `this-command' data.")
 
-(evil-define-local-var evil-mc-cursor-command nil
-  "True if the current command is an evil-mc cursor command.")
-
 (evil-define-local-var evil-mc-cursor-current-face nil
   "The face to use when making fake cursors.")
 
 (evil-define-local-var evil-mc-cursor-list nil
-  "The list of current fake cursors")
+  "The list of current fake cursors.")
 
 (evil-define-local-var evil-mc-frozen nil
   "If true the fake cursors are frozen.")
 
 (evil-define-local-var evil-mc-pattern nil
-  "The current pattern")
+  "The current pattern.")
 
 (evil-define-local-var evil-mc-command nil
-  "Data for the current command to be executed by the fake cursors.")
+  "The current command to be executed.")
 
 (evil-define-local-var evil-mc-executing-debug nil
   "If true display debug messages during the execution of a command.")
@@ -258,7 +255,7 @@ which will be used if no entry matching the current state is found.")
   "List of temporarily disabled minor modes.")
 
 (defun evil-mc-known-command-p (cmd)
-  "True if CMD is a supported command"
+  "True if CMD is a supported command."
   (or (not (null (assq cmd evil-mc-known-commands)))
       (eq (evil-get-command-property cmd :repeat) 'motion)))
 
@@ -328,19 +325,19 @@ which will be used if no entry matching the current state is found.")
 (defun evil-mc-print-pattern ()
   "Print the curent pattern."
   (interactive)
-  (message "%s" evil-mc-pattern))
+  (evil-mc-message "%s" evil-mc-pattern))
 
 (defun evil-mc-print-cursor-list ()
   "Return the cursor list."
   (interactive)
   (if evil-mc-cursor-list
-      (message "%s: %s" (length evil-mc-cursor-list) evil-mc-cursor-list)
-    (message "No cursors found")))
+      (evil-mc-message "%s: %s" (length evil-mc-cursor-list) evil-mc-cursor-list)
+    (evil-mc-message "No cursors found")))
 
 (defun evil-mc-print-command ()
   "Print the information saved for the current command."
   (interactive)
-  (message "%s" evil-mc-command))
+  (evil-mc-message "%s" evil-mc-command))
 
 (defun evil-mc-frozen-p ()
   "True if the fake cursors are frozen."

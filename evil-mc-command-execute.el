@@ -250,7 +250,7 @@ to the keys vector"
 (defun evil-mc-execute-not-supported ()
   "Throw an error for a not supported command."
   (evil-force-normal-state)
-  (error (message "%s is not supported" (evil-mc-get-command-name))))
+  (error (evil-mc-message "%s is not supported" (evil-mc-get-command-name))))
 
 (defun evil-mc-clear-current-region ()
   "Clears the current region."
@@ -514,7 +514,7 @@ by the value of `evil-this-register'."
   "Execute the current command for CURSOR in the context of STATE-VARIABLES and
 ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
   (when (evil-mc-executing-debug-p)
-    (message "Execute %s with %s" (evil-mc-get-command-name) handler))
+    (evil-mc-message "Execute %s with %s" (evil-mc-get-command-name) handler))
   (ignore-errors
     (condition-case error
         (cl-progv
@@ -533,7 +533,7 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
           (apply 'evil-mc-put-cursor-property
                  (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos))
                  (mapcan 'evil-mc-get-var-name-value state-variables)))
-      (error (message "Failed to execute %s with error %s"
+      (error (evil-mc-message "Failed to execute %s with error %s"
                       (evil-mc-get-command-name)
                       (error-message-string error))
              (cond ((eq :normal (evil-mc-get-command-state))
@@ -547,7 +547,7 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
              (not (evil-mc-executing-command-p))
              (not (evil-mc-frozen-p)))
     (when (evil-mc-executing-debug-p)
-      (message "Execute %s for all cursors" (evil-mc-get-command-name)))
+      (evil-mc-message "Execute %s for all cursors" (evil-mc-get-command-name)))
     (let* ((evil-mc-executing-command t)
            (cursor-list nil)
            (handler (evil-mc-get-command-handler
@@ -556,7 +556,7 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
            (state-variables (evil-mc-get-state-variables handler))
            (clear-variables (evil-mc-get-clear-variables handler)))
       (unless handler
-        (message "No handler found for command %s" (evil-mc-get-command-name)))
+        (evil-mc-message "No handler found for command %s" (evil-mc-get-command-name)))
       (when handler
         (evil-repeat-post-hook)
         (evil-mc-remove-last-undo-marker)

@@ -11,6 +11,10 @@
 
 ;;; Code:
 
+(defun evil-mc-command-p (cmd)
+  "Return true if CMD is an `evil-mc' comand."
+  (eq (evil-get-command-property cmd :evil-mc) t))
+
 (defun evil-mc-command-reset ()
   "Clear the currently saved command info."
   (setq evil-mc-command nil)
@@ -80,8 +84,9 @@
 
 (defun evil-mc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
-  (when (evil-mc-recording-debug-p) (message "Command %s %s" this-command (this-command-keys)))
-  (when (and (not (evil-mc-executing-command-p))
+  (when (evil-mc-recording-debug-p) (evil-mc-message "Command %s %s" this-command (this-command-keys)))
+  (when (and (not (evil-mc-command-p this-command))
+             (not (evil-mc-executing-command-p))
              (not (evil-mc-recording-command-p)))
     (setq evil-mc-command nil)
     (when (and (evil-mc-has-cursors-p)
@@ -91,7 +96,7 @@
       (evil-mc-set-command-property :name this-command
                                     :keys-pre (this-command-keys-vector)
                                     :evil-state-begin evil-state)
-      (when (evil-mc-recording-debug-p) (message "Record-begin %s" evil-mc-command)))))
+      (when (evil-mc-recording-debug-p) (evil-mc-message "Record-begin %s" evil-mc-command)))))
 (put 'evil-mc-begin-command-save 'permanent-local-hook t)
 
 (defun evil-mc-save-keys-motion (flag)
@@ -102,7 +107,7 @@
                        :keys-motion-post
                        (this-command-keys-vector))
     (when (evil-mc-recording-debug-p)
-      (message "Record-motion %s %s %s %s"
+      (evil-mc-message "Record-motion %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun evil-mc-save-keys-operator (flag)
@@ -114,7 +119,7 @@
                        :keys-operator-post
                        (this-command-keys-vector))
     (when (evil-mc-recording-debug-p)
-      (message "Record-operator %s %s %s %s"
+      (evil-mc-message "Record-operator %s %s %s %s"
                flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun evil-mc-finish-command-save ()
@@ -125,11 +130,11 @@
                                   :keys-post (this-command-keys-vector)
                                   :keys-post-raw (this-single-command-raw-keys))
     (when (evil-mc-recording-debug-p)
-      (message "Record-finish %s %s" evil-mc-command this-command))
+      (evil-mc-message "Record-finish %s %s" evil-mc-command this-command))
     (ignore-errors
       (condition-case error
           (evil-mc-finalize-command)
-        (error (message "Saving command %s failed with %s"
+        (error (evil-mc-message "Saving command %s failed with %s"
                         (evil-mc-get-command-name)
                         (error-message-string error))
                nil))))
@@ -165,7 +170,7 @@
                                       keys-operator-post))))
                  (t (or keys-post keys-pre)))))
   (when (evil-mc-recording-debug-p)
-    (message "Record-done %s pre %s post %s keys-motion %s keys-operator %s count %s keys %s"
+    (evil-mc-message "Record-done %s pre %s post %s keys-motion %s keys-operator %s count %s keys %s"
              (evil-mc-get-command-name)
              (evil-mc-get-command-keys-string :keys-pre)
              (evil-mc-get-command-keys-string :keys-post)

@@ -34,6 +34,13 @@
     (goto-char pos)
     (current-column)))
 
+(defun evil-mc-message (format-string &rest args)
+  "Display a message given a FORMAT-STRING and ARGS."
+  (apply 'message (concat (propertize "evil-mc "
+                                      'face
+                                      'font-lock-constant-face)
+                          format-string) args))
+
 (provide 'evil-mc-common)
 
 ;;; evil-mc-common.el ends here

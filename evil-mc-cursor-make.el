@@ -22,7 +22,7 @@
 (defun evil-mc-print-cursors-info (&optional msg)
   "Prints information about the current cursors preceded by MSG."
   (when (evil-mc-has-cursors-p)
-    (message "%s %s cursors matching \"%s\""
+    (evil-mc-message "%s %s cursors matching \"%s\""
              (or msg "There are")
              (1+ (length evil-mc-cursor-list))
              (evil-mc-get-pattern-text))))
@@ -273,7 +273,7 @@ and optionally CREATE a cursor at point."
       (if found
           (goto-char (1- (point)))
         (goto-char point)
-        (message "No more matches found for %s" (evil-mc-get-pattern-text)))
+        (evil-mc-message "No more matches found for %s" (evil-mc-get-pattern-text)))
       (when (and found create (/= point (point)))
         (evil-mc-run-cursors-before)
         (evil-mc-make-cursor-at-pos point (evil-mc-read-cursor-state)))
@@ -330,63 +330,76 @@ and optionally CREATE a cursor at point."
 (evil-define-command evil-mc-make-cursor-here ()
   "Create a cursor at point."
   :repeat ignore
+  :evil-mc t
+  (evil-mc-run-cursors-before)
   (evil-mc-make-cursor-at-pos (point)))
 
 (evil-define-command evil-mc-make-and-goto-first-cursor ()
   "Make a cursor at point and move point to the cursor with the lowest position."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-cursor 'evil-mc-find-first-cursor t))
 
 (evil-define-command evil-mc-make-and-goto-last-cursor ()
   "Make a cursor at point and move point to the cursor with the last position."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-cursor 'evil-mc-find-last-cursor t))
 
 (evil-define-command evil-mc-make-and-goto-prev-cursor ()
   "Make a cursor at point and move point to the cursor
 closest to it when searching backwards."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-cursor 'evil-mc-find-prev-cursor t))
 
 (evil-define-command evil-mc-make-and-goto-next-cursor ()
   "Make a cursor at point and move point to the cursor
 closest to it when searching forwards."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-cursor 'evil-mc-find-next-cursor t))
 
 (evil-define-command evil-mc-skip-and-goto-prev-cursor ()
   "Move point to the cursor closest to it when searching backwards."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-cursor 'evil-mc-find-prev-cursor nil))
 
 (evil-define-command evil-mc-skip-and-goto-next-cursor ()
   "Move point to the cursor closest to it when searching forwards."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-cursor 'evil-mc-find-next-cursor nil))
 
 (evil-define-command evil-mc-skip-and-goto-next-match ()
   "Initialize `evil-mc-pattern' and go to the next match."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-match 'forward nil))
 
 (evil-define-command evil-mc-skip-and-goto-prev-match ()
   "Initialize `evil-mc-pattern' and go to the previous match."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-match 'backward nil))
 
 (evil-define-command evil-mc-make-and-goto-next-match ()
   "Initialize `evil-mc-pattern', make a cursor at point, and go to the next match."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-match 'forward t))
 
 (evil-define-command evil-mc-make-and-goto-prev-match ()
   "Initialize `evil-mc-pattern', make a cursor at point, and go to the previous match."
   :repeat ignore
+  :evil-mc t
   (evil-mc-find-and-goto-match 'backward t))
 
 (evil-define-command evil-mc-undo-all-cursors ()
   "Delete all cursors and remove them from `evil-mc-cursor-list'."
   :repeat ignore
+  :evil-mc t
   (when (evil-mc-has-cursors-p)
     (mapc 'evil-mc-delete-cursor evil-mc-cursor-list)
     (evil-exit-visual-state)
@@ -395,6 +408,7 @@ closest to it when searching forwards."
 (evil-define-command evil-mc-make-all-cursors ()
   "Initialize `evil-mc-pattern' and make cursors for all matches."
   :repeat ignore
+  :evil-mc t
   (if (evil-mc-has-cursors-p) (user-error "Cursors already exist.")
     (evil-mc-set-pattern)
     (evil-exit-visual-state)

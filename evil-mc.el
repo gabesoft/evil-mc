@@ -157,23 +157,36 @@ will be set up in `normal' and `visual' mode."))
 
 (defun evil-mc-initialize-hooks ()
   "Initialize all hooks used by `evil-mc'."
-  (when (bound-and-true-p evil-mode)
-    (add-hook 'pre-command-hook 'evil-mc-begin-command-save nil t)
-    (add-hook 'post-command-hook 'evil-mc-finish-command-save t t)
-    (add-hook 'post-command-hook 'evil-mc-execute-for-all t t)
-    (add-hook 'evil-mc-before-cursors-created 'evil-mc-pause-incompatible-modes t t)
-    (add-hook 'evil-mc-after-cursors-deleted 'evil-mc-resume-incompatible-modes t t)
-    (advice-add 'evil-repeat-keystrokes :before #'evil-mc-save-keys-motion)
-    (advice-add 'evil-repeat-motion :before #'evil-mc-save-keys-operator)))
+  (add-hook 'evil-mc-before-cursors-created 'evil-mc-pause-incompatible-modes t t)
+  (add-hook 'evil-mc-before-cursors-created 'evil-mc-initialize-active-state t t)
+  (add-hook 'evil-mc-after-cursors-deleted 'evil-mc-teardown-active-state t t)
+  (add-hook 'evil-mc-after-cursors-deleted 'evil-mc-resume-incompatible-modes t t))
 
 (defun evil-mc-teardown-hooks ()
   "Teardown all hooks used by `evil-mc'."
+  (remove-hook 'evil-mc-before-cursors-created 'evil-mc-pause-incompatible-modes t)
+  (remove-hook 'evil-mc-before-cursors-created 'evil-mc-initialize-active-state t)
+  (remove-hook 'evil-mc-after-cursors-deleted 'evil-mc-teardown-active-state t)
+  (remove-hook 'evil-mc-after-cursors-deleted 'evil-mc-resume-incompatible-modes t))
+
+(defun evil-mc-initialize-active-state ()
+  "Initialize all variables and hooks used while there are active cursors."
+  (when (bound-and-true-p evil-mode)
+    (evil-mc-clear-command)
+    (evil-mc-clear-executing-command)
+    (evil-mc-clear-recording-command)
+    (add-hook 'pre-command-hook 'evil-mc-begin-command-save nil t)
+    (add-hook 'post-command-hook 'evil-mc-finish-command-save t t)
+    (add-hook 'post-command-hook 'evil-mc-execute-for-all t t)
+    (advice-add 'evil-repeat-keystrokes :before #'evil-mc-save-keys-motion)
+    (advice-add 'evil-repeat-motion :before #'evil-mc-save-keys-operator)))
+
+(defun evil-mc-teardown-active-state ()
+  "Teardown all variables and hooks used while there are active cursors."
   (when (bound-and-true-p evil-mode)
     (remove-hook 'pre-command-hook 'evil-mc-begin-command-save t)
     (remove-hook 'post-command-hook 'evil-mc-finish-command-save t)
     (remove-hook 'post-command-hook 'evil-mc-execute-for-all t)
-    (remove-hook 'evil-mc-before-cursors-created 'evil-mc-pause-incompatible-modes t)
-    (remove-hook 'evil-mc-after-cursors-deleted 'evil-mc-resume-incompatible-modes t)
     (advice-remove 'evil-repeat-keystrokes #'evil-mc-save-keys-motion)
     (advice-remove 'evil-repeat-motion #'evil-mc-save-keys-operator)))
 
