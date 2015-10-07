@@ -70,6 +70,7 @@
 
 (defvar evil-mc-known-commands
   '((backward-delete-char-untabify . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-backspace . ((:default . evil-mc-execute-default-call-with-count)))
     (company-complete-selection . ((:default . evil-mc-execute-default-call)))
     (company-select-next . ((:default . evil-mc-execute-default-ignore)))
     (copy-to-the-end-of-line . ((:default . evil-mc-execute-default-call)))
