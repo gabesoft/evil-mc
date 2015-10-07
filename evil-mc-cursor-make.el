@@ -6,6 +6,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'evil-mc-common)
 (require 'evil-mc-vars)
 (require 'evil-mc-cursor-state)
@@ -164,12 +165,12 @@ Return the deleted cursor."
         (found nil))
     (when evil-mc-cursor-list
       (setq evil-mc-cursor-list
-            (remove-if (lambda (cursor)
-                         (when (eq pos (evil-mc-get-cursor-start cursor))
-                           (evil-mc-delete-cursor cursor)
-                           (setq found cursor)
-                           t))
-                       evil-mc-cursor-list)))
+            (cl-remove-if (lambda (cursor)
+                            (when (eq pos (evil-mc-get-cursor-start cursor))
+                              (evil-mc-delete-cursor cursor)
+                              (setq found cursor)
+                              t))
+                          evil-mc-cursor-list)))
     found))
 
 (defun evil-mc-find-prev-cursor (&optional pos)
@@ -261,7 +262,7 @@ and optionally CREATE a cursor at point."
           (had-cursors (evil-mc-has-cursors-p))
           (found (evil-ex-find-next (evil-mc-get-pattern) direction nil)))
       (cond ((eq (evil-mc-get-pattern-length) 1)
-             (ecase direction
+             (cl-ecase direction
                (forward
                 (setq found (evil-ex-find-next (evil-mc-get-pattern) direction nil)))
                (backward

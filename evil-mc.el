@@ -7,7 +7,7 @@
 ;; Version: 0.0.1
 ;; Keywords: evil editing multiple-cursors vim evil-multiple-cursors evil-mc evil-mc
 ;; Homepage: https://github.com/gabesoft/evil-mc
-;; Package-Requires: ((emacs "24") (evil "1.2.5"))
+;; Package-Requires: ((emacs "24") (evil "1.2.5") (cl-lib "0.5"))
 ;;
 ;; This file is NOT part of GNU Emacs.
 
@@ -40,8 +40,6 @@
 (require 'evil-mc-command-record)
 (require 'evil-mc-command-execute)
 (require 'evil-mc-region)
-
-(eval-when-compile (require 'cl-lib))
 
 (defcustom evil-mc-mode-line
   `(:eval (if (> (evil-mc-get-cursor-count) 1)
