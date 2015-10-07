@@ -41,6 +41,10 @@
                                       'font-lock-constant-face)
                           format-string) args))
 
+(defun evil-mc-ends-with-newline-p (text)
+  "True if TEXT ends with a newline character."
+  (string-match-p "\n$" text))
+
 (provide 'evil-mc-common)
 
 ;;; evil-mc-common.el ends here
