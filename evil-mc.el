@@ -1,4 +1,4 @@
-;;; evil-mc.el --- Multiple cursors mode for evil-mode
+;;; evil-mc.el --- Multiple cursors for evil-mode
 
 ;; Copyright © 2015 Gabriel Adomnicai <gabesoft@gmail.com>
 
