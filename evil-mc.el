@@ -1,10 +1,11 @@
-;;; evil-mc.el --- Multiple cursors mode for evil
+;;; evil-mc.el --- Multiple cursors mode for evil-mode
 
 ;; Copyright © 2015 Gabriel Adomnicai <gabesoft@gmail.com>
 
 ;; Author: Gabriel Adomnicai <gabesoft@gmail.com>
+;; Maintainer: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Version: 0.0.1
-;; Keywords: evil editing cursors vim evil-multiple-cursors evil-mc evil-mc
+;; Keywords: evil editing multiple-cursors vim evil-multiple-cursors evil-mc evil-mc
 ;; Package-Requires ((emacs "24") (evil "1.2.5"))
 ;; Homepage: https://github.com/gabesoft/evil-mc
 ;;
