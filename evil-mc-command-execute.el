@@ -167,9 +167,9 @@ or `evil-downcase' command."
 
 (defun evil-mc-execute-evil-substitute ()
   "Execute an `evil-substitute' comand."
-   (let ((point (point)))
+  (let ((point (point)))
     (evil-with-state normal
-      (unless (and region (eq point (point-at-bol)))
+      (unless (or region (eq point (point-at-bol)))
         (evil-forward-char))
       (evil-mc-execute-with-region-and-register 'evil-substitute))))
 
@@ -177,7 +177,7 @@ or `evil-downcase' command."
   "Execute an `evil-change' comand."
   (let ((point (point)))
     (evil-with-state normal
-      (unless (and region (eq point (point-at-bol)))
+      (unless (or region (eq point (point-at-bol)))
         (evil-forward-char))
       (evil-mc-execute-with-region-and-register 'evil-change))))
 
