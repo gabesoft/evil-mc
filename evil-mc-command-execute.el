@@ -250,7 +250,7 @@ to the keys vector"
 (defun evil-mc-execute-not-supported ()
   "Throw an error for a not supported command."
   (evil-force-normal-state)
-  (error (evil-mc-message "%s is not supported" (evil-mc-get-command-name))))
+  (error (message "%s is not supported" (evil-mc-get-command-name))))
 
 (defun evil-mc-clear-current-region ()
   "Clears the current region."
@@ -533,7 +533,7 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
           (apply 'evil-mc-put-cursor-property
                  (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos))
                  (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
-      (error (evil-mc-message "Failed to execute %s with error %s"
+      (error (evil-mc-message "Failed to execute %s with error: %s"
                       (evil-mc-get-command-name)
                       (error-message-string error))
              (cond ((eq :normal (evil-mc-get-command-state))
