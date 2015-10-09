@@ -17,8 +17,8 @@
 
 (defun evil-mc-command-reset ()
   "Clear the currently saved command info."
-  (setq evil-mc-command nil)
-  (setq evil-mc-recording-command nil))
+  (evil-mc-clear-command)
+  (evil-mc-clear-recording-command))
 
 (defun evil-mc-get-command-property (name)
   "Return the current command property with NAME."
@@ -85,12 +85,12 @@
 (defun evil-mc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
   (when (evil-mc-recording-debug-p) (evil-mc-message "Command %s %s" this-command (this-command-keys)))
-  (when (and (not (evil-mc-command-p this-command))
-             (not (evil-mc-executing-command-p))
+  (when (and (not (evil-mc-executing-command-p))
              (not (evil-mc-recording-command-p)))
-    (setq evil-mc-command nil)
+    (evil-mc-clear-command)
     (when (and (evil-mc-has-cursors-p)
                (not (evil-emacs-state-p))
+               (not (evil-mc-command-p this-command))
                (evil-mc-known-command-p this-command))
       (setq evil-mc-recording-command t)
       (evil-mc-set-command-property :name this-command
