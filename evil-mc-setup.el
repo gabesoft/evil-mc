@@ -12,16 +12,20 @@
 (evil-define-local-var evil-mc-custom-paused nil
   "Paused functionality when there are multiple cursors active.")
 
+(defun evil-mc-pause-smartchr-for-mode (mode)
+  "Temporarily disables the smartchr keys for MODE."
+  (let ((init (intern (concat "smartchr/init-" (symbol-name mode))))
+        (undo (intern (concat "smartchr/undo-" (symbol-name mode)))))
+    (when (eq major-mode mode)
+      (funcall undo)
+      (push `(lambda () (,init)) evil-mc-custom-paused))))
+
 (defun evil-mc-before-cursors-setup-hook ()
   "Hook to run before any cursor is created.
 Can be used to temporarily disable any functionality that doesn't
 play well with `evil-mc'."
-  (when (or (bound-and-true-p web-mode) (eq major-mode 'web-mode))
-    (smartchr/undo-web-mode)
-    (push (lambda () (smartchr/init-web-mode)) evil-mc-custom-paused))
-  (when (or (bound-and-true-p js2-mode) (eq major-mode 'js2-mode))
-    (smartchr/undo-js2-mode)
-    (push (lambda () (smartchr/init-js2-mode)) evil-mc-custom-paused)))
+  (mapc 'evil-mc-pause-smartchr-for-mode
+        '(web-mode js2-mode java-mode css-mode)))
 
 (defun evil-mc-after-cursors-teardown-hook ()
   "Hook to run after all cursors are deleted."
