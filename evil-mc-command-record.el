@@ -108,7 +108,7 @@
                        (this-command-keys-vector))
     (when (evil-mc-recording-debug-p)
       (evil-mc-message "Record-motion %s %s %s %s"
-               flag (this-command-keys) (this-command-keys-vector) evil-state))))
+                       flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun evil-mc-save-keys-operator (flag)
   "Save the current evil operator key sequence."
@@ -120,7 +120,7 @@
                        (this-command-keys-vector))
     (when (evil-mc-recording-debug-p)
       (evil-mc-message "Record-operator %s %s %s %s"
-               flag (this-command-keys) (this-command-keys-vector) evil-state))))
+                       flag (this-command-keys) (this-command-keys-vector) evil-state))))
 
 (defun evil-mc-finish-command-save ()
   "Completes the save of a command."
@@ -135,8 +135,8 @@
       (condition-case error
           (evil-mc-finalize-command)
         (error (evil-mc-message "Saving command %s failed with %s"
-                        (evil-mc-get-command-name)
-                        (error-message-string error))
+                                (evil-mc-get-command-name)
+                                (error-message-string error))
                nil))))
   (setq evil-mc-recording-command nil))
 (put 'evil-mc-finish-command-save 'permanent-local-hook t)
@@ -171,13 +171,13 @@
                  (t (or keys-post keys-pre)))))
   (when (evil-mc-recording-debug-p)
     (evil-mc-message "Record-done %s pre %s post %s keys-motion %s keys-operator %s count %s keys %s"
-             (evil-mc-get-command-name)
-             (evil-mc-get-command-keys-string :keys-pre)
-             (evil-mc-get-command-keys-string :keys-post)
-             (evil-mc-get-command-keys-string :keys-motion-post)
-             (evil-mc-get-command-keys-string :keys-operator-post)
-             (evil-mc-get-command-keys-string :keys-count)
-             (evil-mc-get-command-keys-string :keys))))
+                     (evil-mc-get-command-name)
+                     (evil-mc-get-command-keys-string :keys-pre)
+                     (evil-mc-get-command-keys-string :keys-post)
+                     (evil-mc-get-command-keys-string :keys-motion-post)
+                     (evil-mc-get-command-keys-string :keys-operator-post)
+                     (evil-mc-get-command-keys-string :keys-count)
+                     (evil-mc-get-command-keys-string :keys))))
 
 (provide 'evil-mc-command-record)
 
