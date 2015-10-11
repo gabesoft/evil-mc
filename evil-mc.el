@@ -35,6 +35,7 @@
 
 (require 'evil-mc-common)
 (require 'evil-mc-vars)
+(require 'evil-mc-undo)
 (require 'evil-mc-cursor-state)
 (require 'evil-mc-cursor-make)
 (require 'evil-mc-command-record)
@@ -97,7 +98,7 @@
     "The string used in the mode line to identify `evil-mc-mode'.")
 
   (defvar evil-mc-incompatible-minor-modes
-    '(flyspell-mode aggressive-indent-mode yas-minor-mode)
+    '(flyspell-mode flycheck-mode aggressive-indent-mode yas-minor-mode)
     "Minor modes that are incompatible with `evil-mc-mode'.")
 
   (defvar evil-mc-custom-known-commands nil

@@ -39,9 +39,3 @@ play well with `evil-mc'."
   "Override of the default mode line string for `evil-mc-mode'.")
 
 (global-evil-mc-mode 1)
-
-;; (evil-mc-mode 1)
-;; (global-evil-mc-mode 1)
-
-;; (evil-mc-mode -1)
-;; (global-evil-mc-mode -1)

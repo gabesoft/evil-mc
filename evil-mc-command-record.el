@@ -61,6 +61,21 @@
                                 keys)))
       (apply 'concat keys-string))))
 
+(defun evil-mc-get-command-undo-list-pointer-pre ()
+  "Return a pointer to `buffer-undo-list' recorded before the current command executed."
+  (when evil-mc-command
+    (evil-mc-get-command-property :undo-list-pointer-pre)))
+
+(defun evil-mc-get-command-undo-list-pointer-post ()
+  "Return a pointer to `buffer-undo-list' recorded after the current command executed."
+  (when evil-mc-command
+    (evil-mc-get-command-property :undo-list-pointer-post)))
+
+(defun evil-mc-command-undoable-p ()
+  "Return true if the current command has stored undo information in `buffer-undo-list'."
+  (not (eq (evil-mc-get-command-undo-list-pointer-pre)
+           (evil-mc-get-command-undo-list-pointer-post))))
+
 (defun evil-mc-get-command-name ()
   "Return the current command name."
   (when evil-mc-command
@@ -95,7 +110,8 @@
       (setq evil-mc-recording-command t)
       (evil-mc-set-command-property :name this-command
                                     :keys-pre (this-command-keys-vector)
-                                    :evil-state-begin evil-state)
+                                    :evil-state-begin evil-state
+                                    :undo-list-pointer-pre buffer-undo-list)
       (when (evil-mc-recording-debug-p) (evil-mc-message "Record-begin %s" evil-mc-command)))))
 (put 'evil-mc-begin-command-save 'permanent-local-hook t)
 
@@ -128,7 +144,8 @@
     (evil-mc-set-command-property :evil-state-end evil-state
                                   :last-input last-input-event
                                   :keys-post (this-command-keys-vector)
-                                  :keys-post-raw (this-single-command-raw-keys))
+                                  :keys-post-raw (this-single-command-raw-keys)
+                                  :undo-list-pointer-post buffer-undo-list)
     (when (evil-mc-recording-debug-p)
       (evil-mc-message "Record-finish %s %s" evil-mc-command this-command))
     (ignore-errors

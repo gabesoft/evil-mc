@@ -219,6 +219,7 @@
     (spacemacs/evil-numbers-decrease . ((:default . evil-mc-execute-default-call-with-count)))
     (spacemacs/evil-numbers-increase . ((:default . evil-mc-execute-default-call-with-count)))
     (transpose-chars-before-point . ((:default . evil-mc-execute-default-call-with-count)))
+    (transpose-chars . ((:default . evil-mc-execute-default-call-with-count)))
     (unimpaired/paste-above . ((:default . evil-mc-execute-default-call)))
     (unimpaired/paste-below . ((:default . evil-mc-execute-default-call)))
     (yaml-electric-backspace . ((:default . evil-mc-execute-default-call-with-count)))
@@ -253,6 +254,9 @@ which will be used if no entry matching the current state is found.")
 
 (evil-define-local-var evil-mc-command nil
   "The current command to be executed.")
+
+(evil-define-local-var evil-mc-temporary-undo nil
+  "Variable for saving the `buffer-undo-list' temporarily.")
 
 (evil-define-local-var evil-mc-executing-debug nil
   "If true display debug messages during the execution of a command.")

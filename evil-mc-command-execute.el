@@ -8,6 +8,7 @@
 (require 'evil)
 (require 'evil-mc-common)
 (require 'evil-mc-vars)
+(require 'evil-mc-undo)
 (require 'evil-mc-cursor-state)
 (require 'evil-mc-cursor-make)
 (require 'evil-mc-command-record)
@@ -535,8 +536,8 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
                  (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos))
                  (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
       (error (evil-mc-message "Failed to execute %s with error: %s"
-                      (evil-mc-get-command-name)
-                      (error-message-string error))
+                              (evil-mc-get-command-name)
+                              (error-message-string error))
              (cond ((eq :normal (evil-mc-get-command-state))
                     (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
                     (evil-mc-put-cursor-region cursor nil))
@@ -560,12 +561,7 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
         (evil-mc-message "No handler found for command %s" (evil-mc-get-command-name)))
       (when handler
         (evil-repeat-post-hook)
-        (when (memq (evil-mc-get-command-name) '(evil-paste-from-register
-                                                 evil-paste-after
-                                                 evil-paste-before
-                                                 yank))
-          (evil-mc-remove-last-undo-marker))
-        (evil-with-single-undo
+        (evil-mc-with-single-undo
           (save-excursion
             (dolist (cursor evil-mc-cursor-list)
               (setq cursor-list (evil-mc-insert-cursor-into-list
@@ -574,19 +570,6 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
                                                       clear-variables)
                                  cursor-list)))
             (setq evil-mc-cursor-list cursor-list)))))))
-
-(defun evil-mc-remove-last-undo-marker ()
-  "Remove the last undo marker so that future commands
-are undone in the same step as the current command."
-  (let ((undo-list (if (eq buffer-undo-list t)
-                       evil-temporary-undo
-                     buffer-undo-list)))
-    (unless (or (not undo-list) (car undo-list))
-      (while (and undo-list (null (car undo-list)))
-        (pop undo-list)))
-    (if (eq buffer-undo-list t)
-        (setq evil-temporary-undo undo-list)
-      (setq buffer-undo-list undo-list))))
 
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords
