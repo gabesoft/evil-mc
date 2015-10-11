@@ -12,14 +12,14 @@
 
 (Given "^I have at least one cursor$"
        (lambda ()
-         (evil-mc-make-cursor-at-pos (point))))
+         (evil-mc-make-cursor-here)))
 
 (Given "^I have one cursor at \"\\([^\"]+\\)\" in \"\\([^\"]+\\)\"$"
        (lambda (pattern text)
          (insert text)
          (goto-char (point-min))
          (search-forward pattern)
-         (evil-mc-make-cursor-at-pos (point))))
+         (evil-mc-make-cursor-here)))
 
 (When "^These examples should pass:$"
       (lambda (table) (run-and-verify table)))
