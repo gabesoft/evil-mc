@@ -245,7 +245,8 @@ to the keys vector"
          (count (cl-ecase dir (next keys-count) (prev (- keys-count)))))
     (setq column (or column (evil-mc-column-number (point))))
     (forward-line count)
-    (goto-char (min (+ (point) column) (point-at-eol)))))
+    (goto-char (min (+ (point) column)
+                    (max (point-at-bol) (1- (point-at-eol)))))))
 
 (defun evil-mc-execute-not-supported ()
   "Throw an error for a not supported command."
