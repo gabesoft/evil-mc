@@ -32,20 +32,25 @@
            (undo-boundary))))
      (setq evil-undo-list-pointer nil)))
 
+(defun evil-mc-has-undo-boundary-p ()
+  "Return true if the `buffer-undo-list' ends with an undo boundary."
+  (and buffer-undo-list
+       (not (eq buffer-undo-list t))
+       (null (car-safe buffer-undo-list))))
+
 (defun evil-mc-ensure-one-undo-step ()
   "Combine `buffer-undo-list' entries for the current command to
 make up only one undo step."
-  (let ((evil-undo-list-pointer (or (evil-mc-get-command-undo-list-pointer-pre)
-                                    (last buffer-undo-list)))
-        (has-undo-boundary (and buffer-undo-list
-                                (null (car-safe buffer-undo-list)))))
+  (let ((has-undo-boundary (evil-mc-has-undo-boundary-p))
+        (evil-undo-list-pointer (or (evil-mc-get-command-undo-list-pointer-pre)
+                                    (last buffer-undo-list))))
     (evil-refresh-undo-step)
     has-undo-boundary))
 
 (defun evil-mc-remove-last-undo-boundary ()
   "Remove the last undo marker so that future commands
 are undone in the same step as the current command."
-  (when (and buffer-undo-list (null (car-safe buffer-undo-list)))
+  (when (evil-mc-has-undo-boundary-p)
     (pop buffer-undo-list)))
 
 (provide 'evil-mc-undo)

@@ -4,13 +4,6 @@
 
 ;;; Code:
 
-;; (transpose-chars-before-point 1)
-(transpose-chars -1)
-
-(progn
-  ;; (evil-forward-char)
-  (transpose-chars -1))
-
 ;; (global-evil-mc-mode  1)
 ;; (global-evil-mc-mode -1)
 

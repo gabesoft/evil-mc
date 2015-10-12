@@ -1,9 +1,38 @@
 * Items left to do as of 09/06/2015
-** TODO Make undo work per cursor
-*** Track undo data per cursor
-*** Return cursors to their original position after an undo
-*** Implement handlers for evil-paste-pop and evil-paste-pop-next
-*** Ensure spacemacs/paste-micro-state works
+** TODO Make undo work properly
+*** Goals
+**** All cursors should return to their original positions after an undo/redo
+**** Cursors should not affect the overall undo steps
+- except all commands at cursor should be lumped in one
+  undo step with the original command
+**** Undo/Redo should still work properly after the cursors are deactivated
+*** Progress
+**** Make each undo step contain the original command and the fake commands
+**** Keep track of cursor positions for each undo/redo step
+**** Move the cursors to their positions during an undo command
+- undo
+- redo
+- undo-tree-undo
+- undo-tree-redo
+**** Fix undo for evil-repeat 
+- maybe this should be part of completing the evil-repeat implementation
+*** Implementation
+**** Track undo data per cursor
+***** position : the cursor position when an undo step starts
+***** undo-stack : previous positions per undo step
+**** Command recording should add the following info
+***** new-step-p : this is command is a new undo step
+***** undoable-p : this is an undo-able command
+***** complete-undo-step-p : this command is a complete undo step
+***** undo-p : this is an undo/redo command
+- one of undo, redo, undo-tree-undo, undo-tree-redo
+**** When running a command for all cursors
+***** remove the nil marker if any
+***** remove any nil markers in between the fake commands
+***** re-add the nil marker after the fake commands have run if any was removed
+**** During an undo command
+***** move cursors to their previous positions (saved in undo-stack)
+***** what happens during a redo?
 ** TODO Make evil-repeat work for all commands
 ** TODO Fix move-text-up/down
 *** Currently it only works only for non-consecutive lines
