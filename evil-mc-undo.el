@@ -21,7 +21,8 @@
              (evil-with-single-undo ,@body)
            (setq evil-mc-temporary-undo buffer-undo-list)))
      (unless (eq buffer-undo-list t)
-       (let ((has-undo-boundary (evil-mc-ensure-one-undo-step)))
+       (let ((has-undo-boundary (evil-mc-has-undo-boundary-p)))
+         (evil-mc-ensure-one-undo-step)
          (setq buffer-undo-list
                (if (cdr evil-mc-temporary-undo)
                    (nconc evil-mc-temporary-undo buffer-undo-list)
@@ -41,11 +42,9 @@
 (defun evil-mc-ensure-one-undo-step ()
   "Combine `buffer-undo-list' entries for the current command to
 make up only one undo step."
-  (let ((has-undo-boundary (evil-mc-has-undo-boundary-p))
-        (evil-undo-list-pointer (or (evil-mc-get-command-undo-list-pointer-pre)
+  (let ((evil-undo-list-pointer (or (evil-mc-get-command-undo-list-pointer-pre)
                                     (last buffer-undo-list))))
-    (evil-refresh-undo-step)
-    has-undo-boundary))
+    (evil-refresh-undo-step)))
 
 (defun evil-mc-remove-last-undo-boundary ()
   "Remove the last undo marker so that future commands
