@@ -14,6 +14,7 @@
 - redo
 - undo-tree-undo
 - undo-tree-redo
+**** Whitespace cleanup could interfere with the cursor positions if at eol
 **** Fix undo for evil-repeat 
 - maybe this should be part of completing the evil-repeat implementation
 *** Implementation

@@ -246,8 +246,7 @@ to the keys vector"
          (count (cl-ecase dir (next keys-count) (prev (- keys-count)))))
     (setq column (or column (evil-mc-column-number (point))))
     (forward-line count)
-    (goto-char (min (+ (point) column)
-                    (max (point-at-bol) (1- (point-at-eol)))))))
+    (evil-mc-goto-char (+ (point) column))))
 
 (defun evil-mc-execute-not-supported ()
   "Throw an error for a not supported command."
@@ -398,6 +397,26 @@ by the value of `evil-this-register'."
   (evil-insert 1)
   (evil-normal-state))
 
+(evil-mc-define-handler evil-mc-execute-default-undo ()
+  :cursor-clear (region column)
+  (let ((point (car-safe undo-stack-pointer )))
+    (setq undo-stack-pointer (cdr-safe undo-stack-pointer ))
+    (when point (evil-mc-goto-char point))))
+
+(evil-mc-define-handler evil-mc-execute-default-redo ()
+  :cursor-clear (region column)
+  (when (and undo-stack (not (eq undo-stack
+                                 undo-stack-pointer)))
+    (let ((prev-1 undo-stack)
+          (prev-2 nil))
+      (while (and prev-1 (not (eq (cdr prev-1) undo-stack-pointer)))
+        (setq prev-2 prev-1)
+        (pop prev-1))
+      (when (and prev-1 (eq (cdr prev-1) undo-stack-pointer))
+        (setq undo-stack-pointer prev-1)
+        (when (and prev-2 (car prev-2))
+          (evil-mc-goto-char (car prev-2)))))))
+
 (evil-mc-define-handler evil-mc-execute-default-macro ()
   :cursor-clear (region column)
   (evil-mc-execute-macro))
@@ -532,6 +551,8 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
 
           (evil-mc-delete-cursor-overlay cursor)
           (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
+          (setq position (point))
+
           (apply 'evil-mc-put-cursor-property
                  (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos))
                  (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
@@ -559,17 +580,24 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
            (clear-variables (evil-mc-get-clear-variables handler)))
       (unless handler
         (evil-mc-message "No handler found for command %s" (evil-mc-get-command-name)))
-      (when handler
-        (evil-repeat-post-hook)
-        (evil-mc-with-single-undo
-          (save-excursion
-            (dolist (cursor evil-mc-cursor-list)
-              (setq cursor-list (evil-mc-insert-cursor-into-list
-                                 (evil-mc-execute-for cursor
-                                                      state-variables
-                                                      clear-variables)
-                                 cursor-list)))
-            (setq evil-mc-cursor-list cursor-list)))))))
+      (ignore-errors
+        (when handler
+          (evil-repeat-post-hook)
+          (when (and (evil-mc-command-undoable-p)
+                     (evil-mc-has-undo-boundary-p
+                      (evil-mc-get-command-undo-list-pointer-pre))
+                     (not (evil-mc-undo-command-p)))
+            (setq evil-mc-cursor-list (mapcar 'evil-mc-push-cursor-position-onto-undo-stack
+                                              evil-mc-cursor-list)))
+          (evil-mc-with-single-undo
+            (save-excursion
+              (dolist (cursor evil-mc-cursor-list)
+                (setq cursor-list (evil-mc-insert-cursor-into-list
+                                   (evil-mc-execute-for cursor
+                                                        state-variables
+                                                        clear-variables)
+                                   cursor-list)))
+              (setq evil-mc-cursor-list cursor-list))))))))
 
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords

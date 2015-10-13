@@ -45,6 +45,13 @@
   "True if TEXT ends with a newline character."
   (string-match-p "\n$" text))
 
+(defun evil-mc-goto-char (pos)
+  "Goto to POS ensuring that point does not go beyond the end of line."
+  (let ((point (max (min pos (point-max)) (point-min))))
+    (goto-char point)
+    (when (eolp) (goto-char (max (point-at-bol)
+                                 (1- (point-at-eol)))))))
+
 (provide 'evil-mc-common)
 
 ;;; evil-mc-common.el ends here

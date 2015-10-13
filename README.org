@@ -146,8 +146,8 @@ work. Issues and pull requests are welcome.
 
 **** Known issues
 - Only named commands can be executed by the fake cursors.
-- Undo should work properly, but redo may not always succeed.
-- After undo the cursors may not return to their original positions
+- After undo the cursors will return to their original positions
+  if [[http://www.emacswiki.org/emacs/UndoTree][undo-tree]] mode is enabled.
 - There is a performance penalty when there are too many cursors (20+)
 - Paste will not work when [[https://github.com/syl20bnr/spacemacs][spacemacs]]' paste micro state is enabled.
   This is due to the fact that ~evil-paste-pop~ and ~evil-paste-pop-next~ 

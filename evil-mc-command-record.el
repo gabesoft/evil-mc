@@ -76,6 +76,10 @@
   (not (eq (evil-mc-get-command-undo-list-pointer-pre)
            (evil-mc-get-command-undo-list-pointer-post))))
 
+(defun evil-mc-undo-command-p ()
+  "True if the current command is an undo command."
+  (memq (evil-mc-get-command-name) '(undo redo undo-tree-undo undo-tree-redo)))
+
 (defun evil-mc-get-command-name ()
   "Return the current command name."
   (when evil-mc-command

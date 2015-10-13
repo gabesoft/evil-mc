@@ -144,7 +144,9 @@ the cursors are ordered by the cursor overlay start position."
    'evil-repeat-ring (make-ring 10)
    'evil-jumper--window-jumps (make-hash-table)
    'evil-jump-list nil
-   'kill-ring (copy-tree kill-ring)))
+   'kill-ring (copy-tree kill-ring)
+   'undo-stack nil
+   'undo-stack-pointer nil))
 
 (defun evil-mc-make-cursor-at-pos (pos &optional source-cursor)
   "Make a cursor at POS and add it to `evil-mc-cursor-list'.
@@ -153,6 +155,7 @@ If SOURCE-CURSOR is specified copy its state onto the new cursor"
                   (or source-cursor (evil-mc-get-default-cursor))))
          (cursor (evil-mc-put-cursor-property
                   source
+                  'position pos
                   'column (evil-mc-column-number pos)
                   'overlay (evil-mc-cursor-overlay-at-pos pos))))
     (evil-mc-insert-cursor cursor)
@@ -279,7 +282,9 @@ and optionally CREATE a cursor at point."
         (evil-mc-run-cursors-before)
         (evil-mc-make-cursor-at-pos point (evil-mc-read-cursor-state)))
       (evil-mc-write-cursor-state (or (evil-mc-undo-cursor-at-pos (point))
-                                      (evil-mc-get-default-cursor)))
+                                      (evil-mc-put-cursor-position
+                                       (evil-mc-get-default-cursor)
+                                       (point))))
       (unless (evil-mc-has-cursors-p) (evil-mc-clear-pattern))
       (evil-mc-run-cursors-after had-cursors))))
 
@@ -318,7 +323,8 @@ and optionally CREATE a cursor at point."
 (defun evil-mc-cursors-before ()
   "Actions to be executed before any cursors are created."
   (setq evil-mc-cursor-state (evil-mc-read-cursor-state nil))
-  (evil-mc-write-cursor-state (evil-mc-get-default-cursor))
+  (evil-mc-write-cursor-state
+   (evil-mc-put-cursor-position (evil-mc-get-default-cursor) (point)))
   (run-hooks 'evil-mc-before-cursors-created))
 
 (defun evil-mc-cursors-after ()

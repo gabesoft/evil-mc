@@ -55,8 +55,11 @@
                  kill-ring-yank-pointer
                  mark-evil-active
                  mark-ring
+                 position
                  region
-                 register-alist))
+                 register-alist
+                 undo-stack
+                 undo-stack-pointer))
     (:dabbrev . (dabbrev--friend-buffer-list
                  dabbrev--last-buffer
                  dabbrev--last-buffer-found
@@ -220,6 +223,12 @@
     (spacemacs/evil-numbers-increase . ((:default . evil-mc-execute-default-call-with-count)))
     (transpose-chars-before-point . ((:default . evil-mc-execute-default-call-with-count)))
     (transpose-chars . ((:default . evil-mc-execute-default-call-with-count)))
+
+    (undo . ((:default . evil-mc-execute-default-undo)))
+    (undo-tree-undo . ((:default . evil-mc-execute-default-undo)))
+    (redo . ((:default . evil-mc-execute-default-redo)))
+    (undo-tree-redo . ((:default . evil-mc-execute-default-redo)))
+
     (unimpaired/paste-above . ((:default . evil-mc-execute-default-call)))
     (unimpaired/paste-below . ((:default . evil-mc-execute-default-call)))
     (yaml-electric-backspace . ((:default . evil-mc-execute-default-call-with-count)))
