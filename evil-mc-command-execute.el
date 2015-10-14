@@ -500,7 +500,7 @@ by the value of `evil-this-register'."
         (evil-mc-get-object-property handler-data :default)
         (cond ((eq (evil-get-command-property cmd :repeat) 'motion)
                (if (eq state 'visual)
-                   'evil-mc-execute-visual-call-count
+                   'evil-mc-execute-visual-call-with-count
                  'evil-mc-execute-default-call-with-count))
               (t
                (when (not (eq state 'visual))
