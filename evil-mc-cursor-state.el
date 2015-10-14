@@ -67,18 +67,6 @@ If CATEGORIES is nil return all cursor variables."
   "Set the undo-stack-pointer for CURSOR to UNDO-STACK-POINTER."
   (evil-mc-put-cursor-property cursor 'undo-stack-pointer undo-stack-pointer))
 
-(defun evil-mc-push-cursor-position-onto-undo-stack (cursor)
-  "Add the current CURSOR position onto the undo stack.
-Also adjusts the undo stack pointer to point to the top of the stack."
-  (let ((undo-stack (evil-mc-get-cursor-undo-stack-pointer cursor))
-        (undo-stack-pointer nil))
-    (setq undo-stack (cons (evil-mc-get-cursor-position cursor) undo-stack))
-    (setq undo-stack-pointer undo-stack)
-    (evil-mc-put-cursor-property
-     cursor
-     'undo-stack undo-stack
-     'undo-stack-pointer undo-stack-pointer)))
-
 (defun evil-mc-get-cursor-region (cursor)
   "Get the region for CURSOR."
   (evil-mc-get-cursor-property cursor 'region))

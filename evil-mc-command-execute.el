@@ -542,6 +542,12 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
             state-variables
             (evil-mc-get-cursor-properties cursor state-variables)
 
+          (when (and (evil-mc-command-undoable-p)
+                     (evil-mc-has-undo-boundary-p (evil-mc-get-command-undo-list-pointer-pre))
+                     (not (evil-mc-undo-command-p)))
+            (setq undo-stack (cons position undo-stack-pointer))
+            (setq undo-stack-pointer undo-stack))
+
           (goto-char (evil-mc-get-cursor-start cursor))
 
           (evil-jump-hook (evil-mc-get-command-name))
@@ -583,12 +589,6 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
       (ignore-errors
         (when handler
           (evil-repeat-post-hook)
-          (when (and (evil-mc-command-undoable-p)
-                     (evil-mc-has-undo-boundary-p
-                      (evil-mc-get-command-undo-list-pointer-pre))
-                     (not (evil-mc-undo-command-p)))
-            (setq evil-mc-cursor-list (mapcar 'evil-mc-push-cursor-position-onto-undo-stack
-                                              evil-mc-cursor-list)))
           (evil-mc-with-single-undo
             (save-excursion
               (dolist (cursor evil-mc-cursor-list)

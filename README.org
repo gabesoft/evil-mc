@@ -140,17 +140,50 @@ Here's a detailed list of all commands used to create, navigate through, or dele
   ;; this hook runs just after the last cursor is deleted
   #+END_SRC
 
-*** Limitations
-Currently *evil-mc* is in a very early beta stage so not every command will 
-work. Issues and pull requests are welcome. 
+*** Notes
+- Currently *evil-mc* is in a very early beta stage and thus not fully stable.
+- Most evil motions and operators are supported but not every command will work. 
+- If the cursors don't seem to work during a command, either the command is
+  not known (see ~evil-mc-known-commands~ in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-vars.el][evil-mc-vars.el]]) or some minor modes
+  could be interfering with the evil-mc operations. 
+- Issues and pull requests are welcome. 
+
+**** Debugging
+- When a command does not work you can enable or disable 
+  debugging by running any of the commands below interactively.
+  #+BEGIN_SRC emacs-lisp
+  (evil-mc-executing-debug-on)
+  ;; Turn debug on while executing a command.
+
+  (evil-mc-executing-debug-off)
+  ;; Turn debug off while executing a command.
+
+  (evil-mc-recording-debug-on)
+  ;; Turn debug on while recording a command.
+
+  (evil-mc-recording-debug-off)
+  ;; Turn debug off while recording a command.
+
+  (evil-mc-all-debug-on)
+  ;; Turn all debug on.
+
+  (evil-mc-all-debug-off)
+  ;; Turn all debug off.
+  #+END_SRC
+
+**** Limitations
+- After undo the cursors will return to their original positions
+  if [[http://www.emacswiki.org/emacs/UndoTree][undo-tree]] mode is enabled and ~evil-repeat~ is not used.
+- Redo may cause the real cursor to get out of sync with the others.
+  This can be worked around by setting a mark and returning to it after a redo.
+- Jumps work if [[https://github.com/bling/evil-jumper][evil-jumper]] mode is enabled
 
 **** Known issues
 - Only named commands can be executed by the fake cursors.
-- After undo the cursors will return to their original positions
-  if [[http://www.emacswiki.org/emacs/UndoTree][undo-tree]] mode is enabled.
-- There is a performance penalty when there are too many cursors (20+)
+- There could be a performance penalty when there are too many cursors (30+).
 - Paste will not work when [[https://github.com/syl20bnr/spacemacs][spacemacs]]' paste micro state is enabled.
   This is due to the fact that ~evil-paste-pop~ and ~evil-paste-pop-next~ 
   commands are not supported.
-- Jumps work if [[https://github.com/bling/evil-jumper][evil-jumper]] mode is enabled
-- ~evil-repeat~ works only for some commands. In particular it doesn't work for delete.
+- ~evil-repeat~ works only for some commands. 
+  In particular it doesn't work for delete. It will also interfere with the 
+  cursor positions during an undo or redo operation.
