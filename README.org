@@ -142,7 +142,7 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 
 *** Notes
 - Currently *evil-mc* is in a very early beta stage and thus not fully stable.
-- Most evil motions and operators are supported but not every command will work. 
+- Most evil motions and operators are supported but not every single command will work. 
 - If the cursors don't seem to work during a command, either the command is
   not known (see ~evil-mc-known-commands~ in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-vars.el][evil-mc-vars.el]]) or some minor modes
   could be interfering with the evil-mc operations. 
@@ -151,7 +151,7 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 **** Debugging
 - When a command does not work, and you want to get more information,
   you can enable (or disable) debugging by running any of the commands 
-  below interactively.
+  below interactively, then watch the ~*Messages*~ buffer.
   #+BEGIN_SRC emacs-lisp
   (evil-mc-executing-debug-on)
   ;; Turn debug on while executing a command.
