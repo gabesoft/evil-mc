@@ -188,3 +188,13 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 - ~evil-repeat~ works only for some commands. 
   In particular it doesn't work for delete. It will also interfere with the 
   cursor positions during an undo or redo operation.
+
+
+
+* 
+: .__                                            .___.__  __  .__                
+: |  |__ _____  ______ ______ ___.__.   ____   __| _/|__|/  |_|__| ____    ____  
+: |  |  \\__  \ \____ \\____ <   |  | _/ __ \ / __ | |  \   __\  |/    \  / ___\ 
+: |   Y  \/ __ \|  |_> >  |_> >___  | \  ___// /_/ | |  ||  | |  |   |  \/ /_/  >
+: |___|  (____  /   __/|   __// ____|  \___  >____ | |__||__| |__|___|  /\___  / 
+:      \/     \/|__|   |__|   \/           \/     \/                  \//_____/  
