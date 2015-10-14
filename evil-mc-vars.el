@@ -218,17 +218,15 @@
     (orgtbl-self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
     (paste-after-current-line . ((:default . evil-mc-execute-default-call-with-count)))
     (paste-before-current-line . ((:default . evil-mc-execute-default-call-with-count)))
+    (redo . ((:default . evil-mc-execute-default-redo)))
     (self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
     (spacemacs/evil-numbers-decrease . ((:default . evil-mc-execute-default-call-with-count)))
     (spacemacs/evil-numbers-increase . ((:default . evil-mc-execute-default-call-with-count)))
     (transpose-chars-before-point . ((:default . evil-mc-execute-default-call-with-count)))
     (transpose-chars . ((:default . evil-mc-execute-default-call-with-count)))
-
     (undo . ((:default . evil-mc-execute-default-undo)))
     (undo-tree-undo . ((:default . evil-mc-execute-default-undo)))
-    (redo . ((:default . evil-mc-execute-default-redo)))
     (undo-tree-redo . ((:default . evil-mc-execute-default-redo)))
-
     (unimpaired/paste-above . ((:default . evil-mc-execute-default-call)))
     (unimpaired/paste-below . ((:default . evil-mc-execute-default-call)))
     (yaml-electric-backspace . ((:default . evil-mc-execute-default-call-with-count)))
