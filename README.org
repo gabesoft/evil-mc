@@ -151,7 +151,7 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 **** Debugging
 - When a command does not work, and you want to get more information,
   you can enable (or disable) debugging by running any of the commands 
-  below interactively, then watch the ~*Messages*~ buffer.
+  below interactively.
   #+BEGIN_SRC emacs-lisp
   (evil-mc-executing-debug-on)
   ;; Turn debug on while executing a command.
