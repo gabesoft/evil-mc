@@ -149,8 +149,9 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 - Issues and pull requests are welcome. 
 
 **** Debugging
-- When a command does not work you can enable or disable 
-  debugging by running any of the commands below interactively.
+- When a command does not work, and you want to get more information,
+  you can enable (or disable) debugging by running any of the commands 
+  below interactively.
   #+BEGIN_SRC emacs-lisp
   (evil-mc-executing-debug-on)
   ;; Turn debug on while executing a command.
@@ -172,8 +173,8 @@ Here's a detailed list of all commands used to create, navigate through, or dele
   #+END_SRC
 
 **** Limitations
-- After undo the cursors will return to their original positions
-  if [[http://www.emacswiki.org/emacs/UndoTree][undo-tree]] mode is enabled and ~evil-repeat~ is not used.
+- After an undo command the cursors will return to their original positions
+  if [[http://www.emacswiki.org/emacs/UndoTree][undo-tree]] mode is enabled and ~evil-repeat~ has not been used.
 - Redo may cause the real cursor to get out of sync with the others.
   This can be worked around by setting a mark and returning to it after a redo.
 - Jumps work if [[https://github.com/bling/evil-jumper][evil-jumper]] mode is enabled
