@@ -93,13 +93,13 @@ If CATEGORIES is nil return all cursor variables."
   (evil-mc-put-cursor-property
    cursor 'kill-ring-yank-pointer kill-ring-yank-pointer))
 
-(defun evil-mc-get-cursor-column (cursor)
-  "Get the column for CURSOR."
-  (evil-mc-get-cursor-property cursor 'column))
+(defun evil-mc-get-cursor-temporary-goal-column (cursor)
+  "Get the temporary-goal-column for CURSOR."
+  (evil-mc-get-cursor-property cursor 'temporary-goal-column))
 
-(defun evil-mc-put-cursor-column (cursor column)
-  "Set the column for CURSOR to COLUMN."
-  (evil-mc-put-cursor-property cursor 'column column))
+(defun evil-mc-put-cursor-temporary-goal-column (cursor temporary-goal-column)
+  "Set the temporary-goal-column for CURSOR to TEMPORARY-GOAL-COLUMN."
+  (evil-mc-put-cursor-property cursor 'temporary-goal-column temporary-goal-column))
 
 (defun evil-mc-get-cursor-evil-markers-alist (cursor)
   "Get the evil-markers-alist for CURSOR."

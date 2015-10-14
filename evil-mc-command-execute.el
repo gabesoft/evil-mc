@@ -240,14 +240,6 @@ to the keys vector"
   "Execute a generic command as a function call with count."
   (funcall (evil-mc-get-command-name) (evil-mc-get-command-keys-count)))
 
-(defun evil-mc-execute-move-to-line (dir)
-  "Execute a move to line command in DIR."
-  (let* ((keys-count (evil-mc-get-command-keys-count))
-         (count (cl-ecase dir (next keys-count) (prev (- keys-count)))))
-    (setq column (or column (evil-mc-column-number (point))))
-    (forward-line count)
-    (evil-mc-goto-char (+ (point) column))))
-
 (defun evil-mc-execute-not-supported ()
   "Throw an error for a not supported command."
   (evil-force-normal-state)
@@ -283,110 +275,102 @@ by the value of `evil-this-register'."
 ;; default handlers
 
 (evil-mc-define-handler evil-mc-execute-default-complete ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   :cursor-state :dabbrev
   (evil-mc-execute-call))
 
 (evil-mc-define-handler evil-mc-execute-default-hippie-expand ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   :cursor-state :dabbrev
   (hippie-expand 1))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-find-char ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-find-char))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-snipe ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-snipe))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-commentary ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-commentary))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-join ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-join))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-shift-left ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-shift 'evil-shift-left))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-shift-right ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-shift 'evil-shift-right))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-surround-region ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-surround-region))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-replace ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-replace))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-exchange ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-exchange))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-delete ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-delete))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-substitute ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-substitute))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-yank ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-yank))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-change ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-change))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-paste ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-paste))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-invert-char ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-change-case 'evil-invert-char))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-invert-case ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-change-case 'evil-invert-case))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-upcase ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-change-case 'evil-upcase))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-downcase ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-change-case 'evil-downcase))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-delete-char ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-with-region-and-register 'evil-delete-char))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-delete-line ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-with-region-and-register 'evil-delete-line))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-change-line ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-change-line))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-goto-line ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-evil-goto-line))
-
-(evil-mc-define-handler evil-mc-execute-default-next-line ()
-  :cursor-clear region
-  (evil-mc-execute-move-to-line 'next))
-
-(evil-mc-define-handler evil-mc-execute-default-prev-line ()
-  :cursor-clear region
-  (evil-mc-execute-move-to-line 'prev))
 
 (evil-mc-define-handler evil-mc-execute-default-force-normal-state ()
   :cursor-clear region
@@ -398,13 +382,13 @@ by the value of `evil-this-register'."
   (evil-normal-state))
 
 (evil-mc-define-handler evil-mc-execute-default-undo ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (let ((point (car-safe undo-stack-pointer )))
     (setq undo-stack-pointer (cdr-safe undo-stack-pointer ))
     (when point (evil-mc-goto-char point))))
 
 (evil-mc-define-handler evil-mc-execute-default-redo ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (when (and undo-stack (not (eq undo-stack
                                  undo-stack-pointer)))
     (let ((prev-1 undo-stack)
@@ -418,27 +402,31 @@ by the value of `evil-this-register'."
           (evil-mc-goto-char (car prev-2)))))))
 
 (evil-mc-define-handler evil-mc-execute-default-macro ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-macro))
 
 (evil-mc-define-handler evil-mc-execute-default-call ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-call))
 
 (evil-mc-define-handler evil-mc-execute-default-call-with-last-input ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-call-with-last-input))
 
+(evil-mc-define-handler evil-mc-execute-default-line-move ()
+  :cursor-clear (region)
+  (evil-mc-execute-call-with-count))
+
 (evil-mc-define-handler evil-mc-execute-default-call-with-count ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-call-with-count))
 
 (evil-mc-define-handler evil-mc-execute-default-ignore ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (ignore))
 
 (evil-mc-define-handler evil-mc-execute-default-not-supported ()
-  :cursor-clear (region column)
+  :cursor-clear (region temporary-goal-column)
   (evil-mc-execute-not-supported))
 
 ;; handlers for visual state
@@ -493,7 +481,10 @@ by the value of `evil-this-register'."
 (evil-mc-define-visual-handler evil-mc-execute-visual-call ()
   (evil-mc-execute-call))
 
-(evil-mc-define-visual-handler evil-mc-execute-visual-call-count ()
+(evil-mc-define-visual-handler evil-mc-execute-visual-line-move ()
+  (evil-mc-execute-call-with-count))
+
+(evil-mc-define-visual-handler evil-mc-execute-visual-call-with-count ()
   (evil-mc-execute-call-with-count))
 
 ;; ----

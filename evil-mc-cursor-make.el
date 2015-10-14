@@ -156,7 +156,7 @@ If SOURCE-CURSOR is specified copy its state onto the new cursor"
          (cursor (evil-mc-put-cursor-property
                   source
                   'position pos
-                  'column (evil-mc-column-number pos)
+                  'temporary-goal-column (evil-mc-column-number pos)
                   'overlay (evil-mc-cursor-overlay-at-pos pos))))
     (evil-mc-insert-cursor cursor)
     cursor))

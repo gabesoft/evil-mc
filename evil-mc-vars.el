@@ -32,8 +32,7 @@
   :group 'evil-mc)
 
 (defvar evil-mc-cursor-variables
-  '((:default . (column
-                 evil-exchange--overlays
+  '((:default . (evil-exchange--overlays
                  evil-exchange--position
                  evil-jumper--window-jumps
                  evil-jumper--jumping
@@ -59,7 +58,8 @@
                  region
                  register-alist
                  undo-stack
-                 undo-stack-pointer))
+                 undo-stack-pointer
+                 temporary-goal-column))
     (:dabbrev . (dabbrev--friend-buffer-list
                  dabbrev--last-buffer
                  dabbrev--last-buffer-found
@@ -161,7 +161,7 @@
     (evil-jump-item . ((:default . evil-mc-execute-default-call) (visual . evil-mc-execute-visual-call)))
     (evil-lookup . ((:default . evil-mc-execute-default-call) (visual . evil-mc-execute-visual-call)))
     (evil-middle-of-visual-line . ((:default . evil-mc-execute-default-call) (visual evil-mc-execute-visual-call)))
-    (evil-next-line . ((:default . evil-mc-execute-default-next-line) (visual . evil-mc-execute-visual-next-line)))
+    (evil-next-line . ((:default . evil-mc-execute-default-line-move) (visual . evil-mc-execute-visual-line-move)))
     (evil-next-match . ((:default . evil-mc-execute-default-call-with-count) (visual . evil-mc-execute-visual-text-object)))
     (evil-normal-state . ((:default . evil-mc-execute-default-evil-normal-state)))
     (evil-open-above . ((:default . evil-mc-execute-default-call-with-count)))
@@ -176,7 +176,7 @@
     (evil-paste-from-register . ((:default . evil-mc-execute-default-macro)))
     (evil-paste-pop . ((:default . evil-mc-execute-default-not-supported)))
     (evil-paste-pop-next . ((:default . evil-mc-execute-default-not-supported)))
-    (evil-previous-line . ((:default . evil-mc-execute-default-prev-line) (visual . evil-mc-execute-visual-prev-line)))
+    (evil-previous-line . ((:default . evil-mc-execute-default-line-move) (visual . evil-mc-execute-visual-line-move)))
     (evil-previous-match . ((:default . evil-mc-execute-default-call-with-count) (visual . evil-mc-execute-visual-text-object)))
     (evil-repeat . ((:default . evil-mc-execute-default-call-with-count)))
     (evil-repeat-pop . ((:default . evil-mc-execute-default-call-with-count)))
