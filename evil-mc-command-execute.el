@@ -141,19 +141,26 @@ or `evil-downcase' command."
     (goto-char region-start)
     (evil-exchange region-start region-end region-type)))
 
-(defun evil-mc-execute-with-region-and-register (cmd)
-  "Execute CMD with the current register and region."
+(defun evil-mc-execute-with-region-or-macro (cmd)
+  "Execute CMD with the current register and region.
+If there is no region run an `evil-mc-execute-macro'."
   (evil-mc-with-region-or-execute-macro region t
     (funcall cmd region-start region-end region-type evil-this-register)))
 
+(defun evil-mc-execute-with-region-or-pos (cmd)
+  "Execute a CMD with the current register and region.
+If there is no region call CMD with the point position."
+  (evil-mc-with-region region
+      (funcall cmd
+               region-start
+               region-end
+               region-type
+               evil-this-register)
+    (funcall cmd (point) (1+ (point)))))
+
 (defun evil-mc-execute-evil-change-line ()
   "Execute an `evil-change-line' comand."
-  (evil-mc-with-region region
-      (evil-delete-line region-start
-                        region-end
-                        region-type
-                        evil-this-register)
-    (evil-delete-line (point) (1+ (point)))))
+  (evil-mc-execute-with-region-or-pos 'evil-delete-line))
 
 (defun evil-mc-execute-evil-yank ()
   "Execute an `evil-yank' comand."
@@ -162,17 +169,13 @@ or `evil-downcase' command."
     (goto-char (min (evil-mc-get-region-mark region)
                     (evil-mc-get-region-point region)))))
 
-(defun evil-mc-execute-evil-delete ()
-  "Execute an `evil-delete' comand."
-  (evil-mc-execute-with-region-and-register 'evil-delete))
-
 (defun evil-mc-execute-evil-substitute ()
   "Execute an `evil-substitute' comand."
   (let ((point (point)))
     (evil-with-state normal
       (unless (or region (eq point (point-at-bol)))
         (evil-forward-char))
-      (evil-mc-execute-with-region-and-register 'evil-substitute))))
+      (evil-mc-execute-with-region-or-macro 'evil-substitute))))
 
 (defun evil-mc-execute-evil-change ()
   "Execute an `evil-change' comand."
@@ -180,7 +183,7 @@ or `evil-downcase' command."
     (evil-with-state normal
       (unless (or region (eq point (point-at-bol)))
         (evil-forward-char))
-      (evil-mc-execute-with-region-and-register 'evil-change))))
+      (evil-mc-execute-with-region-or-macro 'evil-change))))
 
 (defun evil-mc-execute-evil-paste ()
   "Execute an `evil-paste-before' or `evil-paste-after' command."
@@ -193,7 +196,7 @@ or `evil-downcase' command."
            (let ((kill-ring (copy-tree kill-ring))
                  (kill-ring-yank-pointer nil))
 
-             (evil-mc-execute-evil-delete)
+             (evil-mc-execute-with-region-or-macro 'evil-delete)
              (setq new-kill-ring kill-ring)
              (setq new-kill-ring-yank-pointer kill-ring-yank-pointer))
 
@@ -320,10 +323,6 @@ by the value of `evil-this-register'."
   :cursor-clear region
   (evil-mc-execute-evil-exchange))
 
-(evil-mc-define-handler evil-mc-execute-default-evil-delete ()
-  :cursor-clear region
-  (evil-mc-execute-evil-delete))
-
 (evil-mc-define-handler evil-mc-execute-default-evil-substitute ()
   :cursor-clear region
   (evil-mc-execute-evil-substitute))
@@ -340,33 +339,29 @@ by the value of `evil-this-register'."
   :cursor-clear region
   (evil-mc-execute-evil-paste))
 
-(evil-mc-define-handler evil-mc-execute-default-evil-invert-char ()
+(evil-mc-define-handler evil-mc-execute-default-change-case
   :cursor-clear region
-  (evil-mc-execute-change-case 'evil-invert-char))
+  (evil-mc-execute-change-case (evil-mc-get-command-name)))
 
-(evil-mc-define-handler evil-mc-execute-default-evil-invert-case ()
+(evil-mc-define-handler evil-mc-execute-default-evil-delete ()
   :cursor-clear region
-  (evil-mc-execute-change-case 'evil-invert-case))
-
-(evil-mc-define-handler evil-mc-execute-default-evil-upcase ()
-  :cursor-clear region
-  (evil-mc-execute-change-case 'evil-upcase))
-
-(evil-mc-define-handler evil-mc-execute-default-evil-downcase ()
-  :cursor-clear region
-  (evil-mc-execute-change-case 'evil-downcase))
-
-(evil-mc-define-handler evil-mc-execute-default-evil-delete-char ()
-  :cursor-clear region
-  (evil-mc-execute-with-region-and-register 'evil-delete-char))
-
-(evil-mc-define-handler evil-mc-execute-default-evil-delete-line ()
-  :cursor-clear region
-  (evil-mc-execute-with-region-and-register 'evil-delete-line))
+  (evil-mc-execute-with-region-or-macro (evil-mc-get-command-name)))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-change-line ()
   :cursor-clear region
-  (evil-mc-execute-evil-change-line))
+  (evil-mc-execute-with-region-or-pos 'evil-delete-line))
+
+(evil-mc-define-handler evil-mc-execute-default-evil-sp-change-line ()
+  :cursor-clear region
+  (evil-mc-execute-with-region-or-pos 'evil-sp-delete-line))
+
+(evil-mc-define-handler evil-mc-execute-default-evil-sp-delete ()
+  :cursor-clear region
+  (evil-mc-execute-with-region-or-pos (evil-mc-get-command-name)))
+
+(evil-mc-define-handler evil-mc-execute-default-evil-goto-line ()
+  :cursor-clear region
+  (evil-mc-execute-evil-goto-line))
 
 (evil-mc-define-handler evil-mc-execute-default-force-normal-state ()
   :cursor-clear region
@@ -476,6 +471,9 @@ by the value of `evil-this-register'."
 
 (evil-mc-define-visual-handler evil-mc-execute-visual-line-move ()
   (evil-mc-execute-call-with-count))
+
+(evil-mc-define-visual-handler evil-mc-execute-visual-evil-goto-line ()
+  (evil-mc-execute-evil-goto-line))
 
 (evil-mc-define-visual-handler evil-mc-execute-visual-call-with-count ()
   (evil-mc-execute-call-with-count))
