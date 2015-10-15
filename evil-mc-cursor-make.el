@@ -227,7 +227,7 @@ Return the deleted cursor."
   (let ((whole-word (not (evil-visual-state-p))))
     (if (evil-visual-state-p)
         (let ((end (cadr (evil-visual-range))))
-          (when (and (not (eq (point) end)))
+          (when (not (eq (point) end))
             (goto-char (1- end))))
       (let ((range (evil-inner-symbol)))
         (evil-visual-char (car range) (1- (cadr range)))))
