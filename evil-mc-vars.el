@@ -54,7 +54,7 @@
                  kill-ring-yank-pointer
                  mark-evil-active
                  mark-ring
-                 position
+                 last-position
                  region
                  register-alist
                  undo-stack

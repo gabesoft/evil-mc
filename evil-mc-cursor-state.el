@@ -43,13 +43,13 @@ If CATEGORIES is nil return all cursor variables."
   "Set the overlay for CURSOR to OVERLAY."
   (evil-mc-put-cursor-property cursor 'overlay overlay))
 
-(defun evil-mc-get-cursor-position (cursor)
-  "Get the position for CURSOR."
-  (evil-mc-get-cursor-property cursor 'position))
+(defun evil-mc-get-cursor-last-position (cursor)
+  "Get the last-position for CURSOR."
+  (evil-mc-get-cursor-property cursor 'last-position))
 
-(defun evil-mc-put-cursor-position (cursor position)
-  "Set the position for CURSOR to POSITION."
-  (evil-mc-put-cursor-property cursor 'position position))
+(defun evil-mc-put-cursor-last-position (cursor last-position)
+  "Set the last-position for CURSOR to LAST-POSITION."
+  (evil-mc-put-cursor-property cursor 'last-position last-position))
 
 (defun evil-mc-get-cursor-undo-stack (cursor)
   "Get the undo-stack for CURSOR."

@@ -534,12 +534,12 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
           (when (and (evil-mc-command-undoable-p)
                      (evil-mc-has-undo-boundary-p (evil-mc-get-command-undo-list-pointer-pre))
                      (not (evil-mc-undo-command-p)))
-            (setq undo-stack (cons position undo-stack-pointer))
+            (setq undo-stack (cons last-position undo-stack-pointer))
             (setq undo-stack-pointer undo-stack))
 
           (evil-mc-delete-cursor-overlay cursor)
           (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
-          (setq position (point))
+          (setq last-position (point))
 
           (apply 'evil-mc-put-cursor-property
                  (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos))
