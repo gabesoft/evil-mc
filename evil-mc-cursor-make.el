@@ -24,9 +24,9 @@
   "Prints information about the current cursors preceded by MSG."
   (when (evil-mc-has-cursors-p)
     (evil-mc-message "%s %s cursors matching \"%s\""
-             (or msg "There are")
-             (1+ (length evil-mc-cursor-list))
-             (evil-mc-get-pattern-text))))
+                     (or msg "There are")
+                     (1+ (length evil-mc-cursor-list))
+                     (evil-mc-get-pattern-text))))
 
 (defun evil-mc-cursor-overlay (start end)
   "Make an overlay for a cursor from START to END."
@@ -223,9 +223,12 @@ Return the deleted cursor."
       (error "Invalid range %s" range))))
 
 (defun evil-mc-set-pattern ()
-  "Set `evil-mc-pattern' to the selected text."
+  "Move the cursor to the end of the selected text or symbol at point and initialize `evil-mc-pattern'."
   (let ((whole-word (not (evil-visual-state-p))))
-    (unless (evil-visual-state-p)
+    (if (evil-visual-state-p)
+        (let ((end (cadr (evil-visual-range))))
+          (when (and (not (eq (point) end)))
+            (goto-char (1- end))))
       (let ((range (evil-inner-symbol)))
         (evil-visual-char (car range) (1- (cadr range)))))
     (setq evil-mc-pattern nil)
