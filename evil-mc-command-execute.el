@@ -368,10 +368,6 @@ by the value of `evil-this-register'."
   :cursor-clear region
   (evil-mc-execute-evil-change-line))
 
-(evil-mc-define-handler evil-mc-execute-default-evil-goto-line ()
-  :cursor-clear region
-  (evil-mc-execute-evil-goto-line))
-
 (evil-mc-define-handler evil-mc-execute-default-force-normal-state ()
   :cursor-clear region
   (evil-force-normal-state))
@@ -456,9 +452,6 @@ by the value of `evil-this-register'."
 
 (evil-mc-define-visual-handler evil-mc-execute-visual-evil-snipe ()
   (evil-mc-execute-evil-snipe))
-
-(evil-mc-define-visual-handler evil-mc-execute-visual-evil-goto-line ()
-  (evil-mc-execute-evil-goto-line))
 
 (evil-mc-define-visual-handler evil-mc-execute-visual-next-line ()
   (evil-mc-execute-move-to-line 'next))
