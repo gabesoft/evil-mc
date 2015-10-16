@@ -185,7 +185,8 @@
                                         (not (or
                                               (equal keys-operator-pre [?t])
                                               (equal keys-operator-pre [?f]))))
-                                   (> (length keys-operator-pre) 1))
+                                   (> (length keys-operator-pre) 1)
+                                   (> (length keys-operator-post) 1))
                                keys-operator-post
                              (vconcat keys-operator-pre
                                       keys-operator-post))))
