@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"
 
-ECUKES_EMACS=${EMACS:-$(which emacs)}
+ECUKES_EMACS=${EVM_EMACS:-$(which emacs)}
 export ECUKES_EMACS
 
 echo "*** Emacs version ***"
