@@ -52,11 +52,13 @@ The main commands used to create or delete cursors are:
 #+END_SRC
 
 The above commands as well as others, detailed below, are setup with key bindings
-when enabling the *evil-mc* mode. The keys are defined in ~evil-mc-key-map~. You can 
+when the *evil-mc* mode is enabled. The keys are defined in ~evil-mc-key-map~. You can 
 take a look at that variable declaration in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] to see all key bindings. But,
-in short, ~C-n~, ~C-p~, and, ~C-t~ are used for creating cursors, and ~M-n~, ~M-p~ 
-are used for cycling through cursors. The commands that create cursors wrap around but the 
-ones that cycle them do not.
+in short, ~C-n~, ~C-p~ are used for creating cursors, and ~M-n~, ~M-p~ 
+are used for cycling through cursors. The commands that create cursors wrap around but 
+the ones that cycle them do not. 
+To skip creating a cursor forward use ~C-t~ or ~grn~ and backward ~grp~. 
+Finally use ~gru~ to remove all cursors.
 
 For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
 **** Commands
