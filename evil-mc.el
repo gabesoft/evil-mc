@@ -88,7 +88,8 @@
          (evil-mc-initialize-vars)
          (evil-mc-initialize-hooks))
         (t
-         (evil-mc-teardown-hooks))))
+         (evil-mc-teardown-hooks)))
+  (evil-normalize-keymaps))
 
 (put 'evil-mc-mode 'permanent-local t)
 

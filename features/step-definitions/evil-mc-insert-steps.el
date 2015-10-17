@@ -5,7 +5,7 @@
         (vconcat (edmacro-parse-keys arg)
                  (edmacro-parse-keys "<return>")))))
 
-(When "^I replace buffer text with\\(?: \"\\(.+\\)\"\\|:\\)$"
+(When "^I replace the buffer text with\\(?: \"\\(.+\\)\"\\|:\\)$"
       "Replace the current buffer text with CONTENTS.
 Also enter normal state and go to the beginning of buffer."
       (lambda (contents)

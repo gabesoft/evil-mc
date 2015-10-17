@@ -1,0 +1,1 @@
+Feature: Delete text

@@ -1,7 +1,7 @@
-Feature: Evil insert state
+Feature: Insert and change text
 
   Scenario: Text typed in insert state should be entered into the buffer
-    When I replace buffer text with "aaa"
+    When I replace the buffer text with "aaa"
     And I press "vgrm"
     And I type "clfirst text "
     Then I should see:
@@ -10,7 +10,7 @@ Feature: Evil insert state
     """
 
   Scenario: Should be able to enter new lines
-    When I replace buffer text with "bbb"
+    When I replace the buffer text with "bbb"
     And I press "vgrm"
     And I press "cl"
     And I press "word" followed by enter
@@ -22,19 +22,19 @@ Feature: Evil insert state
     """
 
   Scenario: Should insert at cursor
-    When I replace buffer text with "a a a"
+    When I replace the buffer text with "a a a"
     And I press "vgrm"
     And I press "i-y-"
     Then I should see "-y-a -y-a -y-a"
 
   Scenario: Should insert after cursor
-    When I replace buffer text with "a a a"
+    When I replace the buffer text with "a a a"
     And I press "vgrm"
     And I press "a-x-"
     Then I should see "a-x- a-x- a-x-"
 
   Scenario: Should insert at the beginning of line
-    When I replace buffer text with: 
+    When I replace the buffer text with: 
     """
     This is a line
     This is a line
@@ -51,7 +51,7 @@ Feature: Evil insert state
     """
 
   Scenario: Should insert at the end of line
-    When I replace buffer text with: 
+    When I replace the buffer text with: 
     """
     This is a line
     This is a line
@@ -68,19 +68,19 @@ Feature: Evil insert state
     """
 
   Scenario: Should change a letter
-    When I replace buffer text with "xyz xyz xyz"
+    When I replace the buffer text with "xyz xyz xyz"
     And I press "grm"
     And I type "clw"
     Then I should see "xyw xyw xyw"
 
   Scenario: Should change a word
-    When I replace buffer text with "xyz xyz xyz"
+    When I replace the buffer text with "xyz xyz xyz"
     And I press "grm"
     And I type "bcwabc"
     Then I should see "abc abc abc"
 
   Scenario: Should change a word at the beginning of line
-    When I replace buffer text with:
+    When I replace the buffer text with:
     """
     This is a line 
     This is a line 
@@ -96,31 +96,31 @@ Feature: Evil insert state
     """
 
   Scenario: Should change to the end of word
-    When I replace buffer text with "xyz xyz xyz"
+    When I replace the buffer text with "xyz xyz xyz"
     And I press "grm"
     And I type "bceabc"
     Then I should see "abc abc abc"
 
   Scenario: Should change up to a letter (f)
-    When I replace buffer text with "another-test another-test another-test"
+    When I replace the buffer text with "another-test another-test another-test"
     And I press "grm"
     And I type "bbbcftxyz"
     Then I should see "xyzher-test xyzher-test xyzher-test"
 
   Scenario: Should change up to a letter (f) with count
-    When I replace buffer text with "another-test another-test another-test"
+    When I replace the buffer text with "another-test another-test another-test"
     And I press "grm"
     And I type "bbb2cftxyz"
     Then I should see "xyzest xyzest xyzest"
 
   Scenario: Should change up till before a letter (t)
-    When I replace buffer text with "another-test another-test another-test"
+    When I replace the buffer text with "another-test another-test another-test"
     And I press "grm"
     And I type "bbbcttxyz"
     Then I should see "xyzther-test xyzther-test xyzther-test"
 
   Scenario: Should change a bracket expression excluding brackets
-    When I replace buffer text with:
+    When I replace the buffer text with:
     """
     This is a (sentence) with brackets. 
     This is a (sentence) with brackets. 
@@ -136,7 +136,7 @@ Feature: Evil insert state
     """
 
   Scenario: Should change a bracket expression including brackets
-    When I replace buffer text with:
+    When I replace the buffer text with:
     """
     This is a (sentence) with brackets. 
     This is a (sentence) with brackets. 
@@ -149,4 +149,36 @@ Feature: Evil insert state
     This is a changed with brackets. 
     This is a changed with brackets. 
     This is a changed with brackets.
+    """
+
+  Scenario: Should change until the end of line
+    When I replace the buffer text with:
+    """
+    This is a line. 
+    This is a line. 
+    This is a line.
+    """
+    And I press "grm"
+    And I press "wC"
+    And I type "line has changed."
+    Then I should see:
+    """
+    This line has changed.
+    This line has changed.
+    This line has changed.
+    """
+    
+  Scenario: Should change a whole line
+    When I replace the buffer text with:
+    """
+    This is a line. 
+    This is a line. 
+    This is a line.
+    """
+    And I press "grm"
+    And I press "cc"
+    And I type "This line has changed. "
+    Then I should see:
+    """
+    This line has changed. This line has changed. This line has changed.
     """
