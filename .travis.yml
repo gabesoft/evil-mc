@@ -4,7 +4,7 @@ branches:
   - master
 
 env:
-  - EMACS=emacs24.4-bin
+  - EMACS=emacs-24.4-bin
 
 before_install:
   - sudo mkdir /usr/local/evm
