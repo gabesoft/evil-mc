@@ -1,5 +1,7 @@
 language: emacs-lisp
 
+sudo: false
+
 branches:
   - master
 
