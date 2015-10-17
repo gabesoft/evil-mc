@@ -9,7 +9,7 @@
 :    ░  ░     ░   ░      ░  ░          ░   ░ ░      
 :            ░                             ░        
 
-#+TITLE: evil-mc [[https://travis-ci.org/gabesoft/evil-mc][https://travis-ci.org/gabesoft/evil-mc.svg?branch=master]]
+#+TITLE: evil-mc [[https://travis-ci.org/gabesoft/evil-mc][https://travis-ci.org/gabesoft/evil-mc.svg?branch=master&style=flat-square]]
 
 ** Multiple cursors implementation for evil-mode
 *** Synopsis
