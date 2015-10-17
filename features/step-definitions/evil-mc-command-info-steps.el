@@ -43,9 +43,10 @@ optionally running UNDO after each one."
              (cmd (nth 1 row))
              (out (nth 2 row)))
         (when (or (null out) (eq 0 (length out))) (setq out key))
+        (evil-force-normal-state)
         (When "I press \"%s\"" key)
         (Then "The recorded command name should be \"%s\"" cmd)
         (Then "The recorded command keys should be \"%s\"" out)
         (when undo
-          (When "I press \"ESC\"")
+          (evil-force-normal-state)
           (When "I press \"u\""))))))

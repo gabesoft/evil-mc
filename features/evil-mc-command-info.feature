@@ -27,9 +27,9 @@ Feature: Record current command info
   Scenario: Record commands to change lines
     When I insert:
     """
-    This is the start of text -1 -1 -1 t t t f f f k k k
-    This is the second line -1 -1 -1 t t t f f f k k k
-    This is the third line -1 -1 -1 t t t f f f k k k
+    This is the start of text -1 -1 -1 t t t f f f k k k k
+    This is the second line -1 -1 -1 t t t f f f k k k k
+    This is the third line -1 -1 -1 t t t f f f k k k k
     """
     And I go to the beginning of buffer
     Given I have at least one cursor

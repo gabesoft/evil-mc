@@ -9,7 +9,8 @@
 :    ░  ░     ░   ░      ░  ░          ░   ░ ░      
 :            ░                             ░        
 
-#+TITLE: evil-mc
+#+TITLE: evil-mc [![Build Status](https://img.shields.io/travis/gabesoft/evil-mc/master.svg?style=flat-square)](https://travis-ci.org/gabesoft/evil-mc)
+
 
 ** Multiple cursors implementation for evil-mode
 *** Synopsis
