@@ -51,7 +51,7 @@ The main commands used to create or delete cursors are:
 ;; cursor without creating a cursor at point.
 #+END_SRC
 
-The above commands, as well as others, detailed below, are setup with key bindings
+The above commands as well as others, detailed below, are setup with key bindings
 when enabling the *evil-mc* mode. The keys are defined in ~evil-mc-key-map~. You can 
 take a look at that variable declaration in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] to see all key bindings. But,
 in short, ~C-n~, ~C-p~, and, ~C-t~ are used for creating cursors, and ~M-n~, ~M-p~ 
