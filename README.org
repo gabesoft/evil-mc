@@ -52,9 +52,11 @@ The main commands used to create or delete cursors are:
 #+END_SRC
 
 The above commands, as well as others detailed below, are setup with key bindings
-when enabling the *evil-mc* mode. All key bindings can be overridden or removed by
-defining a variable named ~evil-mc-keys~ with the key bindings of your liking. 
-See the definition of that variable in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] for more info.
+when enabling the *evil-mc* mode. The keys are defined in ~evil-mc-key-map~. You can 
+take a look at that variable declaration in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] to see all key bindings. But,
+in short, ~C-n~, ~C-p~, and, ~C-t~ are used for creating cursors, and ~M-n~, ~M-p~ 
+are used for cycling through cursors. The commands that create cursors wrap around but the 
+ones that cycle them do not.
 
 For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
 **** Commands
@@ -123,7 +125,6 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 **** Customization
 *evil-mc* can be customized in several ways:
 
-- The key bindings can be set in ~evil-mc-keys~ as mentioned above.
 - Every known command is executed using a command handler defined in a variable
   called ~evil-mc-known-commands~ in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-vars.el][evil-mc-vars.el]]. Those can be overridden by 
   defining the ~evil-mc-custom-known-commands~ variable. See the documentation of 
