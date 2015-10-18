@@ -2,7 +2,6 @@
 
 cd "$(dirname "$0")"
 
-# ECUKES_EMACS=${EVM_EMACS:-$(which emacs)}
 ECUKES_EMACS=$(which emacs)
 export ECUKES_EMACS
 

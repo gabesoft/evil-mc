@@ -168,17 +168,21 @@ Feature: Insert and change text
     This line has changed.
     """
     
-  Scenario: Should change a whole line
-    When I replace the buffer text with:
-    """
-    This is a line. 
-    This is a line. 
-    This is a line.
-    """
-    And I press "grm"
-    And I press "cc"
-    And I type "This line has changed. "
-    Then I should see:
-    """
-    This line has changed. This line has changed. This line has changed.
-    """
+  # Scenario: Should change a whole line
+  #   When I replace the buffer text with:
+  #   """
+  #   This is a line. 
+  #   This is a line. 
+  #   This is a line.
+  #   This is a line.
+  #   """
+  #   And I press "grm"
+  #   And I type "cc"
+  #   And I type "This line has changed."
+  #   Then I should see:
+  #   """
+  #   This line has changed.
+  #   This line has changed.
+  #   This line has changed.
+  #   This line has changed.
+  #   """
