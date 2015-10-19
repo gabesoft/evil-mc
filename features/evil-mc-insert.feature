@@ -34,7 +34,7 @@ Feature: Insert and change text
     Then I should see "a-x- a-x- a-x-"
 
   Scenario: Should insert at the beginning of line
-    When I replace the buffer text with: 
+    When I replace the buffer text with:
     """
     This is a line
     This is a line
@@ -51,7 +51,7 @@ Feature: Insert and change text
     """
 
   Scenario: Should insert at the end of line
-    When I replace the buffer text with: 
+    When I replace the buffer text with:
     """
     This is a line
     This is a line
@@ -82,16 +82,16 @@ Feature: Insert and change text
   Scenario: Should change a word at the beginning of line
     When I replace the buffer text with:
     """
-    This is a line 
-    This is a line 
+    This is a line
+    This is a line
     This is a line
     """
     And I press "grm"
     And I type "bcwabc"
     Then I should see:
     """
-    abc is a line 
-    abc is a line 
+    abc is a line
+    abc is a line
     abc is a line
     """
 
@@ -100,6 +100,15 @@ Feature: Insert and change text
     And I press "grm"
     And I type "bceabc"
     Then I should see "abc abc abc"
+
+  Scenario: Should change to the end of word with count
+    When I replace the buffer text with:
+    """
+    xyz yyz yyz xyz yyz yyz xyz yyz yyz xyz yyz yyz
+    """
+    And I press "grm"
+    And I type "b2ceabc"
+    Then I should see "abc yyz abc yyz abc yyz abc yyz"
 
   Scenario: Should change up to a letter (f)
     When I replace the buffer text with "another-test another-test another-test"
@@ -122,40 +131,40 @@ Feature: Insert and change text
   Scenario: Should change a bracket expression excluding brackets
     When I replace the buffer text with:
     """
-    This is a (sentence) with brackets. 
-    This is a (sentence) with brackets. 
+    This is a (sentence) with brackets.
+    This is a (sentence) with brackets.
     This is a (sentence) with brackets.
     """
     And I press "grm"
     And I type "f(cibchanged"
     Then I should see:
     """
-    This is a (changed) with brackets. 
-    This is a (changed) with brackets. 
+    This is a (changed) with brackets.
+    This is a (changed) with brackets.
     This is a (changed) with brackets.
     """
 
   Scenario: Should change a bracket expression including brackets
     When I replace the buffer text with:
     """
-    This is a (sentence) with brackets. 
-    This is a (sentence) with brackets. 
+    This is a (sentence) with brackets.
+    This is a (sentence) with brackets.
     This is a (sentence) with brackets.
     """
     And I press "grm"
     And I type "f(cabchanged"
     Then I should see:
     """
-    This is a changed with brackets. 
-    This is a changed with brackets. 
+    This is a changed with brackets.
+    This is a changed with brackets.
     This is a changed with brackets.
     """
 
   Scenario: Should change until the end of line
     When I replace the buffer text with:
     """
-    This is a line. 
-    This is a line. 
+    This is a line.
+    This is a line.
     This is a line.
     """
     And I press "grm"
@@ -167,22 +176,66 @@ Feature: Insert and change text
     This line has changed.
     This line has changed.
     """
-    
-  # Scenario: Should change a whole line
-  #   When I replace the buffer text with:
-  #   """
-  #   This is a line. 
-  #   This is a line. 
-  #   This is a line.
-  #   This is a line.
-  #   """
-  #   And I press "grm"
-  #   And I type "cc"
-  #   And I type "This line has changed."
-  #   Then I should see:
-  #   """
-  #   This line has changed.
-  #   This line has changed.
-  #   This line has changed.
-  #   This line has changed.
-  #   """
+
+  # TODO ensure this works for consecutive lines and
+  #      passes for [ "cc" "^cc" "$cc" ]
+  Scenario: Should change a whole line
+    When I replace the buffer text with:
+    """
+    This is a line.
+    That is a line.
+    This is a line.
+    That is a line.
+    That is a line.
+    """
+    And I press "grm"
+    And I type "cc"
+    And I type "The line has changed."
+    Then I should see:
+    """
+    The line has changed.
+    That is a line.
+    The line has changed.
+    That is a line.
+    """
+
+  Scenario: Should change a whole visual line
+    When I replace the buffer text with:
+    """
+    This is a line.
+    That is a line.
+    This is a line.
+    That is a line.
+    """
+    And I press "grm"
+    And I press "Vc"
+    And I type "The line has changed."
+    Then I should see:
+    """
+    The line has changed.
+    That is a line.
+    The line has changed.
+    That is a line.
+    """
+
+  Scenario: Should change a whole line with count
+    When I replace the buffer text with:
+    """
+    This is a line.
+    The next line.
+    The last line.
+    This is a line.
+    The next line.
+    The last line.
+    The last line.
+    """
+    And I press "grm"
+    And I press "2cc"
+    And I type "The first two lines have changed."
+    Then I should see:
+    """
+    The first two lines have changed.
+    The last line.
+    The first two lines have changed.
+    The last line.
+    """

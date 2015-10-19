@@ -114,6 +114,7 @@
       (setq evil-mc-recording-command t)
       (evil-mc-set-command-property :name this-command
                                     :keys-pre (this-command-keys-vector)
+                                    :keys-pre-with-count (evil-extract-count (this-command-keys-vector))
                                     :evil-state-begin evil-state
                                     :undo-list-pointer-pre buffer-undo-list)
       (when (evil-mc-recording-debug-p) (evil-mc-message "Record-begin %s" evil-mc-command)))))
@@ -165,7 +166,7 @@
 (defun evil-mc-finalize-command ()
   "Make the command data ready for use, after a save."
   (let* ((keys-pre (evil-mc-get-command-property :keys-pre))
-         (keys-pre-with-count (evil-extract-count keys-pre))
+         (keys-pre-with-count (evil-mc-get-command-property :keys-pre-with-count))
          (keys-pre-count (nth 0 keys-pre-with-count))
          (keys-pre-cmd (vconcat (nth 2 keys-pre-with-count)))
          (keys-post (evil-mc-get-command-property :keys-post))
@@ -198,7 +199,7 @@
                      (evil-mc-get-command-keys-string :keys-post)
                      (evil-mc-get-command-keys-string :keys-motion-post)
                      (evil-mc-get-command-keys-string :keys-operator-post)
-                     (evil-mc-get-command-keys-string :keys-count)
+                     (evil-mc-get-command-property :keys-count)
                      (evil-mc-get-command-keys-string :keys))))
 
 (provide 'evil-mc-command-record)

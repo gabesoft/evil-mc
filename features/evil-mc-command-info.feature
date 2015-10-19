@@ -9,6 +9,7 @@ Feature: Record current command info
     """
     And I go to the beginning of buffer
     Given I have at least one cursor
+    And The cursors are frozen
     Then these examples should pass:
     | keys | command   |
     | yy   | evil-yank |
@@ -85,12 +86,14 @@ Feature: Record current command info
 
   Scenario: Record commands to select inside parentheses
     Given I have one cursor at "inner" in "[external (outer (inner (center))]"
+    And The cursors are frozen
     When I press "vib"
     Then The recorded command name should be "evil-inner-paren"
     And The recorded command keys should be "ib"
 
   Scenario: Record the command to join two lines
     Given I have one cursor at "line" in "First line.\nSecond line."
+    And The cursors are frozen
     When I press "J"
     Then The recorded command name should be "evil-join"
     And The recorded command keys should be "J"

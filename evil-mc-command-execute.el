@@ -174,7 +174,7 @@ If there is no region call CMD with the point position."
   (let ((point (point)))
     (evil-with-state normal
       (unless (or region (eq point (point-at-bol)))
-        (evil-forward-char))
+        (evil-forward-char 1 nil t))
       (evil-mc-execute-with-region-or-macro 'evil-substitute))))
 
 (defun evil-mc-execute-evil-change ()
@@ -182,7 +182,7 @@ If there is no region call CMD with the point position."
   (let ((point (point)))
     (evil-with-state normal
       (unless (or region (eq point (point-at-bol)))
-        (evil-forward-char))
+        (evil-forward-char 1 nil t))
       (evil-mc-execute-with-region-or-macro 'evil-change))))
 
 (defun evil-mc-execute-evil-paste ()
@@ -531,6 +531,7 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
           (funcall handler)
           (evil-repeat-post-hook)
 
+
           (when (and (evil-mc-command-undoable-p)
                      (evil-mc-has-undo-boundary-p (evil-mc-get-command-undo-list-pointer-pre))
                      (not (evil-mc-undo-command-p)))
@@ -541,9 +542,9 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
           (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
           (setq last-position (point))
 
-          (apply 'evil-mc-put-cursor-property
-                 (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos))
-                 (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
+          (let ((new-cursor (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos)))
+                (new-values (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
+            (apply 'evil-mc-put-cursor-property new-cursor new-values)))
       (error (evil-mc-message "Failed to execute %s with error: %s"
                               (evil-mc-get-command-name)
                               (error-message-string error))
@@ -579,7 +580,8 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
                                                         state-variables
                                                         clear-variables)
                                    cursor-list)))
-              (setq evil-mc-cursor-list cursor-list))))))))
+              (setq evil-mc-cursor-list cursor-list)))))
+      (evil-mc-clear-command))))
 
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords
