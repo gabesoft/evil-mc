@@ -40,7 +40,7 @@
 ** TODO Maybe have a default for unknown commands
 *** Default could be evil-mc-execute-macro but need to initialize the correct evil state
 *** This would allow supporting unnamed commands
-** Make change line (cc) work properly
+** TODO Make change line (cc) work properly
 *** Currently it works if the cursors are on non-consecutive lines or if the real cursor is positioned before the fake cursors
 *** The work around is ^C but that doesn't work with a count
 ** TODO Add tests
