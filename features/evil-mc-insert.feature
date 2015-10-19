@@ -152,38 +152,6 @@ Feature: Insert and change text
     That is a simple line.
     """
 
-  Scenario: Should change a bracket expression excluding brackets
-    When I replace the buffer text with:
-    """
-    This is a (sentence) with brackets.
-    This is a (sentence) with brackets.
-    This is a (sentence) with brackets.
-    """
-    And I press "grm"
-    And I type "f(cibchanged"
-    Then I should see:
-    """
-    This is a (changed) with brackets.
-    This is a (changed) with brackets.
-    This is a (changed) with brackets.
-    """
-
-  Scenario: Should change a bracket expression including brackets
-    When I replace the buffer text with:
-    """
-    This is a (sentence) with brackets.
-    This is a (sentence) with brackets.
-    This is a (sentence) with brackets.
-    """
-    And I press "grm"
-    And I type "f(cabchanged"
-    Then I should see:
-    """
-    This is a changed with brackets.
-    This is a changed with brackets.
-    This is a changed with brackets.
-    """
-
   Scenario: Should change until the end of line
     When I replace the buffer text with:
     """
