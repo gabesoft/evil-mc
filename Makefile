@@ -6,6 +6,9 @@ test:
 test-no-win:
 		@cask exec ecukes --no-win
 
+test-win:
+		@cask exec ecukes --win
+
 test-debug:
 		@cask exec ecukes --debug
 
