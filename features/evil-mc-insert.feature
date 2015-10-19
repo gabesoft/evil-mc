@@ -128,6 +128,30 @@ Feature: Insert and change text
     And I type "bbbcttxyz"
     Then I should see "xyzther-test xyzther-test xyzther-test"
 
+  Scenario: Should change a visual selection
+    When I replace the buffer text with "another-test another-test another-test"
+    And I press "grm"
+    And I type "bbbv4lcxyz"
+    Then I should see "xyzer-test xyzer-test xyzer-test"
+
+  Scenario: Should change a visual selection 2
+    When I replace the buffer text with:
+    """
+    This is a simple line.
+    This is a simple line.
+    This is a simple line.
+    That is a simple line.
+    """
+    And I press "grm"
+    And I type "bvt.cChanged text"
+    Then I should see:
+    """
+    Changed text.
+    Changed text.
+    Changed text.
+    That is a simple line.
+    """
+
   Scenario: Should change a bracket expression excluding brackets
     When I replace the buffer text with:
     """
