@@ -187,8 +187,8 @@ implementations."))
   (remove-hook 'post-command-hook 'evil-mc-finish-command-save t)
   (remove-hook 'post-command-hook 'evil-mc-execute-for-all t)
 
-  (ad-remove-advice evil-repeat-keystrokes 'before 'evil-mc-repeat-keystrokes)
-  (ad-remove-advice evil-repeat-motion 'before 'evil-mc-repeat-motion))
+  (ad-remove-advice 'evil-repeat-keystrokes 'before 'evil-mc-repeat-keystrokes)
+  (ad-remove-advice 'evil-repeat-motion 'before 'evil-mc-repeat-motion))
 
 (provide 'evil-mc)
 
