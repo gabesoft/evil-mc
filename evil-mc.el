@@ -175,16 +175,20 @@ implementations."))
   (add-hook 'pre-command-hook 'evil-mc-begin-command-save nil t)
   (add-hook 'post-command-hook 'evil-mc-finish-command-save t t)
   (add-hook 'post-command-hook 'evil-mc-execute-for-all t t)
-  (advice-add 'evil-repeat-keystrokes :before #'evil-mc-save-keys-motion)
-  (advice-add 'evil-repeat-motion :before #'evil-mc-save-keys-operator))
+
+  (defadvice evil-repeat-keystrokes (before evil-mc-repeat-keystrokes (flag) activate)
+    (evil-mc-save-keys-motion flag))
+  (defadvice evil-repeat-motion (before evil-mc-repeat-motion (flag) activate)
+    (evil-mc-save-keys-operator flag)))
 
 (defun evil-mc-teardown-active-state ()
   "Teardown all variables and hooks used while there are active cursors."
   (remove-hook 'pre-command-hook 'evil-mc-begin-command-save t)
   (remove-hook 'post-command-hook 'evil-mc-finish-command-save t)
   (remove-hook 'post-command-hook 'evil-mc-execute-for-all t)
-  (advice-remove 'evil-repeat-keystrokes #'evil-mc-save-keys-motion)
-  (advice-remove 'evil-repeat-motion #'evil-mc-save-keys-operator))
+
+  (ad-remove-advice evil-repeat-keystrokes 'before 'evil-mc-repeat-keystrokes)
+  (ad-remove-advice evil-repeat-motion 'before 'evil-mc-repeat-motion))
 
 (provide 'evil-mc)
 
