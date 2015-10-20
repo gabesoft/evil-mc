@@ -188,6 +188,8 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 - Paste will not work when [[https://github.com/syl20bnr/spacemacs][spacemacs]]' paste micro state is enabled.
   This is due to the fact that ~evil-paste-pop~ and ~evil-paste-pop-next~ 
   commands are not supported.
+- ~cc~ does not work properly when the cursors are on consecutive lines
+  use ~^C~ as a workaround
 - ~evil-repeat~ works only for some commands. 
   In particular it doesn't work for delete. It will also interfere with the 
   cursor positions during an undo or redo operation.
