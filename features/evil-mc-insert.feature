@@ -9,7 +9,7 @@ Feature: Insert and change text
     first text first text first text
     """
 
-  Scenario: Should be able to enter new lines
+  Scenario: Enter new lines
     When I replace the buffer text with "bbb"
     And I press "vgrm"
     And I press "cl"
@@ -21,19 +21,43 @@ Feature: Insert and change text
     word
     """
 
-  Scenario: Should insert at cursor
+  Scenario: Open line below
+    When I replace the buffer text with "bbb"
+    And I press "vgrm"
+    And I press "oabc"
+    Then I should see:
+    """
+    bbb
+    abc
+    abc
+    abc
+    """
+
+  Scenario: Open line above
+    When I replace the buffer text with "bbb"
+    And I press "vgrm"
+    And I press "Oabc"
+    Then I should see:
+    """
+    abc
+    abc
+    abc
+    bbb
+    """
+
+  Scenario: Insert at cursor
     When I replace the buffer text with "a a a"
     And I press "vgrm"
     And I press "i-y-"
     Then I should see "-y-a -y-a -y-a"
 
-  Scenario: Should insert after cursor
+  Scenario: Insert after cursor
     When I replace the buffer text with "a a a"
     And I press "vgrm"
     And I press "a-x-"
     Then I should see "a-x- a-x- a-x-"
 
-  Scenario: Should insert at the beginning of line
+  Scenario: Insert at the beginning of line
     When I replace the buffer text with:
     """
     This is a line
@@ -50,7 +74,7 @@ Feature: Insert and change text
     start This is a line
     """
 
-  Scenario: Should insert at the end of line
+  Scenario: Insert at the end of line
     When I replace the buffer text with:
     """
     This is a line
@@ -67,19 +91,19 @@ Feature: Insert and change text
     This is a line end
     """
 
-  Scenario: Should change a letter
+  Scenario: Change a letter
     When I replace the buffer text with "xyz xyz xyz"
     And I press "grm"
     And I type "clw"
     Then I should see "xyw xyw xyw"
 
-  Scenario: Should change a word
+  Scenario: Change a word
     When I replace the buffer text with "xyz xyz xyz"
     And I press "grm"
     And I type "bcwabc"
     Then I should see "abc abc abc"
 
-  Scenario: Should change a word at the beginning of line
+  Scenario: Change a word at the beginning of line
     When I replace the buffer text with:
     """
     This is a line
@@ -95,13 +119,13 @@ Feature: Insert and change text
     abc is a line
     """
 
-  Scenario: Should change to the end of word
+  Scenario: Change to the end of word
     When I replace the buffer text with "xyz xyz xyz"
     And I press "grm"
     And I type "bceabc"
     Then I should see "abc abc abc"
 
-  Scenario: Should change to the end of word with count
+  Scenario: Change to the end of word with count
     When I replace the buffer text with:
     """
     xyz yyz yyz xyz yyz yyz xyz yyz yyz xyz yyz yyz
@@ -110,31 +134,31 @@ Feature: Insert and change text
     And I type "b2ceabc"
     Then I should see "abc yyz abc yyz abc yyz abc yyz"
 
-  Scenario: Should change up to a letter (f)
+  Scenario: Change up to a letter (f)
     When I replace the buffer text with "another-test another-test another-test"
     And I press "grm"
     And I type "bbbcftxyz"
     Then I should see "xyzher-test xyzher-test xyzher-test"
 
-  Scenario: Should change up to a letter (f) with count
+  Scenario: Change up to a letter (f) with count
     When I replace the buffer text with "another-test another-test another-test"
     And I press "grm"
     And I type "bbb2cftxyz"
     Then I should see "xyzest xyzest xyzest"
 
-  Scenario: Should change up till before a letter (t)
+  Scenario: Change up till before a letter (t)
     When I replace the buffer text with "another-test another-test another-test"
     And I press "grm"
     And I type "bbbcttxyz"
     Then I should see "xyzther-test xyzther-test xyzther-test"
 
-  Scenario: Should change a visual selection
+  Scenario: Change a visual selection
     When I replace the buffer text with "another-test another-test another-test"
     And I press "grm"
     And I type "bbbv4lcxyz"
     Then I should see "xyzer-test xyzer-test xyzer-test"
 
-  Scenario: Should change a visual selection 2
+  Scenario: Change a visual selection 2
     When I replace the buffer text with:
     """
     This is a simple line.
@@ -152,7 +176,7 @@ Feature: Insert and change text
     That is a simple line.
     """
 
-  Scenario: Should change until the end of line
+  Scenario: Change until the end of line
     When I replace the buffer text with:
     """
     This is a line.
@@ -171,7 +195,7 @@ Feature: Insert and change text
 
   # TODO ensure this works for consecutive lines and
   #      passes for [ "cc" "^cc" "$cc" ]
-  Scenario: Should change a whole line
+  Scenario: Change a whole line
     When I replace the buffer text with:
     """
     This is a line.
@@ -191,7 +215,7 @@ Feature: Insert and change text
     That is a line.
     """
 
-  Scenario: Should change a whole visual line
+  Scenario: Change a whole visual line
     When I replace the buffer text with:
     """
     This is a line.
@@ -210,7 +234,7 @@ Feature: Insert and change text
     That is a line.
     """
 
-  Scenario: Should change a whole line with count
+  Scenario: Change a whole line with count
     When I replace the buffer text with:
     """
     This is a line.
