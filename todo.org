@@ -43,6 +43,4 @@
 ** TODO Make change line (cc) work properly
 *** Currently it works if the cursors are on non-consecutive lines or if the real cursor is positioned before the fake cursors
 *** The work around is ^C but that doesn't work with a count
-** TODO Fix cursors position when the real cursor scrolls off the screen
-*** When there are multiple cursors and the real one drops off the screen, it is brought back into view causing it to become out of sync with the others
 ** TODO Add tests

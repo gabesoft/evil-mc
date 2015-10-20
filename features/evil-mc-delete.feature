@@ -158,3 +158,21 @@ Feature: Delete text
     The road h patches of green.
     The road h patches of green.
     """
+    
+  Scenario: Delete till before a letter with count
+    When I replace the buffer text with:
+    """
+    The road was dark brown with patches of green.
+    The road was dark brown with patches of green.
+    The road was dark brown with patches of green.
+    The road was dark brown with patches of green.
+    """
+    And I press "grm"
+    And I press "fw2dth"
+    Then I should see:
+    """
+    The road hes of green.
+    The road hes of green.
+    The road hes of green.
+    The road hes of green.
+    """

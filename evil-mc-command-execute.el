@@ -574,14 +574,30 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
           (evil-repeat-post-hook)
           (evil-mc-with-single-undo
             (save-excursion
-              (dolist (cursor evil-mc-cursor-list)
-                (setq cursor-list (evil-mc-insert-cursor-into-list
-                                   (evil-mc-execute-for cursor
-                                                        state-variables
-                                                        clear-variables)
-                                   cursor-list)))
+              (evil-mc-save-window-scroll
+               (dolist (cursor evil-mc-cursor-list)
+                 (setq cursor-list (evil-mc-insert-cursor-into-list
+                                    (evil-mc-execute-for cursor
+                                                         state-variables
+                                                         clear-variables)
+                                    cursor-list))))
               (setq evil-mc-cursor-list cursor-list)))))
       (evil-mc-clear-command))))
+
+(defmacro evil-mc-save-window-scroll (&rest forms)
+  "Saves and restores the window scroll position"
+  (let ((p (make-symbol "p"))
+        (s (make-symbol "start"))
+        (h (make-symbol "hscroll")))
+    `(let ((,p (set-marker (make-marker) (point)))
+           (,s (set-marker (make-marker) (window-start)))
+           (,h (window-hscroll)))
+       ,@forms
+       (goto-char ,p)
+       (set-window-start nil ,s t)
+       (set-window-hscroll nil ,h)
+       (set-marker ,p nil)
+       (set-marker ,s nil))))
 
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords
