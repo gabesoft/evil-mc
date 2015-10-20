@@ -181,7 +181,9 @@ If there is no region call CMD with the point position."
   "Execute an `evil-change' comand."
   (let ((point (point)))
     (evil-with-state normal
-      (unless (or region (eq point (point-at-bol)))
+      (unless (or (and region (< (evil-mc-get-region-mark region)
+                                 (evil-mc-get-region-point region)))
+                  (eq point (point-at-bol)))
         (evil-forward-char 1 nil t))
       (evil-mc-execute-with-region-or-macro 'evil-change))))
 
@@ -519,39 +521,37 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
   (when (evil-mc-executing-debug-p)
     (evil-mc-message "Execute %s with %s" (evil-mc-get-command-name) handler))
   (ignore-errors
-    (condition-case error
-        (cl-progv
-            state-variables
-            (evil-mc-get-cursor-properties cursor state-variables)
+    (cl-progv
+        state-variables
+        (evil-mc-get-cursor-properties cursor state-variables)
 
-          (goto-char (evil-mc-get-cursor-start cursor))
+      (goto-char (evil-mc-get-cursor-start cursor))
 
-          (evil-jump-hook (evil-mc-get-command-name))
-          (evil-repeat-pre-hook)
-          (funcall handler)
-          (evil-repeat-post-hook)
+      (evil-jump-hook (evil-mc-get-command-name))
+      (evil-repeat-pre-hook)
 
+      (ignore-errors
+        (condition-case error
+            (funcall handler)
+          (error (evil-mc-message "Failed to execute %s with error: %s"
+                                  (evil-mc-get-command-name)
+                                  (error-message-string error)))))
 
-          (when (and (evil-mc-command-undoable-p)
-                     (evil-mc-has-undo-boundary-p (evil-mc-get-command-undo-list-pointer-pre))
-                     (not (evil-mc-undo-command-p)))
-            (setq undo-stack (cons last-position undo-stack-pointer))
-            (setq undo-stack-pointer undo-stack))
+      (evil-repeat-post-hook)
 
-          (evil-mc-delete-cursor-overlay cursor)
-          (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
-          (setq last-position (point))
+      (when (and (evil-mc-command-undoable-p)
+                 (evil-mc-has-undo-boundary-p (evil-mc-get-command-undo-list-pointer-pre))
+                 (not (evil-mc-undo-command-p)))
+        (setq undo-stack (cons last-position undo-stack-pointer))
+        (setq undo-stack-pointer undo-stack))
 
-          (let ((new-cursor (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos)))
-                (new-values (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
-            (apply 'evil-mc-put-cursor-property new-cursor new-values)))
-      (error (evil-mc-message "Failed to execute %s with error: %s"
-                              (evil-mc-get-command-name)
-                              (error-message-string error))
-             (cond ((eq :normal (evil-mc-get-command-state))
-                    (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
-                    (evil-mc-put-cursor-region cursor nil))
-                   (t cursor))))))
+      (evil-mc-delete-cursor-overlay cursor)
+      (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
+      (setq last-position (point))
+
+      (let ((new-cursor (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos)))
+            (new-values (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
+        (apply 'evil-mc-put-cursor-property new-cursor new-values)))))
 
 (defun evil-mc-execute-for-all ()
   "Execute the current command, stored at `evil-mc-command', for all fake cursors."
