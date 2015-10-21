@@ -71,7 +71,7 @@ Feature: Copy paste
     e are somHere are some words.
     """
     
-  Scenario: Copy paste util the end of the line
+  Scenario: Copy paste until the end of the line
     When I replace the buffer text with:
     """
     Here are some words.
