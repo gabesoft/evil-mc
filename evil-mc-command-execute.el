@@ -517,7 +517,7 @@ by the value of `evil-this-register'."
 
 (defun evil-mc-execute-for (cursor state-variables clear-variables)
   "Execute the current command for CURSOR in the context of STATE-VARIABLES and
-ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
+ensure to set CLEAR-VARIABLES to nil after the execution is complete."
   (when (evil-mc-executing-debug-p)
     (evil-mc-message "Execute %s with %s" (evil-mc-get-command-name) handler))
   (ignore-errors
@@ -549,7 +549,9 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
       (evil-mc-delete-region-overlay (evil-mc-get-cursor-region cursor))
       (setq last-position (point))
 
-      (let ((new-cursor (evil-mc-put-cursor-overlay cursor (evil-mc-cursor-overlay-at-pos)))
+      (let ((new-cursor (evil-mc-put-cursor-overlay
+                         cursor
+                         (evil-mc-cursor-overlay-at-pos)))
             (new-values (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
         (apply 'evil-mc-put-cursor-property new-cursor new-values)))))
 
@@ -581,6 +583,7 @@ ensuring to set CLEAR-VARIABLES to nil after the execution is complete."
                                                          state-variables
                                                          clear-variables)
                                     cursor-list))))
+              (length cursor-list)
               (setq evil-mc-cursor-list cursor-list)))))
       (evil-mc-clear-command))))
 
