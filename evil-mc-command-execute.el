@@ -531,11 +531,14 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
       (evil-repeat-pre-hook)
 
       (ignore-errors
-        (condition-case error
-            (funcall handler)
-          (error (evil-mc-message "Failed to execute %s with error: %s"
-                                  (evil-mc-get-command-name)
-                                  (error-message-string error)))))
+        (let ((prev-point (point)))
+          (condition-case error
+              (funcall handler)
+            (error
+             (evil-mc-message "Failed to execute %s with error: %s"
+                              (evil-mc-get-command-name)
+                              (error-message-string error))
+             (goto-char prev-point)))))
 
       (evil-repeat-post-hook)
 
