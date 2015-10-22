@@ -89,13 +89,13 @@ Otherwise, run `evil-mc-execute-macro' with ADD-REGISTER."
 
 (defun evil-mc-execute-evil-snipe ()
   "Execute an `evil-snipe' command."
-  (evil-snipe-repeat (evil-mc-get-command-keys-count)))
+  (funcall 'evil-snipe-repeat (evil-mc-get-command-keys-count)))
 
 (defun evil-mc-execute-evil-commentary ()
   "Execute an `evil-commentary' command."
   (evil-mc-with-region-or-execute-macro region nil
     (when (eq region-type 'char) (goto-char region-start))
-    (evil-commentary region-start region-end)))
+    (funcall 'evil-commentary region-start region-end)))
 
 (defun evil-mc-execute-evil-join ()
   "Execute an `evil-join' command."
@@ -115,10 +115,11 @@ Otherwise, run `evil-mc-execute-macro' with ADD-REGISTER."
   "Execute an `evil-surround-region' command."
   (evil-mc-with-region-or-execute-macro region nil
     (goto-char region-start)
-    (evil-surround-region region-start
-                          region-end
-                          region-type
-                          (evil-mc-get-command-last-input))))
+    (funcall 'evil-surround-region
+             region-start
+             region-end
+             region-type
+             (evil-mc-get-command-last-input))))
 
 (defun evil-mc-execute-change-case (cmd)
   "Execute an `evil-invert-char', `evil-invert-case' `evil-upcase'
@@ -139,7 +140,7 @@ or `evil-downcase' command."
   "Execute an `evil-exchange' command."
   (evil-mc-with-region-or-execute-macro region nil
     (goto-char region-start)
-    (evil-exchange region-start region-end region-type)))
+    (funcall 'evil-exchange region-start region-end region-type)))
 
 (defun evil-mc-execute-with-region-or-macro (cmd)
   "Execute CMD with the current register and region.
@@ -450,12 +451,6 @@ by the value of `evil-this-register'."
 (evil-mc-define-visual-handler evil-mc-execute-visual-evil-snipe ()
   (evil-mc-execute-evil-snipe))
 
-(evil-mc-define-visual-handler evil-mc-execute-visual-next-line ()
-  (evil-mc-execute-move-to-line 'next))
-
-(evil-mc-define-visual-handler evil-mc-execute-visual-prev-line ()
-  (evil-mc-execute-move-to-line 'prev))
-
 (evil-mc-define-visual-handler evil-mc-execute-visual-shift-left ()
   (evil-mc-execute-evil-shift 'evil-shift-left))
 
@@ -586,7 +581,6 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
                                                          state-variables
                                                          clear-variables)
                                     cursor-list))))
-              (length cursor-list)
               (setq evil-mc-cursor-list cursor-list)))))
       (evil-mc-clear-command))))
 
