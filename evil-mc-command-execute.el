@@ -574,14 +574,18 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
           (evil-mc-with-single-undo
             (save-excursion
               (evil-mc-save-window-scroll
-               (let ((next-cursor-list nil))
-                 (dolist (cursor evil-mc-cursor-list)
-                   (setq next-cursor-list (evil-mc-insert-cursor-into-list
-                                           (evil-mc-execute-for cursor
-                                                                state-variables
-                                                                clear-variables)
-                                           next-cursor-list)))
-                 (evil-mc-update-cursor-list next-cursor-list)))))))
+               (condition-case error
+                   (let ((next-cursor-list nil))
+                     (dolist (cursor evil-mc-cursor-list)
+                       (setq next-cursor-list (evil-mc-insert-cursor-into-list
+                                               (evil-mc-execute-for cursor
+                                                                    state-variables
+                                                                    clear-variables)
+                                               next-cursor-list)))
+                     (evil-mc-update-cursor-list next-cursor-list))
+                 (error (evil-mc-message "Failed to execute all %s with error: %s"
+                                         (evil-mc-get-command-name)
+                                         (error-message-string error)))))))))
       (evil-mc-clear-command))))
 
 (defmacro evil-mc-save-window-scroll (&rest forms)
