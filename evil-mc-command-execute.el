@@ -561,7 +561,7 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
     (when (evil-mc-executing-debug-p)
       (evil-mc-message "Execute %s for all cursors" (evil-mc-get-command-name)))
     (let* ((evil-mc-executing-command t)
-           (cursor-list nil)
+           (next-cursor-list nil)
            (handler (evil-mc-get-command-handler
                      (evil-mc-get-command-name)
                      (evil-mc-get-command-state)))
@@ -576,12 +576,12 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
             (save-excursion
               (evil-mc-save-window-scroll
                (dolist (cursor evil-mc-cursor-list)
-                 (setq cursor-list (evil-mc-insert-cursor-into-list
-                                    (evil-mc-execute-for cursor
-                                                         state-variables
-                                                         clear-variables)
-                                    cursor-list))))
-              (setq evil-mc-cursor-list cursor-list)))))
+                 (setq next-cursor-list (evil-mc-insert-cursor-into-list
+                                         (evil-mc-execute-for cursor
+                                                              state-variables
+                                                              clear-variables)
+                                         next-cursor-list))))))
+          (setq evil-mc-cursor-list next-cursor-list)))
       (evil-mc-clear-command))))
 
 (defmacro evil-mc-save-window-scroll (&rest forms)
