@@ -391,6 +391,10 @@ which will be used if no entry matching the current state is found.")
   "Clear the cursor list."
   (setq evil-mc-cursor-list nil))
 
+(defun evil-mc-update-cursor-list cursors
+  "Updates the `evil-mc-cursor-list' to CURSORS."
+  (setq evil-mc-cursor-list cursors))
+
 (defun evil-mc-clear-executing-command ()
   "Clear the `evil-mc-executing-command' variable."
   (setq evil-mc-executing-command nil))
