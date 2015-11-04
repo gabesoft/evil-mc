@@ -91,6 +91,10 @@ Otherwise, run `evil-mc-execute-macro' with ADD-REGISTER."
   "Execute an `evil-snipe' command."
   (funcall 'evil-snipe-repeat (evil-mc-get-command-keys-count)))
 
+(defun evil-mc-execute-evil-snipe-reverse ()
+  "Execute an `evil-snipe-repeat-reverse' command."
+  (funcall 'evil-snipe-repeat (* -1 (evil-mc-get-command-keys-count))))
+
 (defun evil-mc-execute-evil-commentary ()
   "Execute an `evil-commentary' command."
   (evil-mc-with-region-or-execute-macro region nil
@@ -298,6 +302,10 @@ by the value of `evil-this-register'."
   :cursor-clear region
   (evil-mc-execute-evil-snipe))
 
+(evil-mc-define-handler evil-mc-execute-default-evil-snipe-repeat-reverse ()
+  :cursor-clear region
+  (evil-mc-execute-evil-snipe-reverse))
+
 (evil-mc-define-handler evil-mc-execute-default-evil-commentary ()
   :cursor-clear region
   (evil-mc-execute-evil-commentary))
@@ -395,6 +403,10 @@ by the value of `evil-this-register'."
         (when (and prev-2 (car prev-2))
           (evil-mc-goto-char (car prev-2)))))))
 
+(evil-mc-define-handler evil-mc-execute-org-end-of-line ()
+  :cursor-clear region
+  (funcall 'evil-end-of-line (evil-mc-get-command-keys-count)))
+
 (evil-mc-define-handler evil-mc-execute-default-macro ()
   :cursor-clear region
   (evil-mc-execute-macro))
@@ -450,6 +462,9 @@ by the value of `evil-this-register'."
 
 (evil-mc-define-visual-handler evil-mc-execute-visual-evil-snipe ()
   (evil-mc-execute-evil-snipe))
+
+(evil-mc-define-visual-handler evil-mc-execute-visual-evil-snipe-repeat-reverse ()
+  (evil-mc-execute-evil-snipe-reverse))
 
 (evil-mc-define-visual-handler evil-mc-execute-visual-shift-left ()
   (evil-mc-execute-evil-shift 'evil-shift-left))
