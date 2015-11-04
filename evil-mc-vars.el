@@ -222,6 +222,7 @@
     (org-end-of-line . ((:default . evil-mc-execute-org-end-of-line)))
     (org-return . ((:default . evil-mc-execute-default-call)))
     (org-self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
+    (org-todo . ((:default . evil-mc-execute-default-call)))
     (orgtbl-self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
     (orgtbl-hijacker-command-100 . ((:default . evil-mc-execute-default-call-with-count)))
     (paste-after-current-line . ((:default . evil-mc-execute-default-call-with-count)))
