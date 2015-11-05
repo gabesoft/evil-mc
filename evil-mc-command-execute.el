@@ -150,7 +150,8 @@ or `evil-downcase' command."
   "Execute CMD with the current register and region.
 If there is no region run an `evil-mc-execute-macro'."
   (evil-mc-with-region-or-execute-macro region t
-    (funcall cmd region-start region-end region-type evil-this-register)))
+    (funcall cmd region-start region-end region-type evil-this-register)
+    (when (eolp) (evil-end-of-line))))
 
 (defun evil-mc-execute-with-region-or-pos (cmd)
   "Execute a CMD with the current register and region.
