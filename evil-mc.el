@@ -121,7 +121,7 @@
     "The string used in the mode line to identify `evil-mc-mode'.")
 
   (defvar evil-mc-incompatible-minor-modes
-    '(flyspell-mode flycheck-mode aggressive-indent-mode yas-minor-mode evil-cleverparens)
+    '(flyspell-mode flycheck-mode aggressive-indent-mode yas-minor-mode)
     "Minor modes that are incompatible with `evil-mc-mode'.")
 
   (defvar evil-mc-custom-known-commands nil
