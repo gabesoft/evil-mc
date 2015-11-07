@@ -287,6 +287,7 @@ which will be used if no entry matching the current state is found.")
 (defun evil-mc-known-command-p (cmd)
   "True if CMD is a supported command."
   (or (not (null (assq cmd evil-mc-known-commands)))
+      (not (null (assq cmd evil-mc-custom-known-commands)))
       (eq (evil-get-command-property cmd :repeat) 'motion)))
 
 (defun evil-mc-has-cursors-p ()
