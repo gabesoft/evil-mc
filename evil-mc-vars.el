@@ -73,18 +73,6 @@
 
 (defvar evil-mc-known-commands
   '((backward-delete-char-untabify . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-backspace . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-brace . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-colon . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-continued-statement . ((:default . evil-mc-execute-default-call)))
-    (c-electric-delete . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-delete-forward . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-lt-gt . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-paren . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-pound . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-semi&comma . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-slash . ((:default . evil-mc-execute-default-call-with-count)))
-    (c-electric-star . ((:default . evil-mc-execute-default-call-with-count)))
     (company-complete-selection . ((:default . evil-mc-execute-default-call)))
     (company-select-next . ((:default . evil-mc-execute-default-ignore)))
     (copy-to-the-end-of-line . ((:default . evil-mc-execute-default-call)))
@@ -218,6 +206,33 @@
     (move-text-up . ((:default . evil-mc-execute-default-call-with-count)))
     (newline . ((:default . evil-mc-execute-default-call)))
     (newline-and-indent . ((:default . evil-mc-execute-default-call)))
+    (paste-after-current-line . ((:default . evil-mc-execute-default-call-with-count)))
+    (paste-before-current-line . ((:default . evil-mc-execute-default-call-with-count)))
+    (redo . ((:default . evil-mc-execute-default-redo)))
+    (self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
+    (sp-backward-delete-char . ((:default . evil-mc-execute-default-call)))
+    (transpose-chars-before-point . ((:default . evil-mc-execute-default-call-with-count)))
+    (transpose-chars . ((:default . evil-mc-execute-default-call-with-count)))
+    (undo . ((:default . evil-mc-execute-default-undo)))
+    (undo-tree-undo . ((:default . evil-mc-execute-default-undo)))
+    (undo-tree-redo . ((:default . evil-mc-execute-default-redo)))
+    (yank . ((:default . evil-mc-execute-default-call)))
+
+    ;; cc-mode
+    (c-electric-backspace . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-brace . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-colon . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-continued-statement . ((:default . evil-mc-execute-default-call)))
+    (c-electric-delete . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-delete-forward . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-lt-gt . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-paren . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-pound . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-semi&comma . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-slash . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-electric-star . ((:default . evil-mc-execute-default-call-with-count)))
+
+    ;; org-mode
     (org-beginning-of-line . ((:default . evil-mc-execute-default-call-with-count)))
     (org-end-of-line . ((:default . evil-mc-execute-org-end-of-line)))
     (org-return . ((:default . evil-mc-execute-default-call)))
@@ -225,24 +240,21 @@
     (org-todo . ((:default . evil-mc-execute-default-call)))
     (orgtbl-self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
     (orgtbl-hijacker-command-100 . ((:default . evil-mc-execute-default-call-with-count)))
-    (paste-after-current-line . ((:default . evil-mc-execute-default-call-with-count)))
-    (paste-before-current-line . ((:default . evil-mc-execute-default-call-with-count)))
-    (redo . ((:default . evil-mc-execute-default-redo)))
-    (self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
-    (sp-backward-delete-char . ((:default . evil-mc-execute-default-call)))
-    (spacemacs/evil-numbers-decrease . ((:default . evil-mc-execute-default-call-with-count)))
-    (spacemacs/evil-numbers-increase . ((:default . evil-mc-execute-default-call-with-count)))
-    (transpose-chars-before-point . ((:default . evil-mc-execute-default-call-with-count)))
-    (transpose-chars . ((:default . evil-mc-execute-default-call-with-count)))
-    (undo . ((:default . evil-mc-execute-default-undo)))
-    (undo-tree-undo . ((:default . evil-mc-execute-default-undo)))
-    (undo-tree-redo . ((:default . evil-mc-execute-default-redo)))
+
+    ;; unimpaired
     (unimpaired/paste-above . ((:default . evil-mc-execute-default-call)))
     (unimpaired/paste-below . ((:default . evil-mc-execute-default-call)))
+
+    ;; yaml
     (yaml-electric-backspace . ((:default . evil-mc-execute-default-call-with-count)))
     (yaml-electric-bar-and-angle . ((:default . evil-mc-execute-default-call-with-count)))
     (yaml-electric-dash-and-dot . ((:default . evil-mc-execute-default-call-with-count)))
-    (yank . ((:default . evil-mc-execute-default-call)))
+
+    ;; evil-numbers
+    (evil-numbers/inc-at-pt . ((:default . evil-mc-execute-default-call-with-count)))
+    (evil-numbers/dec-at-pt . ((:default . evil-mc-execute-default-call-with-count)))
+    (spacemacs/evil-numbers-decrease . ((:default . evil-mc-execute-default-call-with-count)))
+    (spacemacs/evil-numbers-increase . ((:default . evil-mc-execute-default-call-with-count)))
 
     ;; handlers for evil-cleverparens (work in progress)
     ;; TODO: finish work on evil-cleverparens handlers
