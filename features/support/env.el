@@ -14,7 +14,9 @@
 (require 'cl)
 (require 'evil)
 (require 'evil-surround)
+(require 'evil-numbers)
 (require 'evil-mc)
+(require 'evil-mc-scratch)
 (require 'espuds)
 (require 'ert)
 

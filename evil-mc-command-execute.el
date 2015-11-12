@@ -604,6 +604,23 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
                                        (error-message-string error))))))))
       (evil-mc-clear-command))))
 
+(defun evil-mc-execute-for-all-cursors (cmd)
+  "Executes CMD for each active cursor fake and real."
+  (funcall cmd (evil-mc-put-cursor-property nil :index 0 :real t))
+  (evil-mc-save-window-scroll
+   (save-excursion
+     (let ((next-cursor-list nil)
+           (index 0))
+       (dolist (cursor evil-mc-cursor-list index)
+         (incf index)
+         (let* ((data (evil-mc-put-cursor-property cursor :index index))
+                (handler (lambda () (funcall cmd data)))
+                (vars (evil-mc-get-cursor-variables)))
+           (setq next-cursor-list (evil-mc-insert-cursor-into-list
+                                   (evil-mc-execute-for cursor vars nil)
+                                   next-cursor-list))))
+       (evil-mc-update-cursor-list next-cursor-list)))))
+
 (defmacro evil-mc-save-window-scroll (&rest forms)
   "Saves and restores the window scroll position"
   (let ((p (make-symbol "p"))

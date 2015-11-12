@@ -6,6 +6,7 @@
 (development
  (depends-on "evil")
  (depends-on "evil-surround")
+ (depends-on "evil-numbers")
  (depends-on "f")
  (depends-on "ecukes")
  (depends-on "espuds")
