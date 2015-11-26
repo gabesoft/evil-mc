@@ -256,9 +256,7 @@
     (spacemacs/evil-numbers-decrease . ((:default . evil-mc-execute-default-call-with-count)))
     (spacemacs/evil-numbers-increase . ((:default . evil-mc-execute-default-call-with-count)))
 
-    ;; handlers for evil-cleverparens (work in progress)
-    ;; TODO: finish work on evil-cleverparens handlers
-
+    ;; evil-cleverparens
     (evil-cp-append ; a
      (:default . evil-mc-execute-default-call-with-count))
     (evil-cp-change ; c
@@ -269,6 +267,14 @@
      (:default . evil-mc-execute-default-evil-delete))
     (evil-cp-delete-line ; D
      (:default . evil-mc-execute-default-evil-delete))
+    (evil-cp-change-sexp ; M-c
+     (:default . evil-mc-execute-default-evil-change))
+    (evil-cp-change-enclosing ; M-C
+     (:default . evil-mc-execute-default-evil-change))
+    (evil-cp-delete-sexp ; M-d
+     (:default . evil-mc-execute-default-evil-delete))
+    (evil-cp-delete-enclosing ; M-D
+     (:default . evil-mc-execute-default-evil-delete))
     (evil-cp-delete-char-or-splice ; x
      (:default . evil-mc-execute-default-evil-delete))
     (evil-cp-insert ; i
@@ -277,21 +283,47 @@
      (:default . evil-mc-execute-default-evil-substitute))
     (evil-cp-yank ; y
      (:default . evil-mc-execute-default-evil-yank))
+    (evil-cp-first-non-blank-non-opening ; _
+     (:default . evil-mc-execute-default-call)
+     (visual . evil-mc-execute-visual-call))
     (evil-cp-< ; <
      (:default . evil-mc-execute-default-evil-shift-left)
      (visual . evil-mc-execute-visual-shift-left))
     (evil-cp-> ; >
      (:default . evil-mc-execute-default-evil-shift-right)
      (visual . evil-mc-execute-visual-shift-right))
-
-    ;; these were checked and don't need handlers
-    ;; evil-cp-backward-up-sexp ; opening-paren
-    ;; evil-cp-up-sexp ; closing-paren
-    ;; evil-cp-backward-symbol-begin ; B
-    ;; evil-cp-forward-symbol-end ; E
-    ;; evil-cp-backward-sexp ; H
-    ;; evil-cp-forward-sexp ; L
-    ;; evil-cp-forward-symbol-begin ; W
+    (evil-cp-wrap-next-round ; M-(
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-wrap-previous-round ; M-)
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-wrap-next-square ; M-[
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-wrap-previous-square ; M-]
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-wrap-next-curly ; M-{
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-wrap-previous-curly ; M-}
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-open-below-form ; M-o
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-open-above-form ; M-O
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-insert-at-end-of-form ; M-a
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-insert-at-beginning-of-form ; M-i
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-copy-paste-form ; M-w
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-drag-forward ; M-j
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-drag-backward ; M-k
+     (:default . evil-mc-execute-default-call-with-count))
+    (evil-cp-raise-form ; M-R
+     (:default . evil-mc-execute-default-call-with-count))
+    ;; note: couldn't actually get this one to work, so I set it the same as
+    ;; `evil-delete-backward-word'
+    (evil-cp-delete-backward-word ; C-w in insert state
+     (:default . evil-mc-execute-default-call))
 
     ;; not supported for now, because normal `evil-change-whole-line' also is
     ;; not supported
@@ -301,38 +333,13 @@
     ;; supported
     ;; evil-cp-yank-line ; Y
 
-    ;; TODO: test these commands, add handlers where appropriate
-    ;; evil-cp-previous-opening ; [
-    ;; evil-cp-next-closing ; ]
-    ;; evil-cp-first-non-blank-non-opening ; _
-    ;; evil-cp-delete-char-or-splice ; x
-    ;; evil-cp-next-opening ; {
-    ;; evil-cp-previous-closing ; }
-    ;; evil-cp-wrap-next-round ; M-(
-    ;; evil-cp-wrap-previous-round ; M-)
-    ;; evil-cp-change-enclosing ; M-C
-    ;; evil-cp-delete-enclosing ; M-D
-    ;; evil-cp-open-above-form ; M-O
-    ;; evil-cp-raise-form ; M-R
-    ;; evil-cp-toggle-balanced-yank ; M-T
-    ;; evil-cp-yank-enclosing ; M-Y
-    ;; evil-cp-wrap-next-square ; M-[
-    ;; evil-cp-wrap-previous-square ; M-]
-    ;; evil-cp-insert-at-end-of-form ; M-a
-    ;; evil-cp-change-sexp ; M-c
-    ;; evil-cp-delete-sexp ; M-d
-    ;; evil-cp-beginning-of-defun ; M-h
-    ;; evil-cp-insert-at-beginning-of-form ; M-i
-    ;; evil-cp-drag-forward ; M-j
-    ;; evil-cp-drag-backward ; M-k
-    ;; evil-cp-end-of-defun ; M-l
-    ;; evil-cp-open-below-form ; M-o
-    ;; evil-cp-copy-paste-form ; M-w
-    ;; evil-cp-yank-sexp ; M-y
+    ;; not supported: `evil-cp-override' needs to be called once for each cursor,
+    ;; right before calling the next evil-cp command. For example, if the user
+    ;; has 2 cursors and calls `evil-cp-override' and then
+    ;; `evil-cp-delete-char-or-splice', evil-mc should call them in this order:
+    ;; override, delete-or-splice, override, delete-or-splice
+    ;; instead of: override, override, delete-or-splice, delete-or-splice
     ;; evil-cp-override ; M-z
-    ;; evil-cp-wrap-next-curly ; M-{
-    ;; evil-cp-wrap-previous-curly ; M-}
-    ;; evil-cp-backward-symbol-end ; g E
     )
   "A list of the supported commands and their handlers.
 Entries have the form (NAME . HANDLERS), where handlers is a list of entries of
