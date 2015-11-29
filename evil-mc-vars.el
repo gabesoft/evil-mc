@@ -250,6 +250,9 @@
     (yaml-electric-bar-and-angle . ((:default . evil-mc-execute-default-call-with-count)))
     (yaml-electric-dash-and-dot . ((:default . evil-mc-execute-default-call-with-count)))
 
+    ;; evil-matchit
+    (evilmi-jump-items . ((:default . evil-mc-execute-default-call)))
+
     ;; evil-numbers
     (evil-numbers/inc-at-pt . ((:default . evil-mc-execute-default-call-with-count)))
     (evil-numbers/dec-at-pt . ((:default . evil-mc-execute-default-call-with-count)))
