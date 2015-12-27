@@ -233,6 +233,9 @@
     (c-electric-slash . ((:default . evil-mc-execute-default-call-with-count)))
     (c-electric-star . ((:default . evil-mc-execute-default-call-with-count)))
 
+    ;; python-mode
+    (python-indent-dedent-line-backspace . ((:default . evil-mc-execute-default-call-with-count)))
+
     ;; org-mode
     (org-beginning-of-line . ((:default . evil-mc-execute-default-call-with-count)))
     (org-end-of-line . ((:default . evil-mc-execute-org-end-of-line)))
