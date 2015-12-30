@@ -73,6 +73,7 @@
 
 (defvar evil-mc-known-commands
   '((backward-delete-char-untabify . ((:default . evil-mc-execute-default-call-with-count)))
+    (delete-forward-char . ((:default . evil-mc-execute-default-call-with-count)))
     (company-complete-selection . ((:default . evil-mc-execute-default-call)))
     (company-select-next . ((:default . evil-mc-execute-default-ignore)))
     (copy-to-the-end-of-line . ((:default . evil-mc-execute-default-call)))
@@ -231,6 +232,9 @@
     (c-electric-semi&comma . ((:default . evil-mc-execute-default-call-with-count)))
     (c-electric-slash . ((:default . evil-mc-execute-default-call-with-count)))
     (c-electric-star . ((:default . evil-mc-execute-default-call-with-count)))
+
+    ;; python-mode
+    (python-indent-dedent-line-backspace . ((:default . evil-mc-execute-default-call-with-count)))
 
     ;; org-mode
     (org-beginning-of-line . ((:default . evil-mc-execute-default-call-with-count)))
