@@ -9,7 +9,7 @@
 :    ░  ░     ░   ░      ░  ░          ░   ░ ░      
 :            ░                             ░        
 
- [[https://travis-ci.org/gabesoft/evil-mc][https://img.shields.io/travis/gabesoft/evil-mc/master.svg?style=flat-square]] [[http://melpa.org/#/evil-mc][file:http://melpa.org/packages/evil-mc-badge.svg?style=flat-square]]
+ [[https://travis-ci.org/gabesoft/evil-mc][https://travis-ci.org/gabesoft/evil-mc.svg?branch=master]] [[http://melpa.org/#/evil-mc][file:http://melpa.org/packages/evil-mc-badge.svg?style=flat-square]]
 
 ** Multiple cursors implementation for evil-mode
 *** Synopsis
