@@ -233,6 +233,9 @@
     (c-electric-slash . ((:default . evil-mc-execute-default-call-with-count)))
     (c-electric-star . ((:default . evil-mc-execute-default-call-with-count)))
 
+    ;; ruby mode
+    (ruby-tools-interpolate . ((:default . evil-mc-execute-default-call)))
+
     ;; python-mode
     (python-indent-dedent-line-backspace . ((:default . evil-mc-execute-default-call-with-count)))
 
