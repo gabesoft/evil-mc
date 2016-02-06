@@ -558,6 +558,6 @@ which will be used if no entry matching the current state is found.")
   (1+ (length evil-mc-cursor-list)))
 
 
-(provide'evil-mc-vars)
+(provide 'evil-mc-vars)
 
 ;;; evil-mc-vars.el ends here
