@@ -12,6 +12,7 @@ test-debug:
 		@cask exec ecukes --debug
 
 test-install:
-		@cask
+		@$(RM) -r -f ./.cask/*
+		@cask install
 
 .PHONY: ecukes test test-no-win test-install all
