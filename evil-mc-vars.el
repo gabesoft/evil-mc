@@ -242,6 +242,7 @@
     ;; org-mode
     (org-beginning-of-line . ((:default . evil-mc-execute-default-call-with-count)))
     (org-end-of-line . ((:default . evil-mc-execute-org-end-of-line)))
+    (org-force-self-insert . ((:default . evil-mc-execute-default-call-with-count)))
     (org-return . ((:default . evil-mc-execute-default-call)))
     (org-self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
     (org-todo . ((:default . evil-mc-execute-default-call)))
