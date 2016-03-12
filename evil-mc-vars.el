@@ -232,9 +232,12 @@
     (c-electric-semi&comma . ((:default . evil-mc-execute-default-call-with-count)))
     (c-electric-slash . ((:default . evil-mc-execute-default-call-with-count)))
     (c-electric-star . ((:default . evil-mc-execute-default-call-with-count)))
+    (c-indent-new-comment-line . ((:default . evil-mc-execute-default-call)))
 
     ;; ruby mode
     (ruby-tools-interpolate . ((:default . evil-mc-execute-default-call)))
+
+    ;; c
 
     ;; python-mode
     (python-indent-dedent-line-backspace . ((:default . evil-mc-execute-default-call-with-count)))
