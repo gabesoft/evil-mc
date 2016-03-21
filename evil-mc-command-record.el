@@ -108,18 +108,11 @@
          (count (or evil-mc-command-count 0)))
     (setq evil-mc-command-count (+ (* 10 count) digit))))
 
-(defun evil-mc-starts-with-digit (keys-vector)
-  "Determine whether the first element of KEYS-VECTOR is a number."
-  (if (eq (length keys-vector) 0)
-      nil
-    (let ((digit (elt keys-vector 0)))
-      (and (>= digit 49) (<= digit 57)))))
-
 (defun evil-mc-add-current-count (keys-vector)
   "Add the current count to KEYS-VECTOR if it does not contain it already."
   (if (or (not evil-mc-command-count) (eq (length keys-vector) 0))
       keys-vector
-    (if (evil-mc-starts-with-digit keys-vector)
+    (if (evil-mc-starts-with-digit-p keys-vector)
         keys-vector
       (concat (string-to-vector (int-to-string evil-mc-command-count))
               keys-vector))))

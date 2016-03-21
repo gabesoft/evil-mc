@@ -128,7 +128,7 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 *evil-mc* can be customized in several ways:
 
 - Every known command is executed using a command handler defined in a variable
-  called ~evil-mc-known-commands~ in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-vars.el][evil-mc-vars.el]]. Those can be overridden by 
+  called ~evil-mc-known-commands~ in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-known-commands.el][evil-mc-known-commands.el]]. Those can be overridden by 
   defining the ~evil-mc-custom-known-commands~ variable. See the documentation of 
   that variable in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc.el][evil-mc.el]] for more info.
 - Some minor modes are incompatible with *evil-mc*. Those modes are defined in 
@@ -147,7 +147,7 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 - Currently *evil-mc* is in a very early beta stage and thus not fully stable.
 - Most evil motions and operators are supported but not every single command will work. 
 - If the cursors don't seem to work during a command, either the command is
-  not known (see ~evil-mc-known-commands~ in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-vars.el][evil-mc-vars.el]]) or some minor modes
+  not known (see ~evil-mc-known-commands~ in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-known-commands.el][evil-mc-known-commands.el]]) or some minor modes
   could be interfering with the evil-mc operations. 
 - Issues and pull requests are welcome. 
 

@@ -52,6 +52,13 @@
     (when (eolp) (goto-char (max (point-at-bol)
                                  (1- (point-at-eol)))))))
 
+(defun evil-mc-starts-with-digit-p (vector)
+  "Determine whether the first element of VECTOR is a number."
+  (if (eq (length vector) 0)
+      nil
+    (let ((digit (elt vector 0)))
+      (and (>= digit 49) (<= digit 57)))))
+
 (provide 'evil-mc-common)
 
 ;;; evil-mc-common.el ends here
