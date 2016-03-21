@@ -51,6 +51,9 @@ Also enter normal state and go to the beginning of buffer."
 (And "^The cursors are frozen$"
      (lambda () (evil-mc-pause-cursors)))
 
+(And "^I enable debugging$"
+     (lambda() (evil-mc-recording-debug-on)))
+
 (defun run-and-verify (table &optional undo)
   "Runs all the key sequences in TABLE and verifies them,
 optionally running UNDO after each one."

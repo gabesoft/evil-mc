@@ -101,9 +101,36 @@
     (pre (evil-mc-add-command-property pre-name keys))
     (post (evil-mc-add-command-property post-name keys))))
 
+(defun evil-mc-update-command-count (keys-vector)
+  "Update the current command count with the last digit of KEYS-VECTOR."
+  (let* ((last-key (elt keys-vector (- (length keys-vector) 1)))
+         (digit (string-to-number (char-to-string last-key)))
+         (count (or evil-mc-command-count 0)))
+    (setq evil-mc-command-count (+ (* 10 count) digit))))
+
+(defun evil-mc-starts-with-digit (keys-vector)
+  "Determine whether the first element of KEYS-VECTOR is a number."
+  (if (eq (length keys-vector) 0)
+      nil
+    (let ((digit (elt keys-vector 0)))
+      (and (>= digit 49) (<= digit 57)))))
+
+(defun evil-mc-add-current-count (keys-vector)
+  "Add the current count to KEYS-VECTOR if it does not contain it already."
+  (if (or (not evil-mc-command-count) (eq (length keys-vector) 0))
+      keys-vector
+    (if (evil-mc-starts-with-digit keys-vector)
+        keys-vector
+      (concat (string-to-vector (int-to-string evil-mc-command-count))
+              keys-vector))))
+
 (defun evil-mc-begin-command-save ()
   "Initialize all variables at the start of saving a command."
   (when (evil-mc-recording-debug-p) (evil-mc-message "Command %s %s" this-command (this-command-keys)))
+  (when (and (eq this-command #'digit-argument)
+             (evil-mc-has-cursors-p)
+             (not (evil-mc-executing-command-p)))
+    (evil-mc-update-command-count (this-command-keys-vector)))
   (when (and (not (evil-mc-executing-command-p))
              (not (evil-mc-recording-command-p)))
     (evil-mc-clear-command)
@@ -112,12 +139,13 @@
                (not (evil-mc-command-p this-command))
                (evil-mc-known-command-p this-command))
       (setq evil-mc-recording-command t)
-      (evil-mc-set-command-property :name this-command
-                                    :keys-pre (this-command-keys-vector)
-                                    :keys-pre-with-count (evil-extract-count (this-command-keys-vector))
-                                    :evil-state-begin evil-state
-                                    :undo-list-pointer-pre buffer-undo-list)
-      (when (evil-mc-recording-debug-p) (evil-mc-message "Record-begin %s" evil-mc-command)))))
+      (let ((keys-vector (evil-mc-add-current-count (this-command-keys-vector))))
+        (evil-mc-set-command-property :name this-command
+                                      :keys-pre keys-vector
+                                      :keys-pre-with-count (evil-extract-count keys-vector)
+                                      :evil-state-begin evil-state
+                                      :undo-list-pointer-pre buffer-undo-list)
+        (when (evil-mc-recording-debug-p) (evil-mc-message "Record-begin %s" evil-mc-command))))))
 (put 'evil-mc-begin-command-save 'permanent-local-hook t)
 
 (defun evil-mc-save-keys-motion (flag)
@@ -170,8 +198,8 @@
          (keys-pre-count (nth 0 keys-pre-with-count))
          (keys-pre-cmd (vconcat (nth 2 keys-pre-with-count)))
          (keys-post (evil-mc-get-command-property :keys-post))
-         (keys-motion-pre (evil-mc-get-command-property :keys-motion-pre))
-         (keys-motion-post (evil-mc-get-command-property :keys-motion-post))
+         (keys-motion-pre (evil-mc-add-current-count (evil-mc-get-command-property :keys-motion-pre)))
+         (keys-motion-post (evil-mc-add-current-count (evil-mc-get-command-property :keys-motion-post)))
          (keys-operator-pre (evil-mc-get-command-property :keys-operator-pre))
          (keys-operator-post (evil-mc-get-command-property :keys-operator-post)))
     (evil-mc-set-command-property :keys-count keys-pre-count)
@@ -191,7 +219,8 @@
                                keys-operator-post
                              (vconcat keys-operator-pre
                                       keys-operator-post))))
-                 (t (or keys-post keys-pre)))))
+                 (t (or keys-post keys-pre)))
+     (evil-mc-clear-command-count)))
   (when (evil-mc-recording-debug-p)
     (evil-mc-message "Record-done %s pre %s post %s keys-motion %s keys-operator %s count %s keys %s"
                      (evil-mc-get-command-name)

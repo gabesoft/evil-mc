@@ -89,11 +89,11 @@ Otherwise, run `evil-mc-execute-macro' with ADD-REGISTER."
 
 (defun evil-mc-execute-evil-snipe ()
   "Execute an `evil-snipe' command."
-  (funcall 'evil-snipe-repeat (evil-mc-get-command-keys-count)))
+  (funcall 'evil-snipe-repeat))
 
 (defun evil-mc-execute-evil-snipe-reverse ()
   "Execute an `evil-snipe-repeat-reverse' command."
-  (funcall 'evil-snipe-repeat (* -1 (evil-mc-get-command-keys-count))))
+  (funcall 'evil-snipe-repeat -1))
 
 (defun evil-mc-execute-evil-commentary ()
   "Execute an `evil-commentary' command."

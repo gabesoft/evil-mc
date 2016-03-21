@@ -1,6 +1,21 @@
 Feature: Record current command info
-  
-  Scenario: Record commands to copy lines
+  Scenario: Record commands to replace text
+    When I insert:
+    """
+    This is the start of text -1 -1 -1 t t t f f f k k k
+    This is the second line -1 -1 -1 t t t f f f k k k
+    This is the third line -1 -1 -1 t t t f f f k k k
+    """
+    And I go to the beginning of buffer
+    Given I have at least one cursor
+    And The cursors are frozen
+    Then these examples with undo should pass:
+    | keys | command      |
+    | rx   | evil-replace |
+    | 3rx  | evil-replace |
+    | 13rx | evil-replace |
+
+  Scenario: Record commands to copy text
     When I insert:
     """
     This is the start of text -1 -1 -1 t t t f f f k k k
@@ -24,8 +39,10 @@ Feature: Record current command info
     | yff  | evil-yank |
     | 2ytt | evil-yank |
     | 2yff | evil-yank |
-    
-  Scenario: Record commands to change lines
+    # | y3w  | evil-yank | - not supported
+    # | y2tf | evil-yank | - not supported
+
+  Scenario: Record commands to change text
     When I insert:
     """
     This is the start of text -1 -1 -1 t t t f f f k k k k
@@ -43,12 +60,15 @@ Feature: Record current command info
     | ctt  | evil-change |
     | cff  | evil-change |
     | 3ctk | evil-change |
-    | 3cfk | evil-change |
     | 3ctt | evil-change |
+    | 3cfk | evil-change |
+    | c3tk | evil-change |
+    | c3tt | evil-change |
+    | c3w  | evil-change |
     | 3cff | evil-change |
     | 3cc  | evil-change |
 
-  Scenario: Record commands to delete lines
+  Scenario: Record commands to delete text
     When I insert:
     """
     This is the start of text -1 -1 -1 t t t f f f k k k
@@ -70,6 +90,8 @@ Feature: Record current command info
     | 3dtt | evil-delete |
     | 3dff | evil-delete |
     | 3dd  | evil-delete |
+    | d3w  | evil-delete |
+    | d3tk | evil-delete |
 
   Scenario: Record commands to work with surrounding delimiters
     Given I have one cursor at "inner" in "[external (outer (inner (center))]"
