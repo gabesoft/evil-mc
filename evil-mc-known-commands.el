@@ -173,6 +173,10 @@
     ;; ruby mode
     (ruby-tools-interpolate . ((:default . evil-mc-execute-default-call)))
 
+    ;; java
+    (spacemacs/java-completing-dot . ((:default . evil-mc-execute-default-call)))
+    (spacemacs/java-completing-double-colon . ((:default . evil-mc-execute-default-call)))
+
     ;; c
 
     ;; python-mode
