@@ -538,7 +538,8 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
 
       (goto-char (evil-mc-get-cursor-start cursor))
 
-      (evil--jump-hook (evil-mc-get-command-name))
+      (when (fboundp 'evil--jump-hook)
+        (evil--jump-hook (evil-mc-get-command-name)))
       (evil-repeat-pre-hook)
 
       (ignore-errors
