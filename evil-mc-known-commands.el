@@ -182,6 +182,9 @@
     ;; python-mode
     (python-indent-dedent-line-backspace . ((:default . evil-mc-execute-default-call-with-count)))
 
+    ;; scala
+    (scala/newline-and-indent-with-asterisk . ((:default . evil-mc-execute-default-call)))
+
     ;; org-mode
     (org-beginning-of-line . ((:default . evil-mc-execute-default-call-with-count)))
     (org-end-of-line . ((:default . evil-mc-execute-org-end-of-line)))
