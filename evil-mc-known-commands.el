@@ -184,6 +184,7 @@
 
     ;; scala
     (scala/newline-and-indent-with-asterisk . ((:default . evil-mc-execute-default-call)))
+    (scala/completing-dot . ((:default . evil-mc-execute-default-call)))
 
     ;; org-mode
     (org-beginning-of-line . ((:default . evil-mc-execute-default-call-with-count)))
