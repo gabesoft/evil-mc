@@ -170,6 +170,9 @@
     (c-electric-star . ((:default . evil-mc-execute-default-call-with-count)))
     (c-indent-new-comment-line . ((:default . evil-mc-execute-default-call)))
 
+    ;; haskell
+    (haskell-indentation-common-electric-command . ((:default . evil-mc-execute-default-macro)))
+
     ;; ruby mode
     (ruby-tools-interpolate . ((:default . evil-mc-execute-default-call)))
 
