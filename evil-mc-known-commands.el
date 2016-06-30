@@ -172,6 +172,7 @@
 
     ;; haskell
     (haskell-indentation-common-electric-command . ((:default . evil-mc-execute-default-macro)))
+    (haskell-indentation-newline-and-indent . ((:default . evil-mc-execute-default-call)))
 
     ;; ruby mode
     (ruby-tools-interpolate . ((:default . evil-mc-execute-default-call)))
