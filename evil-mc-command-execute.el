@@ -51,6 +51,21 @@
          (apply #'evil-set-command-properties func ',keys)
          func))))
 
+(defmacro evil-mc-save-window-scroll (&rest forms)
+  "Saves and restores the window scroll position"
+  (let ((p (make-symbol "p"))
+        (s (make-symbol "start"))
+        (h (make-symbol "hscroll")))
+    `(let ((,p (set-marker (make-marker) (point)))
+           (,s (set-marker (make-marker) (window-start)))
+           (,h (window-hscroll)))
+       ,@forms
+       (goto-char ,p)
+       (set-window-start nil ,s t)
+       (set-window-hscroll nil ,h)
+       (set-marker ,p nil)
+       (set-marker ,s nil))))
+
 (defmacro evil-mc-define-visual-handler (command &rest body)
   "Define a visual COMMAND handler with BODY that updates the
 current region after executing BODY.
@@ -621,21 +636,6 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
                                    (evil-mc-execute-for cursor vars nil)
                                    next-cursor-list))))
        (evil-mc-update-cursor-list next-cursor-list)))))
-
-(defmacro evil-mc-save-window-scroll (&rest forms)
-  "Saves and restores the window scroll position"
-  (let ((p (make-symbol "p"))
-        (s (make-symbol "start"))
-        (h (make-symbol "hscroll")))
-    `(let ((,p (set-marker (make-marker) (point)))
-           (,s (set-marker (make-marker) (window-start)))
-           (,h (window-hscroll)))
-       ,@forms
-       (goto-char ,p)
-       (set-window-start nil ,s t)
-       (set-window-hscroll nil ,h)
-       (set-marker ,p nil)
-       (set-marker ,s nil))))
 
 (when (fboundp 'font-lock-add-keywords)
   (font-lock-add-keywords

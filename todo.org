@@ -43,4 +43,5 @@
 ** TODO Make change line (cc) work properly
 *** Currently it works if the cursors are on non-consecutive lines or if the real cursor is positioned before the fake cursors
 *** The work around is ^C but that doesn't work with a count
-** TODO Add tests
+** DONE Add tests
+CLOSED: [2016-07-19 Tue 10:11]

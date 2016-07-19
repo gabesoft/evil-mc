@@ -1,3 +1,5 @@
+TEMP := $(shell find . -name ".\#*")
+
 all: test
 
 test: test-no-win
@@ -15,4 +17,7 @@ test-install:
 		@$(RM) -r -f ./.cask/*
 		@cask install
 
-.PHONY: ecukes test test-no-win test-install all
+clean-temp:
+	$(RM) $(TEMP)
+
+.PHONY: ecukes test test-no-win test-install clean-temp all
