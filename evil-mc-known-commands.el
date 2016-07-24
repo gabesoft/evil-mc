@@ -173,6 +173,7 @@
     ;; haskell
     (haskell-indentation-common-electric-command . ((:default . evil-mc-execute-default-macro)))
     (haskell-indentation-newline-and-indent . ((:default . evil-mc-execute-default-call)))
+    (haskell-interactive-mode-space . ((:default . evil-mc-execute-default-call-with-count)))
 
     ;; ruby mode
     (ruby-tools-interpolate . ((:default . evil-mc-execute-default-call)))
