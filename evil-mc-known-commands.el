@@ -219,6 +219,14 @@
     (spacemacs/evil-numbers-decrease . ((:default . evil-mc-execute-default-call-with-count)))
     (spacemacs/evil-numbers-increase . ((:default . evil-mc-execute-default-call-with-count)))
 
+    ;; auctex
+    (TeX-insert-backslash . ((:default . evil-mc-execute-default-call-with-count)))
+    (LaTeX-insert-left-brace . ((:default . evil-mc-execute-default-call-with-count)))
+    (LaTeX-insert-right-brace . ((:default . evil-mc-execute-default-call-with-count)))
+    (LaTeX-babel-insert-hyphen . ((:default . evil-mc-execute-default-call-with-count)))
+    (TeX-insert-sub-or-superscript . ((:default . evil-mc-execute-default-call-with-count)))
+    (TeX-insert-dollar . ((:default . evil-mc-execute-default-call-with-count)))
+
     ;; evil-cleverparens
     (evil-cp-append ; a
      (:default . evil-mc-execute-default-call-with-count))
