@@ -344,6 +344,22 @@ and optionally CREATE a cursor at point."
   (evil-mc-run-cursors-before)
   (evil-mc-make-cursor-at-pos (point)))
 
+(evil-define-command evil-mc-make-cursor-move-next-line ()
+  "Create a cursor at point and move to next line."
+  :repeat ignore
+  :evil-mc t
+  (evil-mc-run-cursors-before)
+  (evil-mc-make-cursor-at-pos (point))
+  (next-line))
+
+(evil-define-command evil-mc-make-cursor-move-prev-line ()
+  "Create a cursor at point and move to previous line."
+  :repeat ignore
+  :evil-mc t
+  (evil-mc-run-cursors-before)
+  (evil-mc-make-cursor-at-pos (point))
+  (previous-line))
+
 (evil-define-command evil-mc-make-and-goto-first-cursor ()
   "Make a cursor at point and move point to the cursor with the lowest position."
   :repeat ignore
