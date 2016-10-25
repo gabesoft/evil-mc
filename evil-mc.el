@@ -62,6 +62,8 @@
                 ("grf" . evil-mc-make-and-goto-first-cursor)
                 ("grl" . evil-mc-make-and-goto-last-cursor)
                 ("grh" . evil-mc-make-cursor-here)
+                ("grj" . evil-mc-make-cursor-move-next-line)
+                ("grk" . evil-mc-make-cursor-move-prev-line)
                 ("M-n" . evil-mc-make-and-goto-next-cursor)
                 ("grN" . evil-mc-skip-and-goto-next-cursor)
                 ("M-p" . evil-mc-make-and-goto-prev-cursor)
