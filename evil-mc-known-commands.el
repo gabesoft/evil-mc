@@ -219,6 +219,9 @@
     (spacemacs/evil-numbers-decrease . ((:default . evil-mc-execute-default-call-with-count)))
     (spacemacs/evil-numbers-increase . ((:default . evil-mc-execute-default-call-with-count)))
 
+    ;; spacemacs
+    (spacemacs/smart-closing-parenthesis  . ((:default . evil-mc-execute-default-call)))
+
     ;; auctex
     (TeX-insert-backslash . ((:default . evil-mc-execute-default-call-with-count)))
     (LaTeX-insert-left-brace . ((:default . evil-mc-execute-default-call-with-count)))
