@@ -178,6 +178,9 @@
     ;; ruby mode
     (ruby-tools-interpolate . ((:default . evil-mc-execute-default-call)))
 
+    ;; shell mode
+    (sh-assignment . ((:default . evil-mc-execute-default-call-with-count)))
+
     ;; java
     (spacemacs/java-completing-dot . ((:default . evil-mc-execute-default-call)))
     (spacemacs/java-completing-double-colon . ((:default . evil-mc-execute-default-call)))
