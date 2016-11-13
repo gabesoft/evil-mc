@@ -23,6 +23,11 @@
   "The face used for fake regions"
   :group 'evil-mc)
 
+(defface evil-mc-cursor-bar-face
+  `((t (:height 1 :background ,(car evil-insert-state-cursor))))
+  "The face used for fake cursors if the cursor-type is bar"
+  :group 'evil-mc)
+
 (defcustom evil-mc-cursor-overlay-priority 201
   "The priority of the fake cursors overlay."
   :type 'integer
