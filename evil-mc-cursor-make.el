@@ -36,11 +36,6 @@
     (overlay-put overlay 'priority evil-mc-cursor-overlay-priority)
     overlay))
 
-(defface evil-mc-cursor-bar-face
-  `((t (:height 1 :background ,(car evil-insert-state-cursor))))
-  "The face used for fake cursors if the cursor-type is bar"
-  :group 'evil-mc)
-
 (defun evil-mc-cursor-is-bar ()
   "returns true if the cursor is a bar"
   (cond ((equalp cursor-type 'bar) t)
