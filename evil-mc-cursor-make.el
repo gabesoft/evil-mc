@@ -11,6 +11,7 @@
 (require 'evil-mc-vars)
 (require 'evil-mc-cursor-state)
 (require 'evil-mc-region)
+(require 'evil)
 
 (defun evil-mc-get-cursor-face ()
   "Get the current cursor face."
