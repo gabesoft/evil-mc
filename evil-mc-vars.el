@@ -5,6 +5,7 @@
 ;; This file contains variables used by evil-mc
 
 (require 'evil-mc-known-commands)
+(require 'evil-states)
 
 ;;; Code:
 
