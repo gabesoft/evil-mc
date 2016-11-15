@@ -14,6 +14,13 @@
   :prefix "evil-mc-"
   :group 'evil)
 
+(defun evil-mc-cursor-color (state-cursor)
+  "Get the cursor color for a STATE-CURSOR"
+  (or (and (listp state-cursor)
+           (stringp (car state-cursor))
+           (car state-cursor))
+      "red"))
+
 (defface evil-mc-cursor-default-face
   '((t (:inherit cursor :inverse-video nil)))
   "The face used for fake cursors."
@@ -25,8 +32,13 @@
   :group 'evil-mc)
 
 (defface evil-mc-cursor-bar-face
-  `((t (:height 1 :background ,(car evil-insert-state-cursor))))
+  `((t (:height 1 :background ,(evil-mc-cursor-color evil-insert-state-cursor))))
   "The face used for fake cursors if the cursor-type is bar"
+  :group 'evil-mc)
+
+(defface evil-mc-cursor-hbar-face
+  `((t (:underline (:color ,(evil-mc-cursor-color evil-replace-state-cursor)))))
+  "The face used for fake cursors if the cursor-type is horizontal bar"
   :group 'evil-mc)
 
 (defcustom evil-mc-cursor-overlay-priority 201

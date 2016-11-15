@@ -4,7 +4,7 @@
 
 ;; Author: Gabriel Adomnicai <gabesoft@gmail.com>
 ;; Maintainer: Gabriel Adomnicai <gabesoft@gmail.com>
-;; Version: 0.0.2
+;; Version: 0.0.3
 ;; Keywords: evil editing multiple-cursors vim evil-multiple-cursors evil-mc evil-mc
 ;; Homepage: https://github.com/gabesoft/evil-mc
 ;; Package-Requires: ((emacs "24.3") (evil "1.2.12") (cl-lib "0.5"))
