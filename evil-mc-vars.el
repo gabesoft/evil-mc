@@ -5,6 +5,7 @@
 ;; This file contains variables used by evil-mc
 
 (require 'evil-mc-known-commands)
+(require 'evil-states)
 
 ;;; Code:
 
@@ -21,6 +22,11 @@
 (defface evil-mc-region-face
   '((t :inherit region))
   "The face used for fake regions"
+  :group 'evil-mc)
+
+(defface evil-mc-cursor-bar-face
+  `((t (:height 1 :background ,(car evil-insert-state-cursor))))
+  "The face used for fake cursors if the cursor-type is bar"
   :group 'evil-mc)
 
 (defcustom evil-mc-cursor-overlay-priority 201

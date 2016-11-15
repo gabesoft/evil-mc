@@ -35,18 +35,28 @@
     (overlay-put overlay 'priority evil-mc-cursor-overlay-priority)
     overlay))
 
+(defun evil-mc-cursor-is-bar ()
+  "returns true if the cursor is a bar"
+  (cond ((equalp cursor-type 'bar) t)
+	((when (listp cursor-type) (equalp (car cursor-type) 'bar)) t)
+	(t nil)))
+
 (defun evil-mc-cursor-overlay-at-eol (pos)
   "Make a cursor overlay at POS assuming pos is at the end of line."
   (let ((overlay (evil-mc-cursor-overlay pos pos))
         (face (evil-mc-get-cursor-face)))
-    (overlay-put overlay 'after-string (propertize " " 'face face))
+    (if (evil-mc-cursor-is-bar)
+	(overlay-put overlay 'before-string (propertize "|" 'face 'evil-mc-cursor-bar-face))
+      (overlay-put overlay 'after-string (propertize " " 'face face)))
     overlay))
 
 (defun evil-mc-cursor-overlay-inline (pos)
   "Make a cursor overlay at POS assuming pos is not at the end of line."
   (let ((overlay (evil-mc-cursor-overlay pos (1+ pos)))
         (face (evil-mc-get-cursor-face)))
-    (overlay-put overlay 'face face)
+    (if (evil-mc-cursor-is-bar)
+	(overlay-put overlay 'before-string (propertize "|" 'face 'evil-mc-cursor-bar-face))
+      (overlay-put overlay 'face face))
     overlay))
 
 (defun evil-mc-cursor-overlay-at-pos (&optional pos)
