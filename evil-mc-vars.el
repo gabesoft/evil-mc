@@ -19,7 +19,7 @@
   (or (and (listp state-cursor)
            (stringp (car state-cursor))
            (car state-cursor))
-      "red"))
+      (face-attribute 'cursor :background)))
 
 (defface evil-mc-cursor-default-face
   '((t (:inherit cursor :inverse-video nil)))
