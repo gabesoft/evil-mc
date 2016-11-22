@@ -31,7 +31,7 @@
   (interactive)
   (evil-mc-execute-for-all-cursors
    (lambda (cursor)
-     (insert-string
+     (insert
       (format-time-string "%d/%m/%Y" (current-time))))))
 
 (provide 'evil-mc-scratch)
