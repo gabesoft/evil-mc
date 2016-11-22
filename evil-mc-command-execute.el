@@ -628,7 +628,7 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
      (let ((next-cursor-list nil)
            (index 0))
        (dolist (cursor evil-mc-cursor-list index)
-         (incf index)
+         (cl-incf index)
          (let* ((data (evil-mc-put-cursor-property cursor :index index))
                 (handler (lambda () (funcall cmd data)))
                 (vars (evil-mc-get-cursor-variables)))
