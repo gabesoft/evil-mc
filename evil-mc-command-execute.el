@@ -555,7 +555,8 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
 
       (when (fboundp 'evil--jump-hook)
         (evil--jump-hook (evil-mc-get-command-name)))
-      (evil-repeat-pre-hook)
+      (when (fboundp 'evil-repeat-pre-hook) (evil-repeat-pre-hook))
+      (when (fboundp 'evil-replace-pre-command) (evil-replace-pre-command))
 
       (ignore-errors
         (let ((prev-point (point)))

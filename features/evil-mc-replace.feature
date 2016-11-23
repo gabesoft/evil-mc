@@ -47,3 +47,20 @@ Feature: Replace text
     abcs is the second line -1 -1 -1 t t t f f f k k k
     abcs is the third line -1 -1 -1 t t t f f f k k k
     """
+
+  Scenario: Should undo replace on delete
+    When I replace the buffer text with:
+    """
+    This is the start of text -1 -1 -1 t t t f f f k k k
+    This is the second line -1 -1 -1 t t t f f f k k k
+    This is the third line -1 -1 -1 t t t f f f k k k
+    """
+    And I press "vgrm"
+    And I type "Rabcdefg"
+    And I press "<DEL><DEL><DEL><DEL><DEL><DEL>"
+    Then I should see:
+    """
+    ahis is the start of text -1 -1 -1 t t t f f f k k k
+    ahis is the second line -1 -1 -1 t t t f f f k k k
+    ahis is the third line -1 -1 -1 t t t f f f k k k
+    """

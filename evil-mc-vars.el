@@ -80,6 +80,7 @@
                  undo-stack
                  undo-stack-pointer
                  temporary-goal-column))
+    (:replace . (evil-replace-alist))
     (:dabbrev . (dabbrev--friend-buffer-list
                  dabbrev--last-buffer
                  dabbrev--last-buffer-found
