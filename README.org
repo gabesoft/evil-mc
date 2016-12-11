@@ -144,7 +144,6 @@ Here's a detailed list of all commands used to create, navigate through, or dele
   #+END_SRC
 
 *** Notes
-- Currently *evil-mc* is in a very early beta stage and thus not fully stable.
 - Most evil motions and operators are supported but not every single command will work. 
 - If the cursors don't seem to work during a command, either the command is
   not known (see ~evil-mc-known-commands~ in [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-known-commands.el][evil-mc-known-commands.el]]) or some minor modes
