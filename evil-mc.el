@@ -131,7 +131,10 @@ These modes will be paused while the cursors are active.")
     "Custom command handlers. The entries here should have
 the same form as those in `evil-mc-known-commands'.
 This variable can be used to override default command handlers
-implementations."))
+implementations.")
+
+  (defvar evil-mc-undo-cursors-on-keyboard-quit nil
+    "Flag that determines whether to delete all cursors on `keyboard-quit'."))
 
 (defun evil-mc-initialize-vars ()
   "Initialize all variables used by `evil-mc'."
@@ -182,7 +185,10 @@ implementations."))
   (defadvice evil-repeat-keystrokes (before evil-mc-repeat-keystrokes (flag) activate)
     (evil-mc-save-keys-motion flag))
   (defadvice evil-repeat-motion (before evil-mc-repeat-motion (flag) activate)
-    (evil-mc-save-keys-operator flag)))
+    (evil-mc-save-keys-operator flag))
+  (when evil-mc-undo-cursors-on-keyboard-quit
+    (defadvice keyboard-quit (before evil-mc-keyboard-quit activate)
+      (evil-mc-undo-all-cursors))))
 
 (defun evil-mc-teardown-active-state ()
   "Teardown all variables and hooks used while there are active cursors."
@@ -191,7 +197,9 @@ implementations."))
   (remove-hook 'post-command-hook 'evil-mc-execute-for-all t)
 
   (ad-remove-advice 'evil-repeat-keystrokes 'before 'evil-mc-repeat-keystrokes)
-  (ad-remove-advice 'evil-repeat-motion 'before 'evil-mc-repeat-motion))
+  (ad-remove-advice 'evil-repeat-motion 'before 'evil-mc-repeat-motion)
+  (when evil-mc-undo-cursors-on-keyboard-quit
+    (ad-remove-advice 'keyboard-quit 'before 'evil-mc-keyboard-quit)))
 
 (provide 'evil-mc)
 
