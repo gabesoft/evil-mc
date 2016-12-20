@@ -193,8 +193,6 @@ Feature: Insert and change text
     This line has changed.
     """
 
-  # TODO ensure this works for consecutive lines and
-  #      passes for [ "cc" "^cc" "$cc" ]
   Scenario: Change a whole line
     When I replace the buffer text with:
     """
@@ -213,6 +211,27 @@ Feature: Insert and change text
     That is a line.
     The line has changed.
     That is a line.
+    """
+
+  Scenario: Change a whole line (consecutive lines)
+    When I replace the buffer text with:
+    """
+    That is a line.
+    That is a line.
+    That is a line.
+    That is a line.
+    That is a line.
+    """
+    And I press "grm"
+    And I type "cc"
+    And I type "The line has changed."
+    Then I should see:
+    """
+    The line has changed.
+    The line has changed.
+    The line has changed.
+    The line has changed.
+    The line has changed.
     """
 
   Scenario: Change a whole visual line
@@ -254,4 +273,42 @@ Feature: Insert and change text
     The last line.
     The first two lines have changed.
     The last line.
+    """
+
+  Scenario: Insert with several cursors on a empty line
+    When I replace the buffer text with:
+    """
+                   x
+    """
+    And I type "fxxhhhhv"
+    And I press "C-n"
+    And I press "C-n"
+    And I type "iabc "
+    Then I should see:
+    """
+              abc  abc  abc    
+    """
+
+  # TODO: make this work with evil-append and evil-append-line as well
+  Scenario: Insert with cursors on multiple empty lines
+    When I replace the buffer text with:
+    """
+    line
+    line
+    line
+    line
+    """
+    And I type "grm"
+    And I type "bC"
+    And I type "        "
+    And I press "<escape>"
+    And I type "i"
+    And I press "<escape>"
+    And I type "iabc"
+    Then I should see:
+    """
+          abc  
+          abc  
+          abc  
+          abc  
     """

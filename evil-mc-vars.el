@@ -65,7 +65,6 @@
                  evil-repeat-count
                  evil-repeat-info
                  evil-repeat-keys
-                 evil-repeat-move-cursor
                  evil-repeat-pos
                  evil-repeat-ring
                  evil-this-register

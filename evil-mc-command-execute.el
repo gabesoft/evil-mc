@@ -206,7 +206,8 @@ If there is no region call CMD with the point position."
                                  (evil-mc-get-region-point region)))
                   (eq point (point-at-bol)))
         (evil-forward-char 1 nil t))
-      (evil-mc-execute-with-region-or-macro 'evil-change))))
+      (evil-mc-execute-with-region-or-macro 'evil-change)
+      (evil-maybe-remove-spaces nil))))
 
 (defun evil-mc-execute-evil-paste ()
   "Execute an `evil-paste-before' or `evil-paste-after' command."
@@ -224,7 +225,9 @@ If there is no region call CMD with the point position."
              (setq new-kill-ring-yank-pointer kill-ring-yank-pointer))
 
            ;; execute paste with the old key ring
-           (evil-paste-before (evil-mc-get-command-keys-count) evil-this-register)
+           (if (eq (point-at-eol) (evil-mc-get-region-end region))
+               (evil-paste-after (evil-mc-get-command-keys-count) evil-this-register)
+             (evil-paste-before (evil-mc-get-command-keys-count) evil-this-register))
 
            ;; update the kill ring with the overwritten text
            (setq kill-ring new-kill-ring)
@@ -253,6 +256,10 @@ to the keys vector"
     (if count
         (evil-goto-line count)
       (evil-goto-line))))
+
+(defun evil-mc-execute-evil-repeat ()
+  "Execute an `evil-repeat' command."
+  (evil-repeat (evil-mc-get-command-keys-count) evil-repeat-move-cursor))
 
 (defun evil-mc-execute-call ()
   "Execute a generic command as a function call without parameters."
@@ -394,9 +401,17 @@ by the value of `evil-this-register'."
   :cursor-clear region
   (evil-force-normal-state))
 
+(evil-mc-define-handler evil-mc-execute-default-evil-insert-state ()
+  :cursor-clear region
+  (evil-insert-repeat-hook)
+  (evil-mc-execute-call-with-count)
+  (evil-maybe-remove-spaces nil))
+
 (evil-mc-define-handler evil-mc-execute-default-evil-normal-state ()
   :cursor-clear region
+  (evil-insert-repeat-hook)
   (evil-insert 1)
+  (evil-maybe-remove-spaces nil)
   (evil-normal-state))
 
 (evil-mc-define-handler evil-mc-execute-default-undo ()
@@ -438,6 +453,10 @@ by the value of `evil-this-register'."
 (evil-mc-define-handler evil-mc-execute-default-line-move ()
   :cursor-clear region
   (evil-mc-execute-call-with-count))
+
+(evil-mc-define-handler evil-mc-execute-default-evil-repeat ()
+  :cursor-clear region
+  (evil-mc-execute-evil-repeat))
 
 (evil-mc-define-handler evil-mc-execute-default-call-with-count ()
   :cursor-clear region
@@ -553,8 +572,7 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
 
       (goto-char (evil-mc-get-cursor-start cursor))
 
-      (when (fboundp 'evil--jump-hook)
-        (evil--jump-hook (evil-mc-get-command-name)))
+      (when (fboundp 'evil--jump-hook) (evil--jump-hook (evil-mc-get-command-name)))
       (when (fboundp 'evil-repeat-pre-hook) (evil-repeat-pre-hook))
       (when (fboundp 'evil-replace-pre-command) (evil-replace-pre-command))
 

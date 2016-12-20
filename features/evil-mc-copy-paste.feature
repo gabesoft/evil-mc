@@ -1,5 +1,5 @@
 Feature: Copy paste
-  
+
   Scenario: Copy paste a word (before)
     When I replace the buffer text with:
     """
@@ -12,7 +12,7 @@ Feature: Copy paste
     """
     Here is a list of some words, some are some small, some some big and some huge.
     """
-    
+
   Scenario: Copy paste a word (after)
     When I replace the buffer text with:
     """
@@ -38,7 +38,7 @@ Feature: Copy paste
     """
     blue and big and and big and purple and big and and big and pink and big and and big and small
     """
-    
+
   Scenario: Copy paste up to a letter
     When I replace the buffer text with:
     """
@@ -54,7 +54,7 @@ Feature: Copy paste
     e are soHere are some words.
     e are soHere are some words.
     """
-    
+
   Scenario: Copy paste till before a letter
     When I replace the buffer text with:
     """
@@ -70,7 +70,7 @@ Feature: Copy paste
     e are somHere are some words.
     e are somHere are some words.
     """
-    
+
   Scenario: Copy paste until the end of the line
     When I replace the buffer text with:
     """
@@ -86,7 +86,7 @@ Feature: Copy paste
     Here are some words.some words.
     Here are some words.some words.
     """
-    
+
   Scenario: Copy paste a line
     When I replace the buffer text with:
     """
@@ -106,7 +106,7 @@ Feature: Copy paste
     Here are some words.
     There are some words.
     """
-    
+
   Scenario: Copy paste a line with count
     When I replace the buffer text with:
     """
@@ -129,7 +129,7 @@ Feature: Copy paste
     Here are some words.
     There are some words.
     """
-    
+
   Scenario: Copy paste with registers
     When I replace the buffer text with:
     """
