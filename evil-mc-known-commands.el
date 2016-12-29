@@ -50,6 +50,7 @@
     (evil-exchange . ((:default . evil-mc-execute-default-evil-exchange)))
     (evil-exchange-cancel . ((:default . evil-mc-execute-default-call)))
     (evil-exchange-point-and-mark . ((visual . evil-mc-execute-visual-exchange-point-and-mark)))
+    (evil-exit-visual-state . ((:default . evil-mc-execute-default-call) (visual . evil-mc-execute-visual-call)))
     (evil-find-char . ((:default . evil-mc-execute-default-evil-find-char) (visual . evil-mc-execute-visual-evil-find-char)))
     (evil-find-char-backward . ((:default . evil-mc-execute-default-evil-find-char) (visual . evil-mc-execute-visual-evil-find-char)))
     (evil-find-char-to . ((:default . evil-mc-execute-default-evil-find-char) (visual . evil-mc-execute-visual-evil-find-char)))
