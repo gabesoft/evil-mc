@@ -380,7 +380,7 @@ DIR should be 1 or -1 and COUNT should be a positive integer or nil."
   (dotimes (i count)
     (evil-mc-run-cursors-before)
     (evil-mc-make-cursor-at-pos (point))
-    (let (line-move-visual)
+    (let ((line-move-visual t))
       (evil-line-move dir))))
 
 (evil-define-command evil-mc-make-cursor-here ()
