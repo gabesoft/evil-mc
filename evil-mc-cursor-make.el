@@ -372,6 +372,17 @@ and optionally CREATE a cursor at point."
   (evil-mc-clear-cursor-state)
   (run-hooks 'evil-mc-after-cursors-deleted))
 
+(defun evil-mc-make-cursor-move-by-line (dir count)
+  "Create COUNT cursors one for each line moving in the direction DIR.
+DIR should be 1 or -1 and COUNT should be a positive integer or nil."
+  (evil-force-normal-state)
+  (setq count (max 0 (or count 1)))
+  (dotimes (i count)
+    (evil-mc-run-cursors-before)
+    (evil-mc-make-cursor-at-pos (point))
+    (let (line-move-visual)
+      (evil-line-move dir))))
+
 (evil-define-command evil-mc-make-cursor-here ()
   "Create a cursor at point."
   :repeat ignore
@@ -379,21 +390,19 @@ and optionally CREATE a cursor at point."
   (evil-mc-run-cursors-before)
   (evil-mc-make-cursor-at-pos (point)))
 
-(evil-define-command evil-mc-make-cursor-move-next-line ()
+(evil-define-command evil-mc-make-cursor-move-next-line (count)
   "Create a cursor at point and move to next line."
   :repeat ignore
   :evil-mc t
-  (evil-mc-run-cursors-before)
-  (evil-mc-make-cursor-at-pos (point))
-  (next-line))
+  (interactive "<c>")
+  (evil-mc-make-cursor-move-by-line 1 count))
 
-(evil-define-command evil-mc-make-cursor-move-prev-line ()
+(evil-define-command evil-mc-make-cursor-move-prev-line (count)
   "Create a cursor at point and move to previous line."
   :repeat ignore
   :evil-mc t
-  (evil-mc-run-cursors-before)
-  (evil-mc-make-cursor-at-pos (point))
-  (previous-line))
+  (interactive "<c>")
+  (evil-mc-make-cursor-move-by-line -1 count))
 
 (evil-define-command evil-mc-make-and-goto-first-cursor ()
   "Make a cursor at point and move point to the cursor with the lowest position."
