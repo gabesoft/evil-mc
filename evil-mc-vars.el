@@ -16,10 +16,11 @@
 
 (defun evil-mc-cursor-color (state-cursor)
   "Get the cursor color for a STATE-CURSOR"
-  (or (and (listp state-cursor)
-           (stringp (car state-cursor))
-           (car state-cursor))
-      (face-attribute 'cursor :background)))
+  (cond ((and (listp state-cursor) (stringp (car state-cursor)))
+         (car state-cursor))
+        ((not (eq (face-attribute 'cursor :background) 'unspecified))
+         (face-attribute 'cursor :background))
+        (t "gray")))
 
 (defface evil-mc-cursor-default-face
   '((t (:inherit cursor :inverse-video nil)))
