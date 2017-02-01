@@ -123,11 +123,12 @@
     "The string used in the mode line to identify `evil-mc-mode'.")
 
   (defvar evil-mc-incompatible-minor-modes
-    '(flyspell-mode
-      flycheck-mode aggressive-indent-mode
-      yas-minor-mode
+    '(aggressive-indent-mode
+      flycheck-mode
+      flyspell-mode
       haskell-indent-mode
-      haskell-indentation-mode)
+      haskell-indentation-mode
+      yas-minor-mode)
     "Minor modes that are incompatible with `evil-mc-mode'.
 These modes will be paused while the cursors are active.")
 
