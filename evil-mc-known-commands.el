@@ -43,6 +43,7 @@
     (evil-delete . ((:default . evil-mc-execute-default-evil-delete)))
     (evil-delete-backward-char-and-join . ((:default . evil-mc-execute-default-call-with-count)))
     (evil-delete-backward-word . ((:default . evil-mc-execute-default-call)))
+    (evil-delete-backward-char . ((:default . evil-mc-execute-default-evil-delete)))
     (evil-delete-char . ((:default . evil-mc-execute-default-evil-delete)))
     (evil-delete-line . ((:default . evil-mc-execute-default-evil-delete)))
     (evil-digit-argument-or-evil-beginning-of-line . ((:default . evil-mc-execute-default-call) (visual . evil-mc-execute-visual-call)))
