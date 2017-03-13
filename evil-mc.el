@@ -119,10 +119,6 @@
 (defun evil-mc-define-vars ()
   "Define vars that can be overridden before enabling `evil-mc-mode'."
 
-  (defvar evil-mc-enable-bar-cursor t
-    "Flag that determines whether to attempt to display the fake cursors
-as bar when the real cursor is of type `bar'")
-
   (defvar evil-mc-mode-line-prefix "emc"
     "The string used in the mode line to identify `evil-mc-mode'.")
 

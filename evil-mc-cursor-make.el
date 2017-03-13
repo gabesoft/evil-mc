@@ -18,9 +18,8 @@
       (and (listp cursor-type) (eq (car cursor-type) type))))
 
 (defun evil-mc-cursor-is-bar ()
-  "Return true if the cursor is of type vertical bar
-and `evil-mc-enable-bar-cursor' is not `nil'."
-  (and evil-mc-enable-bar-cursor (evil-mc-cursor-is-of-type 'bar)))
+  "Return true if the cursor is of type vertical bar"
+  (evil-mc-cursor-is-of-type 'bar))
 
 (defun evil-mc-cursor-is-hbar ()
   "Return true if the cursor is of type horizontal bar"
