@@ -4,7 +4,7 @@ branches:
   - master
 
 env:
-  - EVM_EMACS=emacs-25.1-bin
+  - EVM_EMACS=emacs-25.1-travis
 
 before_install:
   - sudo mkdir /usr/local/evm
