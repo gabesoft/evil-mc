@@ -229,6 +229,8 @@
 
     ;; spacemacs
     (spacemacs/smart-closing-parenthesis  . ((:default . evil-mc-execute-default-call)))
+    (spacemacs-evil/evil-mc-paste-after . ((:default . evil-mc-execute-default-evil-paste)))
+    (spacemacs-evil/evil-mc-paste-before . ((:default . evil-mc-execute-default-evil-paste)))
 
     ;; auctex
     (TeX-insert-backslash . ((:default . evil-mc-execute-default-call-with-count)))
