@@ -391,6 +391,25 @@ DIR should be 1 or -1 and COUNT should be a positive integer or nil."
   (evil-mc-run-cursors-before)
   (evil-mc-make-cursor-at-pos (point)))
 
+(defun evil-mc-toggle-cursor-on-click (event)
+  "Create a cursor were the mouse is clicked, or remove a
+cursor that is already there."
+  (interactive "e")
+  (mouse-minibuffer-check event)
+  (let ((position (event-end event)))
+    (when (not (windowp (posn-window position)))
+      (error "Position not in text area of window"))
+    (select-window (posn-window position))
+    (let ((pt (posn-point position)))
+      (when (numberp pt)
+        (let* ((existing (evil-mc-find-next-cursor pt))
+               (start (evil-mc-get-cursor-start existing)))
+          (if (and existing (eq pt start))
+              (evil-mc-undo-cursor existing)
+            (save-excursion
+              (goto-char pt)
+              (evil-mc-make-cursor-here))))))))
+
 (evil-define-command evil-mc-make-cursor-move-next-line (count)
   "Create a cursor at point and move to next line."
   :repeat ignore
