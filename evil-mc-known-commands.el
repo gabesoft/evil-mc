@@ -240,6 +240,9 @@
     (TeX-insert-sub-or-superscript . ((:default . evil-mc-execute-default-call-with-count)))
     (TeX-insert-dollar . ((:default . evil-mc-execute-default-call-with-count)))
 
+    ;; tide
+    (typescript-insert-and-indent . ((self-insert-command . evil-mc-execute-default-call-with-count)))
+
     ;; evil-cleverparens
     (evil-cp-append ; a
      (:default . evil-mc-execute-default-call-with-count))
