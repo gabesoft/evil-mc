@@ -43,11 +43,14 @@
 (require 'evil-mc-region)
 
 (defcustom evil-mc-mode-line
-  `(:eval (if (> (evil-mc-get-cursor-count) 1)
-              (format ,(propertize " %s:%d" 'face 'cursor)
-                      evil-mc-mode-line-prefix
-                      (evil-mc-get-cursor-count))
-            (format ,(propertize " %s") evil-mc-mode-line-prefix)))
+  `(:eval (cond ((<= (evil-mc-get-cursor-count) 1)
+                 (format ,(propertize " %s") evil-mc-mode-line-prefix))
+                ((evil-mc-frozen-p)
+                 (format ,(propertize " %s(paused):%d" 'face '(:inherit cursor :inverse-video t))
+                         evil-mc-mode-line-prefix (evil-mc-get-cursor-count)))
+                (t
+                 (format ,(propertize " %s:%d" 'face 'cursor)
+                         evil-mc-mode-line-prefix (evil-mc-get-cursor-count)))))
   "Cursors indicator in the mode line."
   :group 'evil-mc)
 

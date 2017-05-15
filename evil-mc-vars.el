@@ -224,12 +224,14 @@
 (defun evil-mc-pause-cursors ()
   "Freeze the fake cursors."
   (interactive)
-  (setq evil-mc-frozen t))
+  (setq evil-mc-frozen t)
+  (force-mode-line-update))
 
 (defun evil-mc-resume-cursors ()
   "Unfreeze the fake cursors."
   (interactive)
-  (setq evil-mc-frozen nil))
+  (setq evil-mc-frozen nil)
+  (force-mode-line-update))
 
 (defun evil-mc-clear-pattern ()
   "Clear the currently saved pattern."
