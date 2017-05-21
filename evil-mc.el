@@ -42,19 +42,39 @@
 (require 'evil-mc-command-execute)
 (require 'evil-mc-region)
 
-(defcustom evil-mc-mode-line
-  `(:eval (cond ((<= (evil-mc-get-cursor-count) 1)
-                 (format ,(propertize " %s") evil-mc-mode-line-prefix))
-                ((evil-mc-frozen-p)
-                 (format ,(propertize " %s(paused):%d" 'face '(:inherit cursor :inverse-video t))
-                         evil-mc-mode-line-prefix (evil-mc-get-cursor-count)))
-                (t
-                 (format ,(propertize " %s:%d" 'face 'cursor)
-                         evil-mc-mode-line-prefix (evil-mc-get-cursor-count)))))
-  "Cursors indicator in the mode line."
-  :group 'evil-mc)
+(defun evil-mc-active-mode-line (prefix)
+  "Get the mode-line text to be displayed when there are active cursors"
+  (let ((mode-line-text
+         (concat mode-line-text-prefix
+                 (when (and (evil-mc-frozen-p)
+                            evil-mc-mode-line-text-paused)
+                   "(paused)")
+                 (format ":%d" (evil-mc-get-cursor-count)))))
+    ;; mode line text colors
+    (cond ((and (evil-mc-frozen-p)
+                evil-mc-mode-line-text-inverse-colors)
+           (propertize mode-line-text 'face '(:inverse-video t)))
+          ;; resumed (unfrozen) cursors
+          (evil-mc-mode-line-text-cursor-color
+           (propertize
+            mode-line-text
+            'face
+            '(:inherit cursor :foreground "black" :distant-foreground "white")))
+          ;; default colors
+          (t mode-line-text))))
 
-(put 'evil-mc-mode-line 'risky-local-variable t)
+(defcustom evil-mc-mode-line
+  `(:eval
+    (let ((mode-line-text-prefix (concat " " evil-mc-mode-line-prefix)))
+      (if (> (evil-mc-get-cursor-count) 1)
+          (evil-mc-active-mode-line mode-line-text-prefix)
+        (when evil-mc-one-cursor-show-mode-line-text
+          mode-line-text-prefix))))
+  "The evil-mc mode line text. It shows the number of cursors,
+ when there are more than one and whether the cursors are paused."
+  :group 'evil-mc
+  :type '(string)
+  :risky t)
 
 (defvar evil-mc-key-map
   (let ((map (make-sparse-keymap))
