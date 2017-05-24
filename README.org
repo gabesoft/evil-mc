@@ -143,6 +143,42 @@ Here's a detailed list of all commands used to create, navigate through, or dele
   ;; this hook runs just after the last cursor is deleted
   #+END_SRC
 
+*** Mode line text and colors
+There are 4 variables, that can change the mode lines text, and its color.
+
+**** Only one cursor
+The ~emc~ text can be hidden, by setting this variable to ~nil~.
+(default: ~t~)
+#+BEGIN_SRC
+(setq evil-mc-one-cursor-show-mode-line-text t)
+#+END_SRC
+
+**** Two or more cursors, resumed (unpaused)
+The resumed mode line text, can have two different colors:
+- The cursors color, when this variable is ~t~.
+- The default colors, when this variable is ~nil~.
+(default: ~t~)
+#+BEGIN_SRC
+(setq evil-mc-mode-line-text-cursor-color t)
+#+END_SRC
+
+**** Two or more cursors, paused
+The ~(paused)~ text can be hidden, by setting this variable to ~nil~.
+(default: ~t~)
+#+BEGIN_SRC
+(setq evil-mc-mode-line-text-paused t)
+#+END_SRC
+
+The paused mode line text can have three different colors:
+- Inverse colors, when the inverse colors variable is ~t~.
+- Cursors color, when the inverse colors variable is ~nil~, and the cursor color variable is ~t~.
+- Default colors, when both the inverse and cursor color variables are ~nil~.
+(default: ~t~, for both the inverse and cursor variables)
+#+BEGIN_SRC
+(setq evil-mc-mode-line-text-inverse-colors t)
+(setq evil-mc-mode-line-text-cursor-color t)
+#+END_SRC
+
 *** Notes
 - Most evil motions and operators are supported but not every single command will work. 
 - If the cursors don't seem to work during a command, either the command is

@@ -131,6 +131,18 @@
 (evil-define-local-var evil-mc-paused-modes nil
   "List of temporarily disabled minor modes.")
 
+(evil-define-local-var evil-mc-one-cursor-show-mode-line-text t
+  "Show mode line text when there's only one cursor.")
+
+(evil-define-local-var evil-mc-mode-line-text-paused t
+  "Show (paused) text in the mode line.")
+
+(evil-define-local-var evil-mc-mode-line-text-inverse-colors t
+  "Show mode line text with inverse colors.")
+
+(evil-define-local-var evil-mc-mode-line-text-cursor-color t
+  "Show mode line text with the cursor color.")
+
 (defun evil-mc-known-command-p (cmd)
   "True if CMD is a supported command."
   (or (not (null (assq cmd evil-mc-known-commands)))
