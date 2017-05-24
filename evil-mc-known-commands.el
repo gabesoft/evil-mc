@@ -239,6 +239,18 @@
     (LaTeX-babel-insert-hyphen . ((:default . evil-mc-execute-default-call-with-count)))
     (TeX-insert-sub-or-superscript . ((:default . evil-mc-execute-default-call-with-count)))
     (TeX-insert-dollar . ((:default . evil-mc-execute-default-call-with-count)))
+    
+    ;; paredit
+    (paredit-backward-delete . ((:default . evil-mc-execute-default-call-with-count)))
+    (paredit-doublequote . ((:default . evil-mc-execute-default-call)))
+    (paredit-open-round  . ((:default . evil-mc-execute-default-call)))
+    (paredit-close-round  . ((:default . evil-mc-execute-default-call)))
+    (paredit-open-square  . ((:default . evil-mc-execute-default-call)))
+    (paredit-close-square  . ((:default . evil-mc-execute-default-call)))
+    (paredit-forward-slurp-sexp . ((:default . evil-mc-execute-default-call-with-count)))
+    (paredit-backward-slurp-sexp . ((:default . evil-mc-execute-default-call-with-count)))
+    (paredit-forward-barf-sexp . ((:default . evil-mc-execute-default-call-with-count)))
+    (paredit-backward-barf-sexp . ((:default . evil-mc-execute-default-call-with-count)))
 
     ;; tide
     (typescript-insert-and-indent . ((self-insert-command . evil-mc-execute-default-call-with-count)))
