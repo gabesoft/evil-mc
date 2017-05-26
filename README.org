@@ -216,6 +216,7 @@ The paused mode line text can have three different colors:
 - Redo may cause the real cursor to get out of sync with the others.
   This can be worked around by setting a mark and returning to it after a redo.
 - Jumps work if [[https://github.com/bling/evil-jumper][evil-jumper]] mode is enabled
+- Search commands such as ~evil-search-forward~, ~evil-search-backward~, and ~evil-search-next~ are not supported
 
 **** Known issues
 - Only named commands can be executed by the fake cursors.
