@@ -177,6 +177,10 @@
     (haskell-indentation-newline-and-indent . ((:default . evil-mc-execute-default-call)))
     (haskell-interactive-mode-space . ((:default . evil-mc-execute-default-call-with-count)))
 
+    ;; hungry-delete
+    (hungry-delete-backward . ((:default . evil-mc-execute-default-call-with-count)))
+    (hungry-delete-forward . ((:default . evil-mc-execute-default-call-with-count)))
+
     ;; ruby mode
     (ruby-tools-interpolate . ((:default . evil-mc-execute-default-call)))
 
