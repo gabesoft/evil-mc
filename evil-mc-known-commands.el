@@ -246,6 +246,51 @@
     ;; tide
     (typescript-insert-and-indent . ((self-insert-command . evil-mc-execute-default-call-with-count)))
 
+    ;; lispyville
+    (lispyville-normal-state
+     . ((:default . evil-mc-execute-default-evil-normal-state)))
+    (lispyville-yank ; y
+     (:default . evil-mc-execute-default-evil-yank))
+    (lispyville-change ; c
+     (:default . evil-mc-execute-default-evil-change))
+    (lispyville-change-line ; C
+     (:default . evil-mc-execute-default-evil-change-line))
+    (lispyville-delete ; d
+     (:default . evil-mc-execute-default-evil-delete))
+    (lispyville-delete-line ; D
+     (:default . evil-mc-execute-default-evil-delete))
+    (lispyville-delete-char-or-splice ; x
+     (:default . evil-mc-execute-default-evil-delete))
+    (lispyville-substitute ; s
+     (:default . evil-mc-execute-default-evil-substitute))
+    (lispyville-< ; <
+     (:default . evil-mc-execute-default-evil-shift-left)
+     (visual . evil-mc-execute-visual-shift-left))
+    (lispyville-> ; >
+     (:default . evil-mc-execute-default-evil-shift-right)
+     (visual . evil-mc-execute-visual-shift-right))
+    (lispyville-barf ; <
+     (:default . evil-mc-execute-default-evil-shift-left)
+     (visual . evil-mc-execute-visual-shift-left))
+    (lispyville-slurp ; >
+     (:default . evil-mc-execute-default-evil-shift-right)
+     (visual . evil-mc-execute-visual-shift-right))
+    (lispyville-drag-forward ; M-j
+     (:default . evil-mc-execute-default-call-with-count))
+    (lispyville-drag-backward ; M-k
+     (:default . evil-mc-execute-default-call-with-count))
+
+    ;; Not supported for now, because normal `evil-yank-line' also is not
+    ;; supported.
+    ;; lispyville-yank-line ; Y
+
+    ;; Not supported for now, because normal `evil-change-whole-line' also is
+    ;; not supported.
+    ;; lispyville-change-whole-line ; S
+
+    ;; Not supported for now.
+    ;; lispyville-delete-char-or-splice-backwards ; X
+
     ;; evil-cleverparens
     (evil-cp-append ; a
      (:default . evil-mc-execute-default-call-with-count))
