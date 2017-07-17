@@ -172,6 +172,9 @@
     (c-electric-star . ((:default . evil-mc-execute-default-call-with-count)))
     (c-indent-new-comment-line . ((:default . evil-mc-execute-default-call)))
 
+    ;; electric-pair
+    (electric-pair-delete-pair . ((:default . evil-mc-execute-default-call-with-count)))
+
     ;; haskell
     (haskell-indentation-common-electric-command . ((:default . evil-mc-execute-default-macro)))
     (haskell-indentation-newline-and-indent . ((:default . evil-mc-execute-default-call)))
