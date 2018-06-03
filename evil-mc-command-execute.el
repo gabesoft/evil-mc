@@ -190,6 +190,14 @@ If there is no region call CMD with the point position."
     (goto-char (min (evil-mc-get-region-mark region)
                     (evil-mc-get-region-point region)))))
 
+;; TODO: Factor with evil-yank
+(defun evil-mc-execute-evil-paredit-yank ()
+  "Execute an `evil-paredit-yank' comand."
+  (evil-mc-with-region-or-execute-macro region t
+    (evil-paredit-yank region-start region-end region-type evil-this-register)
+    (goto-char (min (evil-mc-get-region-mark region)
+                    (evil-mc-get-region-point region)))))
+
 (defun evil-mc-execute-evil-substitute ()
   "Execute an `evil-substitute' comand."
   (let ((point (point)))
@@ -207,6 +215,18 @@ If there is no region call CMD with the point position."
                   (eq point (point-at-bol)))
         (evil-forward-char 1 nil t))
       (evil-mc-execute-with-region-or-macro 'evil-change)
+      (evil-maybe-remove-spaces nil))))
+
+;; TODO: Factor with evil-change
+(defun evil-mc-execute-evil-paredit-change ()
+  "Execute an `evil-paredit-change' comand."
+  (let ((point (point)))
+    (evil-with-state normal
+      (unless (or (and region (< (evil-mc-get-region-mark region)
+                                 (evil-mc-get-region-point region)))
+                  (eq point (point-at-bol)))
+        (evil-forward-char 1 nil t))
+      (evil-mc-execute-with-region-or-macro 'evil-paredit-change)
       (evil-maybe-remove-spaces nil))))
 
 (defun evil-mc-execute-evil-paste ()
@@ -525,6 +545,13 @@ by the value of `evil-this-register'."
 (evil-mc-define-visual-handler evil-mc-execute-visual-call-with-count ()
   (evil-mc-execute-call-with-count))
 
+(evil-mc-define-handler evil-mc-execute-call-with-region-or-macro
+  :cursor-clear region
+  (evil-mc-execute-with-region-or-macro (evil-mc-get-command-name)))
+
+(evil-mc-define-handler evil-mc-execute-call-with-region-or-pos
+  :cursor-clear region
+  (evil-mc-execute-with-region-or-pos (evil-mc-get-command-name)))
 ;; ----
 
 (defun evil-mc-get-command-handler (cmd state)

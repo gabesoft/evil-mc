@@ -378,6 +378,18 @@
     ;; override, delete-or-splice, override, delete-or-splice
     ;; instead of: override, override, delete-or-splice, delete-or-splice
     ;; evil-cp-override ; M-z
+
+    ;; evil-paredit
+    ;; TODO: delete-line does not place cursor correctly
+    (evil-paredit-delete . ((:default . evil-mc-execute-call-with-region-or-macro)))
+    (evil-paredit-change . ((:default . evil-mc-execute-evil-paredit-change)))
+    (evil-paredit-yank . ((:default . evil-mc-execute-evil-paredit-yank)))
+    (evil-paredit-delete-line . ((:default . evil-mc-execute-call-with-region-or-pos)))
+    (evil-paredit-change-line . ((:default . evil-mc-execute-call-with-region-or-pos)))
+    (evil-paredit-change-whole-line . ((:default . evil-mc-execute-call)))
+    (evil-paredit-yank-line . ((:default . evil-mc-execute-call-with-region-or-macro)))
+    (paredit-backward-delete . ((:default . evil-mc-execute-call)))
+    (paredit-forward-delete . ((:default . evil-mc-execute-call)))
     )
   "A list of the supported commands and their handlers.
 Entries have the form (NAME . HANDLERS), where handlers is a list of entries of
