@@ -373,6 +373,33 @@ and optionally CREATE a cursor at point."
   (evil-mc-clear-cursor-state)
   (run-hooks 'evil-mc-after-cursors-deleted))
 
+(defun evil-mc-before-undo-all-cursors ()
+  "Actions to be executed before all cursors are deleted."
+  (evil-mc-set-killed-rectangle))
+
+(defun evil-mc-set-killed-rectangle ()
+  "Add the latest kill-ring entry for each cursor to `killed-rectangle'.
+So it can be pasted later with `yank-rectangle'."
+  (let ((entries (evil-mc-kill-ring-entries)))
+    (unless (evil-mc-all-equal entries)
+      (setq killed-rectangle entries))))
+
+(defun evil-mc-kill-ring-entries ()
+  "Return the latest `kill-ring' entry for each cursor
+fake or real sorted by their position in the buffer."
+  (let (entries)
+    (setq entries (cons (cons (car kill-ring) (point)) entries))
+    (dolist (cursor evil-mc-cursor-list)
+      (setq entries
+            (cons (cons (car (evil-mc-get-cursor-kill-ring cursor))
+                        (evil-mc-get-cursor-start cursor))
+                  entries)))
+    (mapcar 'car
+            (sort entries
+                  (lambda (x y)
+                    (< (cdr x)
+                       (cdr y)))))))
+
 (defun evil-mc-make-cursor-move-by-line (dir count)
   "Create COUNT cursors one for each line moving in the direction DIR.
 DIR should be 1 or -1 and COUNT should be a positive integer or nil."
@@ -491,6 +518,7 @@ closest to it when searching forwards."
   :repeat ignore
   :evil-mc t
   (when (evil-mc-has-cursors-p)
+    (evil-mc-before-undo-all-cursors)
     (mapc 'evil-mc-delete-cursor evil-mc-cursor-list)
     (evil-exit-visual-state)
     (evil-mc-cursors-after)))

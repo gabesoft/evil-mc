@@ -154,3 +154,31 @@ Feature: Copy paste
     Here are some words.Here are some 
     Here are some words.Here are some 
     """
+
+  Scenario: Copy paste with kill-ring
+    When I replace the buffer text with:
+    """
+    This is the first line
+    This is the second line
+    This is the third line
+    This is the fourth line
+
+    """
+    And I press "grm"
+    And I press "C-n"
+    And I press "w"
+    And I press "3yw"
+    And I press "gru"
+    And I press "G"
+    And I press "C-x r y"
+    Then I should see:
+    """
+    This is the first line
+    This is the second line
+    This is the third line
+    This is the fourth line
+    is the first 
+    is the second 
+    is the third 
+    is the fourth 
+    """

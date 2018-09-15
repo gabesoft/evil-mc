@@ -59,6 +59,15 @@
     (let ((digit (elt vector 0)))
       (and (>= digit 49) (<= digit 57)))))
 
+(defun evil-mc-all-equal (list)
+  "Are all items in LIST equal?"
+  (let ((first (car list))
+        (all-equal t))
+    (while (and all-equal list)
+      (setq all-equal (equal first (car list)))
+      (setq list (cdr list)))
+    all-equal))
+
 (provide 'evil-mc-common)
 
 ;;; evil-mc-common.el ends here
