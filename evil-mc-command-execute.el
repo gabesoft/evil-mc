@@ -401,6 +401,10 @@ by the value of `evil-this-register'."
   :cursor-clear region
   (evil-mc-execute-with-region-or-macro (evil-mc-get-command-name)))
 
+(evil-mc-define-handler evil-mc-execute-default-evil-indent ()
+  :cursor-clear region
+  (evil-mc-execute-with-region-or-macro (evil-mc-get-command-name)))
+
 (evil-mc-define-handler evil-mc-execute-default-evil-change-line ()
   :cursor-clear region
   (evil-mc-execute-with-region-or-pos 'evil-delete-line))

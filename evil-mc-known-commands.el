@@ -62,6 +62,8 @@
     (evil-goto-line . ((:default . evil-mc-execute-default-evil-goto-line) (visual . evil-mc-execute-visual-evil-goto-line)))
     (evil-goto-mark . ((:default . evil-mc-execute-default-call-with-last-input) (visual . evil-mc-execute-visual-call-with-last-input)))
     (evil-goto-mark-line . ((:default . evil-mc-execute-default-call-with-last-input) (visual . evil-mc-execute-visual-call-with-last-input)))
+    (evil-indent . ((:default . evil-mc-execute-default-evil-indent)))
+    (evil-indent-line . ((:default . evil-mc-execute-default-evil-indent)))
     (evil-inner-WORD . ((:default . evil-mc-execute-default-call-with-count) (visual . evil-mc-execute-visual-text-object)))
     (evil-inner-angle . ((:default . evil-mc-execute-default-call-with-count) (visual . evil-mc-execute-visual-text-object)))
     (evil-inner-back-quote . ((:default . evil-mc-execute-default-call-with-count) (visual . evil-mc-execute-visual-text-object)))
