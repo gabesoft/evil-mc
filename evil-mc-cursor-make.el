@@ -187,15 +187,23 @@ the cursors are ordered by the cursor overlay start position."
 (defun evil-mc-make-cursor-at-pos (pos &optional source-cursor)
   "Make a cursor at POS and add it to `evil-mc-cursor-list'.
 If SOURCE-CURSOR is specified copy its state onto the new cursor"
-  (let* ((source (evil-mc-copy-cursor-state
-                  (or source-cursor (evil-mc-get-default-cursor))))
-         (cursor (evil-mc-put-cursor-property
-                  source
-                  'last-position pos
-                  'temporary-goal-column (evil-mc-column-number pos)
-                  'overlay (evil-mc-cursor-overlay-at-pos pos))))
-    (evil-mc-insert-cursor cursor)
-    cursor))
+  (unless (cl-some (lambda (cursor)
+                     (= pos (evil-mc-get-cursor-start cursor)))
+                   evil-mc-cursor-list)
+    (let* ((source (evil-mc-copy-cursor-state
+                    (or source-cursor (evil-mc-get-default-cursor))))
+           (cursor (evil-mc-put-cursor-property
+                    source
+                    'last-position pos
+                    'order (if (null evil-mc-cursor-list) 1 ; ordered "chronologically"
+                             (1+ (apply #'max
+                                        (mapcar (lambda (cursor)
+                                                  (evil-mc-get-cursor-property cursor 'order))
+                                                evil-mc-cursor-list))))
+                    'temporary-goal-column (evil-mc-column-number pos)
+                    'overlay (evil-mc-cursor-overlay-at-pos pos))))
+      (evil-mc-insert-cursor cursor)
+      cursor)))
 
 (defun evil-mc-undo-cursor-at-pos (pos)
   "Delete the cursor at POS from `evil-mc-cursor-list' and remove its overlay.
