@@ -220,6 +220,21 @@ Return the deleted cursor."
                           evil-mc-cursor-list)))
     found))
 
+(defun evil-mc-undo-last-added-cursor ()
+  "Delete the latest added cursor from `evil-mc-cursor-list' and remove its overlay.
+Move the point to its position."
+  (interactive)
+  (when (evil-mc-has-cursors-p)
+    (let ((latest-cursor nil)
+          (order 0))
+      (dolist (c evil-mc-cursor-list)
+        (if (> (evil-mc-get-cursor-property c 'order) order)
+            (setq latest-cursor c)))
+      (goto-char (evil-mc-get-cursor-start latest-cursor))
+      (setq evil-mc-cursor-list (remove latest-cursor evil-mc-cursor-list))
+      (evil-mc-delete-cursor latest-cursor))))
+
+
 (defun evil-mc-find-prev-cursor (&optional pos)
   "Find the cursor closest to POS when searching backwards."
   (let ((prev nil) (pos (or pos (point))))
