@@ -168,7 +168,7 @@ Feature: Copy paste
     And I press "C-n"
     And I press "w"
     And I press "3yw"
-    And I press "gru"
+    And I press "grq"
     And I press "G"
     And I press "C-x r y"
     Then I should see:
