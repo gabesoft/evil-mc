@@ -187,15 +187,23 @@ the cursors are ordered by the cursor overlay start position."
 (defun evil-mc-make-cursor-at-pos (pos &optional source-cursor)
   "Make a cursor at POS and add it to `evil-mc-cursor-list'.
 If SOURCE-CURSOR is specified copy its state onto the new cursor"
-  (let* ((source (evil-mc-copy-cursor-state
-                  (or source-cursor (evil-mc-get-default-cursor))))
-         (cursor (evil-mc-put-cursor-property
-                  source
-                  'last-position pos
-                  'temporary-goal-column (evil-mc-column-number pos)
-                  'overlay (evil-mc-cursor-overlay-at-pos pos))))
-    (evil-mc-insert-cursor cursor)
-    cursor))
+  (unless (cl-some (lambda (cursor)
+                     (= pos (evil-mc-get-cursor-start cursor)))
+                   evil-mc-cursor-list)
+    (let* ((source (evil-mc-copy-cursor-state
+                    (or source-cursor (evil-mc-get-default-cursor))))
+           (cursor (evil-mc-put-cursor-property
+                    source
+                    'last-position pos
+                    'order (if (null evil-mc-cursor-list) 1 ; ordered "chronologically"
+                             (1+ (apply #'max
+                                        (mapcar (lambda (cursor)
+                                                  (evil-mc-get-cursor-property cursor 'order))
+                                                evil-mc-cursor-list))))
+                    'temporary-goal-column (evil-mc-column-number pos)
+                    'overlay (evil-mc-cursor-overlay-at-pos pos))))
+      (evil-mc-insert-cursor cursor)
+      cursor)))
 
 (defun evil-mc-undo-cursor-at-pos (pos)
   "Delete the cursor at POS from `evil-mc-cursor-list' and remove its overlay.
@@ -211,6 +219,21 @@ Return the deleted cursor."
                               t))
                           evil-mc-cursor-list)))
     found))
+
+(defun evil-mc-undo-last-added-cursor ()
+  "Delete the latest added cursor from `evil-mc-cursor-list' and remove its overlay.
+Move the point to its position."
+  (interactive)
+  (when (evil-mc-has-cursors-p)
+    (let ((latest-cursor nil)
+          (order 0))
+      (dolist (c evil-mc-cursor-list)
+        (if (> (evil-mc-get-cursor-property c 'order) order)
+            (setq latest-cursor c)))
+      (goto-char (evil-mc-get-cursor-start latest-cursor))
+      (setq evil-mc-cursor-list (remove latest-cursor evil-mc-cursor-list))
+      (evil-mc-delete-cursor latest-cursor))))
+
 
 (defun evil-mc-find-prev-cursor (&optional pos)
   "Find the cursor closest to POS when searching backwards."

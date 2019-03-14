@@ -79,7 +79,8 @@
 (defvar evil-mc-key-map
   (let ((map (make-sparse-keymap))
         (keys '(("grm" . evil-mc-make-all-cursors)
-                ("gru" . evil-mc-undo-all-cursors)
+                ("gru" . evil-mc-undo-last-added-cursor)
+                ("grq" . evil-mc-undo-all-cursors)
                 ("grs" . evil-mc-pause-cursors)
                 ("grr" . evil-mc-resume-cursors)
                 ("grf" . evil-mc-make-and-goto-first-cursor)
