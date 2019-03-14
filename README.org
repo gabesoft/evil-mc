@@ -58,7 +58,7 @@ in short, ~C-n~ / ~C-p~ are used for creating cursors, and ~M-n~ / ~M-p~
 are used for cycling through cursors. The commands that create cursors wrap around; but, 
 the ones that cycle them do not. 
 To skip creating a cursor forward use ~C-t~ or ~grn~ and backward ~grp~. 
-Finally use ~gru~ to remove all cursors.
+Finally use ~gru~ to "undo" the last added cursor, and ~grq~ to remove all cursors.
 
 For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
 **** Commands
@@ -71,6 +71,9 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 
 (evil-mc-undo-all-cursors)
 ;; Remove all cursors.
+
+(evil-mc-undo-last-added-cursor)
+;; Remove the last added cursor and move point to its position.
 
 (evil-mc-make-and-goto-next-match)
 ;; Make a cursor at point, and go to the next match of the 
