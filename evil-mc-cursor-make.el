@@ -232,7 +232,8 @@ Move the point to its position."
             (setq latest-cursor c)))
       (goto-char (evil-mc-get-cursor-start latest-cursor))
       (setq evil-mc-cursor-list (remove latest-cursor evil-mc-cursor-list))
-      (evil-mc-delete-cursor latest-cursor))))
+      (evil-mc-delete-cursor latest-cursor)
+      (evil-mc-run-cursors-after t))))
 
 
 (defun evil-mc-find-prev-cursor (&optional pos)
