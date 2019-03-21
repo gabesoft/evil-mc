@@ -461,6 +461,57 @@ cursor that is already there."
               (goto-char pt)
               (evil-mc-make-cursor-here))))))))
 
+(defun evil-mc-make-cursor-in-visual-selection-block (column)
+  "Create cursors at COLUMN column."
+  (evil-visual-rotate 'upper-left)
+  (dotimes (num (- (count-lines evil-visual-beginning evil-visual-end) 1))
+    (if (not (= (move-to-column column) column))
+        (progn
+          (indent-to-column column)
+          (move-to-column column)))
+    (evil-mc-run-cursors-before)
+    (evil-mc-make-cursor-at-pos (point))
+    (forward-line))
+  (move-to-column column))
+
+(defun evil-mc-make-cursor-in-visual-selection (beg)
+  "If BEG is non-nil, create cursors at beginning of line."
+  (evil-visual-rotate 'upper-left)
+  (dotimes (num (- (count-lines evil-visual-beginning evil-visual-end) 1))
+    (evil-mc-run-cursors-before)
+    (evil-mc-make-cursor-at-pos
+     (if beg
+         (line-beginning-position)
+       (line-end-position)))
+    (forward-line))
+  (if beg
+      (beginning-of-line)
+    (end-of-line)))
+
+(evil-define-command evil-mc-make-cursor-in-visual-selection-beg ()
+  "Create cursor in beginning of every visually selected line.
+Acts like the I key in evil-visual-state."
+  :repeat ignore
+  :evil-mc t
+  (if (eq (evil-visual-type) 'block)
+      (evil-mc-make-cursor-in-visual-selection-block
+       (min (evil-column evil-visual-beginning)
+            (evil-column evil-visual-end)))
+    (evil-mc-make-cursor-in-visual-selection t))
+  (evil-insert-state))
+
+(evil-define-command evil-mc-make-cursor-in-visual-selection-end ()
+  "Create cursor at end of every visually selected line.
+Acts like the A key in evil-visual-state."
+  :repeat ignore
+  :evil-mc t
+  (if (eq (evil-visual-type) 'block)
+      (evil-mc-make-cursor-in-visual-selection-block
+       (max (evil-column evil-visual-beginning)
+            (evil-column evil-visual-end)))
+    (evil-mc-make-cursor-in-visual-selection nil))
+  (evil-insert-state))
+
 (evil-define-command evil-mc-make-cursor-move-next-line (count)
   "Create a cursor at point and move to next line."
   :repeat ignore
