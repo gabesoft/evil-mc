@@ -61,6 +61,15 @@ To skip creating a cursor forward use ~C-t~ or ~grn~ and backward ~grp~.
 Finally use ~gru~ to "undo" the last added cursor, and ~grq~ to remove all cursors.
 
 For an example of setting up *evil-mc* see this [[https://github.com/gabesoft/evil-mc/blob/master/evil-mc-setup.el][setup file]]
+
+Optionally set up visual mode keybindings for ~I~ and ~A~ to create cursors at the
+beginning or end of every visually selected line instead of the default behavior.
+
+#+BEGIN_SRC emacs-lisp
+(evil-define-key 'visual evil-mc-key-map
+  "A" #'evil-mc-make-cursor-in-visual-selection-end
+  "I" #'evil-mc-make-cursor-in-visual-selection-beg)
+#+END_SRC
 **** Commands
 Here's a detailed list of all commands used to create, navigate through, or delete cursors:\\
 /All the commands below assume that there is a real cursor and possibly some fake cursors./
@@ -125,6 +134,12 @@ Here's a detailed list of all commands used to create, navigate through, or dele
 
 (evil-mc-resume-cursors)
 ;; Call to resume paused cursors.
+
+(evil-mc-make-cursor-in-visual-selection-beg)
+;; Create cursors at the beginning of every visually selected line.
+
+(evil-mc-make-cursor-in-visual-selection-end)
+;; Create cursors at the end of every visually selected line.
 #+END_SRC
 
 **** Customization
