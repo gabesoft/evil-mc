@@ -216,8 +216,10 @@
     (orgtbl-hijacker-command-100 . ((:default . evil-mc-execute-default-call-with-count)))
     (orgtbl-hijacker-command-109 . ((:default . evil-mc-execute-default-call-with-count)))
     (org-delete-backward-char . ((:default . evil-mc-execute-default-call-with-count)))
+    (evil-org-delete-char . ((:default . evil-mc-execute-default-evil-delete)))
+    (evil-org-delete-backward-char . ((:default . evil-mc-execute-default-evil-delete)))
 
-     ;; Outshine
+    ;; outshine
     (outshine-self-insert-command . ((:default . evil-mc-execute-default-call-with-count)))
 
     ;; unimpaired
