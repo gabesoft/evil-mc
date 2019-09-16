@@ -476,7 +476,9 @@ by the value of `evil-this-register'."
 
 (evil-mc-define-handler evil-mc-execute-default-line-move ()
   :cursor-clear region
-  (evil-mc-execute-call-with-count))
+  (evil-mc-execute-call-with-count)
+  (when (eolp)
+    (evil-end-of-line)))
 
 (evil-mc-define-handler evil-mc-execute-default-evil-repeat ()
   :cursor-clear region
@@ -541,7 +543,9 @@ by the value of `evil-this-register'."
   (evil-mc-execute-call))
 
 (evil-mc-define-visual-handler evil-mc-execute-visual-line-move ()
-  (evil-mc-execute-call-with-count))
+  (evil-mc-execute-call-with-count)
+  (when (eolp)
+    (evil-end-of-line)))
 
 (evil-mc-define-visual-handler evil-mc-execute-visual-evil-goto-line ()
   (evil-mc-execute-evil-goto-line))
