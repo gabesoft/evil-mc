@@ -27,12 +27,17 @@
     (apply #'evil-mc-put-object-property
            (cons obj properties))))
 
-
 (defun evil-mc-column-number (pos)
   "Return the column number at POS."
   (save-excursion
     (goto-char pos)
     (current-column)))
+
+(defun evil-mc-log-execute-failure (command-name error)
+  (when (not (evil-mc-silence-errors-p))
+    (evil-mc-message "Failed to execute %s with error: %s"
+                     command-name
+                     (error-message-string error))))
 
 (defun evil-mc-message (format-string &rest args)
   "Display a message given a FORMAT-STRING and ARGS."

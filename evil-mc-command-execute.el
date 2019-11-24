@@ -616,9 +616,7 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
           (condition-case error
               (funcall handler)
             (error
-             (evil-mc-message "Failed to execute %s with error: %s"
-                              (evil-mc-get-command-name)
-                              (error-message-string error))
+             (evil-mc-log-execute-failure (evil-mc-get-command-name) error)
              (goto-char prev-point)))))
 
       (evil-repeat-post-hook)
@@ -669,9 +667,7 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
                                                                     clear-variables)
                                                next-cursor-list))))
                    (evil-mc-update-cursor-list next-cursor-list))
-               (error (evil-mc-message "Failed to execute all %s with error: %s"
-                                       (evil-mc-get-command-name)
-                                       (error-message-string error))))))))
+               (error (evil-mc-log-execute-failure (evil-mc-get-command-name) error)))))))
       (evil-mc-clear-command))))
 
 (defun evil-mc-execute-for-all-cursors (cmd)

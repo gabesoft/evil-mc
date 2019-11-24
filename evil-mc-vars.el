@@ -128,6 +128,9 @@
 (evil-define-local-var evil-mc-recording-debug nil
   "If true display debug messages during the recording of a command.")
 
+(evil-define-local-var evil-mc-silence-errors t
+  "If true don't display messages when failing to execute a command.")
+
 (evil-define-local-var evil-mc-paused-modes nil
   "List of temporarily disabled minor modes.")
 
@@ -160,6 +163,20 @@
 (defun evil-mc-has-pattern-p ()
   "True if there is a saved pattern."
   (not (null evil-mc-pattern)))
+
+(defun evil-mc-silence-errors-p ()
+  "True if logging of command execution errors is disabled."
+  (eq evil-mc-silence-errors t))
+
+(defun evil-mc-silence-errors-on ()
+  "Silence command failure errors."
+  (interactive)
+  (setq evil-mc-silence-errors t))
+
+(defun evil-mc-silence-errors-off ()
+  "Display command failure errors."
+  (interactive)
+  (setq evil-mc-silence-errors nil))
 
 (defun evil-mc-executing-command-p ()
   "True when executing a command for all fake cursors."
