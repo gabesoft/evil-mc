@@ -493,24 +493,30 @@ cursor that is already there."
 Acts like the I key in evil-visual-state."
   :repeat ignore
   :evil-mc t
-  (if (eq (evil-visual-type) 'block)
-      (evil-mc-make-cursor-in-visual-selection-block
-       (min (evil-column evil-visual-beginning)
-            (evil-column evil-visual-end)))
-    (evil-mc-make-cursor-in-visual-selection t))
-  (evil-insert-state))
+  (if (evil-visual-state-p)
+      (progn
+        (if (eq (evil-visual-type) 'block)
+            (evil-mc-make-cursor-in-visual-selection-block
+             (min (evil-column evil-visual-beginning)
+                  (evil-column evil-visual-end)))
+          (evil-mc-make-cursor-in-visual-selection t))
+        (evil-insert-state))
+    (message "%s: Only works with a selection" this-command)))
 
 (evil-define-command evil-mc-make-cursor-in-visual-selection-end ()
   "Create cursor at end of every visually selected line.
 Acts like the A key in evil-visual-state."
   :repeat ignore
   :evil-mc t
-  (if (eq (evil-visual-type) 'block)
-      (evil-mc-make-cursor-in-visual-selection-block
-       (max (evil-column evil-visual-beginning)
-            (evil-column evil-visual-end)))
-    (evil-mc-make-cursor-in-visual-selection nil))
-  (evil-insert-state))
+  (if (evil-visual-state-p)
+      (progn
+        (if (eq (evil-visual-type) 'block)
+            (evil-mc-make-cursor-in-visual-selection-block
+             (max (evil-column evil-visual-beginning)
+                  (evil-column evil-visual-end)))
+          (evil-mc-make-cursor-in-visual-selection nil))
+        (evil-insert-state))
+    (message "%s: Only works with a selection" this-command)))
 
 (evil-define-command evil-mc-make-cursor-move-next-line (count)
   "Create a cursor at point and move to next line."
