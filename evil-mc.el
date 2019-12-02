@@ -76,32 +76,35 @@
   :type '(string)
   :risky t)
 
+(defvar evil-mc-cursors-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "m") 'evil-mc-make-all-cursors)
+    (define-key map (kbd "u") 'evil-mc-undo-last-added-cursor)
+    (define-key map (kbd "q") 'evil-mc-undo-all-cursors)
+    (define-key map (kbd "s") 'evil-mc-pause-cursors)
+    (define-key map (kbd "r") 'evil-mc-resume-cursors)
+    (define-key map (kbd "f") 'evil-mc-make-and-goto-first-cursor)
+    (define-key map (kbd "l") 'evil-mc-make-and-goto-last-cursor)
+    (define-key map (kbd "h") 'evil-mc-make-cursor-here)
+    (define-key map (kbd "j") 'evil-mc-make-cursor-move-next-line)
+    (define-key map (kbd "k") 'evil-mc-make-cursor-move-prev-line)
+    (define-key map (kbd "N") 'evil-mc-skip-and-goto-next-cursor)
+    (define-key map (kbd "P") 'evil-mc-skip-and-goto-prev-cursor)
+    (define-key map (kbd "n") 'evil-mc-skip-and-goto-next-match)
+    (define-key map (kbd "p") 'evil-mc-skip-and-goto-prev-match)
+    (define-key map (kbd "I") 'evil-mc-make-cursor-in-visual-selection-beg)
+    (define-key map (kbd "A") 'evil-mc-make-cursor-in-visual-selection-end)
+    map))
+
 (defvar evil-mc-key-map
-  (let ((map (make-sparse-keymap))
-        (keys '(("grm" . evil-mc-make-all-cursors)
-                ("gru" . evil-mc-undo-last-added-cursor)
-                ("grq" . evil-mc-undo-all-cursors)
-                ("grs" . evil-mc-pause-cursors)
-                ("grr" . evil-mc-resume-cursors)
-                ("grf" . evil-mc-make-and-goto-first-cursor)
-                ("grl" . evil-mc-make-and-goto-last-cursor)
-                ("grh" . evil-mc-make-cursor-here)
-                ("grj" . evil-mc-make-cursor-move-next-line)
-                ("grk" . evil-mc-make-cursor-move-prev-line)
-                ("M-n" . evil-mc-make-and-goto-next-cursor)
-                ("grN" . evil-mc-skip-and-goto-next-cursor)
-                ("M-p" . evil-mc-make-and-goto-prev-cursor)
-                ("grP" . evil-mc-skip-and-goto-prev-cursor)
-                ("C-n" . evil-mc-make-and-goto-next-match)
-                ("grn" . evil-mc-skip-and-goto-next-match)
-                ("C-t" . evil-mc-skip-and-goto-next-match)
-                ("C-p" . evil-mc-make-and-goto-prev-match)
-                ("grp" . evil-mc-skip-and-goto-prev-match)
-                ("grI" . evil-mc-make-cursor-in-visual-selection-beg)
-                ("grA" . evil-mc-make-cursor-in-visual-selection-end))))
-    (dolist (key-data keys)
-      (evil-define-key 'normal map (kbd (car key-data)) (cdr key-data))
-      (evil-define-key 'visual map (kbd (car key-data)) (cdr key-data)))
+  (let ((map (make-sparse-keymap)))
+    (evil-define-key* '(normal visual) map
+                      (kbd "gr") evil-mc-cursors-map
+                      (kbd "M-n") 'evil-mc-make-and-goto-next-cursor
+                      (kbd "M-p") 'evil-mc-make-and-goto-prev-cursor
+                      (kbd "C-n") 'evil-mc-make-and-goto-next-match
+                      (kbd "C-t") 'evil-mc-skip-and-goto-next-match
+                      (kbd "C-p") 'evil-mc-make-and-goto-prev-match)
     map))
 
 ;;;###autoload
