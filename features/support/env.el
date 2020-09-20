@@ -11,7 +11,7 @@
 
 (add-to-list 'load-path evil-multiple-cursors-root-path)
 
-(require 'cl)
+(require 'cl-lib)
 (require 'evil)
 (require 'evil-surround)
 (require 'evil-numbers)
