@@ -14,6 +14,8 @@
     (company-select-next . ((:default . evil-mc-execute-default-ignore)))
     (copy-to-the-end-of-line . ((:default . evil-mc-execute-default-call)))
     (delete-backward-char . ((:default . evil-mc-execute-default-call-with-count)))
+    (delete-char . ((:default . evil-mc-execute-default-call-with-count)))
+    (backward-delete-char . ((:default . evil-mc-execute-call-with-count)))
     (electric-newline-and-maybe-indent . ((:default . evil-mc-execute-default-call)))
     (evil-a-WORD . ((:default . evil-mc-execute-default-call-with-count) (visual . evil-mc-execute-visual-text-object)))
     (evil-a-back-quote . ((:default . evil-mc-execute-default-call-with-count) (visual . evil-mc-execute-visual-text-object)))
@@ -216,6 +218,7 @@
     (orgtbl-hijacker-command-100 . ((:default . evil-mc-execute-default-call-with-count)))
     (orgtbl-hijacker-command-109 . ((:default . evil-mc-execute-default-call-with-count)))
     (org-delete-backward-char . ((:default . evil-mc-execute-default-call-with-count)))
+    (org-delete-char . ((:default . evil-mc-execute-default-call-with-count)))
     (evil-org-delete-char . ((:default . evil-mc-execute-default-evil-delete)))
     (evil-org-delete-backward-char . ((:default . evil-mc-execute-default-evil-delete)))
 
