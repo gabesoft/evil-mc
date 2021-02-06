@@ -8,6 +8,9 @@
 
 ;;; Code:
 
+;; This module is loaded after `evil-mc-vars'
+(defvar evil-mc-cursor-variables)
+
 (defun evil-mc-get-cursor-variables (&optional categories)
   "Gets the cursor variable names associated with CATEGORIES.
 If CATEGORIES is nil return all cursor variables."
@@ -94,11 +97,11 @@ If CATEGORIES is nil return all cursor variables."
    cursor 'kill-ring-yank-pointer kill-ring-yank-pointer))
 
 (defun evil-mc-get-cursor-temporary-goal-column (cursor)
-  "Get the temporary-goal-column for CURSOR."
+  "Get the `temporary-goal-column' for CURSOR."
   (evil-mc-get-cursor-property cursor 'temporary-goal-column))
 
 (defun evil-mc-put-cursor-temporary-goal-column (cursor temporary-goal-column)
-  "Set the temporary-goal-column for CURSOR to TEMPORARY-GOAL-COLUMN."
+  "Set the `temporary-goal-column' for CURSOR to TEMPORARY-GOAL-COLUMN."
   (evil-mc-put-cursor-property cursor 'temporary-goal-column temporary-goal-column))
 
 (defun evil-mc-get-cursor-evil-markers-alist (cursor)
