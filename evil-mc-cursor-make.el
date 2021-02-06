@@ -7,6 +7,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'evil-types)
 (require 'evil-mc-common)
 (require 'evil-mc-vars)
 (require 'evil-mc-cursor-state)
