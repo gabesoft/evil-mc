@@ -147,6 +147,8 @@
     (move-text-down . ((:default . evil-mc-execute-default-call-with-count)))
     (move-text-up . ((:default . evil-mc-execute-default-call-with-count)))
     (capitalize-word . ((:default . evil-mc-execute-default-call-with-count)))
+    (downcase-word . ((:default . evil-mc-execute-default-call-with-count)))
+    (upcase-word . ((:default . evil-mc-execute-default-call-with-count)))
     (newline . ((:default . evil-mc-execute-default-call)))
     (newline-and-indent . ((:default . evil-mc-execute-default-call)))
     (paste-after-current-line . ((:default . evil-mc-execute-default-call-with-count)))
