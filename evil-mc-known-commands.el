@@ -221,6 +221,12 @@
     (orgtbl-hijacker-command-109 . ((:default . evil-mc-execute-default-call-with-count)))
     (org-delete-backward-char . ((:default . evil-mc-execute-default-call-with-count)))
     (org-delete-char . ((:default . evil-mc-execute-default-call-with-count)))
+
+    ;; evil-org
+    (evil-org-insert-line . ((:default . evil-mc-execute-default-call-with-count)))
+    (evil-org-append-line . ((:default . evil-mc-execute-default-call-with-count)))
+    (evil-org-open-below . ((:default . evil-mc-execute-default-call-with-count)))
+    (evil-org-open-above . ((:default . evil-mc-execute-default-call-with-count)))
     (evil-org-delete-char . ((:default . evil-mc-execute-default-evil-delete)))
     (evil-org-delete-backward-char . ((:default . evil-mc-execute-default-evil-delete)))
 
