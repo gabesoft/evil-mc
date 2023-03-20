@@ -99,7 +99,8 @@
   "Save KEYS at PRE-NAME or POST-NAME according to FLAG."
   (cl-ecase flag
     (pre (evil-mc-add-command-property pre-name keys))
-    (post (evil-mc-add-command-property post-name keys))))
+    (post (evil-mc-add-command-property post-name keys))
+    (pre-read-key-sequence (evil-mc-add-command-property post-name keys))))
 
 (defun evil-mc-update-command-count (keys-vector)
   "Update the current command count with the last digit of KEYS-VECTOR."
