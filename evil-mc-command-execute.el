@@ -1,4 +1,4 @@
-;;; evil-mc-command-execute.el --- Execute commands for every fake cursor
+;;; evil-mc-command-execute.el --- Execute commands for every fake cursor -*- lexical-binding: nil -*-
 
 ;;; Commentary:
 

@@ -1,4 +1,4 @@
-;;; evil-mc.el --- Multiple cursors for evil-mode
+;;; evil-mc.el --- Multiple cursors for evil-mode -*- lexical-binding: nil -*-
 
 ;; Copyright © 2015-2016 Gabriel Adomnicai <gabesoft@gmail.com>
 

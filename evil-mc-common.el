@@ -1,4 +1,4 @@
-;;; evil-mc-common.el --- Common functions
+;;; evil-mc-common.el --- Common functions -*- lexical-binding: nil -*-
 
 ;;; Commentary:
 

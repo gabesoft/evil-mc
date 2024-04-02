@@ -1,4 +1,4 @@
-;;; evil-mc-known-commands.el --- A list of supported commands and their handlers
+;;; evil-mc-known-commands.el --- A list of supported commands and their handlers -*- lexical-binding: nil -*-
 
 ;;; Commentary:
 

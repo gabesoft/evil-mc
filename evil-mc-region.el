@@ -1,4 +1,4 @@
-;;; evil-mc-region.el --- Visual region
+;;; evil-mc-region.el --- Visual region -*- lexical-binding: nil -*-
 
 ;;; Commentary:
 

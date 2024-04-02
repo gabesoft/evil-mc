@@ -1,4 +1,4 @@
-;;; evil-mc-setup.el --- Sample setup for evil-mc
+;;; evil-mc-setup.el --- Sample setup for evil-mc -*- lexical-binding: nil -*-
 
 ;;; Commentary: Example of setting up evil-mc
 

@@ -1,4 +1,4 @@
-;;; evil-mc-cursor-make.el --- Fake cursor creation and deletion
+;;; evil-mc-cursor-make.el --- Fake cursor creation and deletion -*- lexical-binding: nil -*-
 
 ;;; Commentary:
 

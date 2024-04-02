@@ -1,4 +1,4 @@
-;;; evil-mc-cursor-state.el --- State saved for each fake cursor
+;;; evil-mc-cursor-state.el --- State saved for each fake cursor -*- lexical-binding: nil -*-
 
 ;;; Commentary:
 
