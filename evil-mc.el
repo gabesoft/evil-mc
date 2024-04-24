@@ -1,4 +1,4 @@
-;;; evil-mc.el --- Multiple cursors for evil-mode
+;;; evil-mc.el --- Multiple cursors for evil-mode -*- lexical-binding: nil; -*-
 
 ;; Copyright © 2015-2016 Gabriel Adomnicai <gabesoft@gmail.com>
 
@@ -45,7 +45,7 @@
 (defun evil-mc-active-mode-line (prefix)
   "Get the mode-line text to be displayed when there are active cursors"
   (let ((mode-line-text
-         (concat mode-line-text-prefix
+         (concat prefix
                  (when (and (evil-mc-frozen-p)
                             evil-mc-mode-line-text-paused)
                    "(paused)")

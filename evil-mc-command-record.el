@@ -1,4 +1,4 @@
-;;; evil-mc-command-record.el --- Record info for the currently running command
+;;; evil-mc-command-record.el --- Record info for the currently running command -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 

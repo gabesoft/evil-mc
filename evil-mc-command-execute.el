@@ -1,4 +1,4 @@
-;;; evil-mc-command-execute.el --- Execute commands for every fake cursor
+;;; evil-mc-command-execute.el --- Execute commands for every fake cursor -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 
@@ -563,13 +563,13 @@ by the value of `evil-this-register'."
 ;; ----
 
 (defun evil-mc-get-command-handler (cmd state)
-  "Get the handler function for CMD and evil STATE."
+  "Get the `evil-mc--handler' function for CMD and evil STATE."
   (when (symbolp cmd) (setq cmd (intern (symbol-name cmd))))
   (let* ((handler-data
           (or (evil-mc-get-object-property evil-mc-custom-known-commands cmd)
               (evil-mc-get-object-property evil-mc-known-commands cmd)))
-         (handler (evil-mc-get-object-property handler-data state)))
-    (or handler
+         (evil-mc--handler (evil-mc-get-object-property handler-data state)))
+    (or evil-mc--handler
         (evil-mc-get-object-property handler-data :default)
         (cond ((eq (evil-get-command-property cmd :repeat) 'motion)
                (if (eq state 'visual)
@@ -579,31 +579,31 @@ by the value of `evil-this-register'."
                (when (not (eq state 'visual))
                  'evil-mc-execute-default-macro))))))
 
-(defun evil-mc-get-state-variables (handler)
+(defun evil-mc-get-state-variables (evil-mc--handler)
   "Get all cursor variables required to hold state for HANDLER."
-  (let ((categories (evil-get-command-property handler :cursor-state)))
+  (let ((categories (evil-get-command-property evil-mc--handler :cursor-state)))
     (when (atom categories) (setq categories (list categories)))
     (when (not (memq :default categories)) (push :default categories))
     (evil-mc-get-cursor-variables categories)))
 
-(defun evil-mc-get-clear-variables (handler)
+(defun evil-mc-get-clear-variables (evil-mc--handler)
   "Get all cursor variables that should be cleared after HANDLER."
-  (let ((names (evil-get-command-property handler :cursor-clear)))
+  (let ((names (evil-get-command-property evil-mc--handler :cursor-clear)))
     (if (atom names) (list names) names)))
 
 (defun evil-mc-get-var-name-value (var)
   "Gets the current name and value pair of VAR or nil if it needs to be cleared."
-  (list var (unless (memq var clear-variables) (symbol-value var))))
+  (list var (unless (memq var evil-mc--clear-variables) (symbol-value var))))
 
-(defun evil-mc-execute-for (cursor state-variables clear-variables)
-  "Execute the current command for CURSOR in the context of STATE-VARIABLES and
-ensure to set CLEAR-VARIABLES to nil after the execution is complete."
+(defun evil-mc-execute-for (cursor evil-mc--state-variables evil-mc--clear-variables)
+  "Execute the current command for CURSOR in the context of EVIL-MC--STATE-VARIABLES and
+ensure to set EVIL-MC--CLEAR-VARIABLES to nil after the execution is complete."
   (when (evil-mc-executing-debug-p)
-    (evil-mc-message "Execute %s with %s" (evil-mc-get-command-name) handler))
+    (evil-mc-message "Execute %s with %s" (evil-mc-get-command-name) evil-mc--handler))
   (ignore-errors
     (cl-progv
-        state-variables
-        (evil-mc-get-cursor-properties cursor state-variables)
+        evil-mc--state-variables
+        (evil-mc-get-cursor-properties cursor evil-mc--state-variables)
 
       (goto-char (evil-mc-get-cursor-start cursor))
 
@@ -614,7 +614,7 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
       (ignore-errors
         (let ((prev-point (point)))
           (condition-case error
-              (funcall handler)
+              (funcall evil-mc--handler)
             (error
              (evil-mc-log-execute-failure (evil-mc-get-command-name) error)
              (goto-char prev-point)))))
@@ -634,8 +634,12 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
       (let ((new-cursor (evil-mc-put-cursor-overlay
                          cursor
                          (evil-mc-cursor-overlay-at-pos)))
-            (new-values (cl-mapcan 'evil-mc-get-var-name-value state-variables)))
+            (new-values (cl-mapcan 'evil-mc-get-var-name-value evil-mc--state-variables)))
         (apply 'evil-mc-put-cursor-property new-cursor new-values)))))
+
+(defvar evil-mc--handler nil)
+(defvar evil-mc--state-variables nil)
+(defvar evil-mc--clear-variables nil)
 
 (defun evil-mc-execute-for-all ()
   "Execute the current command, stored at `evil-mc-command', for all fake cursors."
@@ -645,15 +649,15 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
     (when (evil-mc-executing-debug-p)
       (evil-mc-message "Execute %s for all cursors" (evil-mc-get-command-name)))
     (let* ((evil-mc-executing-command t)
-           (handler (evil-mc-get-command-handler
+           (evil-mc--handler (evil-mc-get-command-handler
                      (evil-mc-get-command-name)
                      (evil-mc-get-command-state)))
-           (state-variables (evil-mc-get-state-variables handler))
-           (clear-variables (evil-mc-get-clear-variables handler)))
-      (unless handler
-        (evil-mc-message "No handler found for command %s" (evil-mc-get-command-name)))
+           (evil-mc--state-variables (evil-mc-get-state-variables evil-mc--handler))
+           (evil-mc--clear-variables (evil-mc-get-clear-variables evil-mc--handler)))
+      (unless evil-mc--handler
+        (evil-mc-message "No evil-mc--handler found for command %s" (evil-mc-get-command-name)))
       (ignore-errors
-        (when handler
+        (when evil-mc--handler
           (evil-repeat-post-hook)
           (save-excursion
             (evil-mc-save-window-scroll
@@ -663,8 +667,8 @@ ensure to set CLEAR-VARIABLES to nil after the execution is complete."
                      (dolist (cursor evil-mc-cursor-list)
                        (setq next-cursor-list (evil-mc-insert-cursor-into-list
                                                (evil-mc-execute-for cursor
-                                                                    state-variables
-                                                                    clear-variables)
+                                                                    evil-mc--state-variables
+                                                                    evil-mc--clear-variables)
                                                next-cursor-list))))
                    (evil-mc-update-cursor-list next-cursor-list))
                (error (evil-mc-log-execute-failure (evil-mc-get-command-name) error)))))))

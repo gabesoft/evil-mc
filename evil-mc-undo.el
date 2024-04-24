@@ -1,4 +1,4 @@
-;;; evil-mc-undo.el --- Undo related functions
+;;; evil-mc-undo.el --- Undo related functions -*- lexical-binding: nil; -*-
 
 ;;; Commentary:
 

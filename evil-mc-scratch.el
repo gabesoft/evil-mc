@@ -1,4 +1,4 @@
-;;; evil-mc-scratch.el --- Functions used during development
+;;; evil-mc-scratch.el --- Functions used during development -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 
