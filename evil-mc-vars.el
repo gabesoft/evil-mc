@@ -1,4 +1,4 @@
-;;; evil-mc-vars.el --- Variables for evil-mc
+;;; evil-mc-vars.el --- Variables for evil-mc -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 

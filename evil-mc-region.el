@@ -1,4 +1,4 @@
-;;; evil-mc-region.el --- Visual region
+;;; evil-mc-region.el --- Visual region -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 
@@ -104,8 +104,6 @@ set to the specified values."
   "Make an overlay for a visual region of type line from MARK to POINT."
   (let* ((start-pos (if (< mark point) mark point))
          (end-pos (if (< mark point) point mark))
-         (start-line (line-number-at-pos start-pos))
-         (end-line (line-number-at-pos end-pos))
          (start (evil-mc-get-pos-at-bol start-pos))
          (end (1+ (evil-mc-get-pos-at-eol end-pos)))
          (overlay (evil-mc-region-overlay start end)))
