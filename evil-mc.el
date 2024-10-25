@@ -99,7 +99,7 @@
 (defvar evil-mc-key-map
   (let ((map (make-sparse-keymap)))
     (evil-define-key* '(normal visual) map
-                      (kbd "gr") evil-mc-cursors-map
+                      (kbd evil-mc-cursors-keymap-prefix) evil-mc-cursors-map
                       (kbd "M-n") 'evil-mc-make-and-goto-next-cursor
                       (kbd "M-p") 'evil-mc-make-and-goto-prev-cursor
                       (kbd "C-n") 'evil-mc-make-and-goto-next-match

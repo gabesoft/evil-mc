@@ -52,6 +52,12 @@
   :type 'integer
   :group 'evil-mc)
 
+(defcustom evil-mc-cursors-keymap-prefix "gr"
+  "The keybinding that is going to be used in normal and visual mode for
+  moving and manipulating cursors."
+  :type 'string
+  :group 'evil-mc)
+
 (defvar evil-mc-cursor-variables
   '((:default . (evil-exchange--overlays
                  evil-exchange--position
